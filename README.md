@@ -1,36 +1,129 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CoffeeConnect ☕
 
-## Getting Started
+A social media web app for coffee enthusiasts to discover, review, and share local coffee shops with friends.
 
-First, run the development server:
+## Quick Start
 
+### Start the Development Server
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+```
+Then open [http://localhost:3000](http://localhost:3000) in your browser.
+
+### Using Aliases (If Set Up)
+```bash
+# Navigate to project
+coffee
+
+# Start server
+coffeestart
+
+# Check git status
+coffeestatus
+
+# Run linter
+coffeelint
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Project Structure
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+coffee-shop-app/
+├── app/
+│   ├── page.tsx          # Home/landing page
+│   ├── shops/
+│   │   ├── page.tsx      # Browse all coffee shops
+│   │   └── [id]/page.tsx # Individual shop details
+│   ├── about/page.tsx    # About page
+│   └── types.ts          # TypeScript interfaces
+├── CLAUDE.md             # Guide for Claude Code AI
+└── package.json
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Available Scripts
 
-## Learn More
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start development server at port 3000 |
+| `npm run build` | Build for production |
+| `npm start` | Run production server |
+| `npm run lint` | Run ESLint to check code quality |
 
-To learn more about Next.js, take a look at the following resources:
+## Tech Stack
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Next.js 16** - React framework with App Router
+- **TypeScript** - Type-safe JavaScript
+- **Tailwind CSS 4** - Utility-first styling
+- **React 19** - UI library
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Features
 
-## Deploy on Vercel
+- ✅ Browse coffee shops with filters (WiFi, Outlets, Quiet)
+- ✅ View individual shop details with reviews
+- ✅ Responsive design for mobile and desktop
+- ✅ Type-safe with TypeScript
+- 🚧 User authentication (planned)
+- 🚧 Map integration (planned)
+- 🚧 Social features (planned)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Saving Your Work
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### When Done Coding for the Day:
+1. **Stop the dev server** - Press `Ctrl+C` in the terminal running the server
+2. **Commit your changes** (if you made any):
+   ```bash
+   git add .
+   git commit -m "Describe what you changed"
+   ```
+3. **Close the terminal** - Your work is safely saved in Git
+
+### Coming Back to Work:
+1. **Open a new terminal**
+2. **Navigate to project**:
+   - Type `coffee` (if using aliases)
+   - Or `cd ~/coffee-shop-app`
+3. **Start the server**:
+   - Type `coffeestart` (if using aliases)
+   - Or `npm run dev`
+4. **Open browser** to http://localhost:3000
+
+## Git Workflow
+
+```bash
+# Check what changed
+git status
+
+# See what you changed in files
+git diff
+
+# Save your changes
+git add .
+git commit -m "Your message here"
+
+# See commit history
+git log
+```
+
+## Known Issues
+
+### npm Cache Permissions
+If you have trouble installing packages:
+```bash
+npm install --cache /tmp/npm-cache
+```
+
+## Resources
+
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
+- [TypeScript Documentation](https://www.typescriptlang.org/docs)
+
+## Future Enhancements
+
+- [ ] User authentication (NextAuth.js)
+- [ ] Real database (Prisma + PostgreSQL)
+- [ ] Google Maps integration for shop locations
+- [ ] Photo uploads for shops and reviews
+- [ ] Friend system and social features
+- [ ] Real-time notifications
+- [ ] Mobile app version
