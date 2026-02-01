@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { isFavorite, toggleFavorite } from "../lib/storage";
 
 interface GoogleShop {
   place_id: string;
@@ -15,12 +16,17 @@ interface GoogleShop {
   open_now: boolean | null;
 }
 
+type FilterType = 'all' | 'favorites' | 'open' | 'high-rated';
+
 export default function ShopsPage() {
   const [shops, setShops] = useState<GoogleShop[]>([]);
+  const [filteredShops, setFilteredShops] = useState<GoogleShop[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [location, setLocation] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [activeFilter, setActiveFilter] = useState<FilterType>('all');
+  const [favorites, setFavorites] = useState<Set<string>>(new Set());
 
   // Get user's location on page load
   useEffect(() => {
@@ -54,6 +60,17 @@ export default function ShopsPage() {
     }
   }, []);
 
+  // Load favorites from localStorage
+  useEffect(() => {
+    const favs = new Set<string>();
+    shops.forEach(shop => {
+      if (isFavorite(shop.place_id)) {
+        favs.add(shop.place_id);
+      }
+    });
+    setFavorites(favs);
+  }, [shops]);
+
   const fetchShops = async (loc: string, query: string = "coffee shop") => {
     setLoading(true);
     setError(null);
@@ -65,8 +82,10 @@ export default function ShopsPage() {
       if (data.error) {
         setError(data.error);
         setShops([]);
+        setFilteredShops([]);
       } else {
         setShops(data.shops || []);
+        setFilteredShops(data.shops || []);
       }
     } catch (err) {
       setError("Failed to load coffee shops. Please try again.");
@@ -79,9 +98,50 @@ export default function ShopsPage() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      // Search for city + coffee shops
       fetchShops("", `${searchQuery} coffee shops`);
     }
+  };
+
+  const handleFavoriteToggle = (e: React.MouseEvent, placeId: string, placeName: string, address: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const newState = toggleFavorite(placeId, placeName, address);
+    const newFavorites = new Set(favorites);
+
+    if (newState) {
+      newFavorites.add(placeId);
+    } else {
+      newFavorites.delete(placeId);
+    }
+
+    setFavorites(newFavorites);
+    applyFilter(activeFilter, shops, newFavorites);
+  };
+
+  const applyFilter = (filter: FilterType, shopList: GoogleShop[], favs: Set<string>) => {
+    let filtered = shopList;
+
+    switch (filter) {
+      case 'favorites':
+        filtered = shopList.filter(shop => favs.has(shop.place_id));
+        break;
+      case 'open':
+        filtered = shopList.filter(shop => shop.open_now === true);
+        break;
+      case 'high-rated':
+        filtered = shopList.filter(shop => shop.rating >= 4.5);
+        break;
+      default:
+        filtered = shopList;
+    }
+
+    setFilteredShops(filtered);
+  };
+
+  const handleFilterClick = (filter: FilterType) => {
+    setActiveFilter(filter);
+    applyFilter(filter, shops, favorites);
   };
 
   return (
@@ -95,8 +155,8 @@ export default function ShopsPage() {
           <Link href="/shops" className="text-amber-700 font-semibold">
             Find Shops
           </Link>
-          <Link href="/about" className="text-gray-700 hover:text-amber-700 transition">
-            About
+          <Link href="/profile" className="text-gray-700 hover:text-amber-700 transition">
+            Profile
           </Link>
         </div>
       </nav>
@@ -131,6 +191,50 @@ export default function ShopsPage() {
           </div>
         </form>
 
+        {/* Filters */}
+        <div className="flex flex-wrap gap-3 mb-8">
+          <button
+            onClick={() => handleFilterClick('all')}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition ${
+              activeFilter === 'all'
+                ? 'bg-amber-700 text-white'
+                : 'bg-white text-gray-700 hover:bg-amber-50 border border-amber-200'
+            }`}
+          >
+            All Shops ({shops.length})
+          </button>
+          <button
+            onClick={() => handleFilterClick('favorites')}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition ${
+              activeFilter === 'favorites'
+                ? 'bg-amber-700 text-white'
+                : 'bg-white text-gray-700 hover:bg-amber-50 border border-amber-200'
+            }`}
+          >
+            ❤️ Favorites ({favorites.size})
+          </button>
+          <button
+            onClick={() => handleFilterClick('open')}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition ${
+              activeFilter === 'open'
+                ? 'bg-amber-700 text-white'
+                : 'bg-white text-gray-700 hover:bg-amber-50 border border-amber-200'
+            }`}
+          >
+            🟢 Open Now
+          </button>
+          <button
+            onClick={() => handleFilterClick('high-rated')}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition ${
+              activeFilter === 'high-rated'
+                ? 'bg-amber-700 text-white'
+                : 'bg-white text-gray-700 hover:bg-amber-50 border border-amber-200'
+            }`}
+          >
+            ⭐ 4.5+ Stars
+          </button>
+        </div>
+
         {/* Error Message */}
         {error && (
           <div className="mb-6 p-4 bg-amber-100 border border-amber-300 rounded-xl text-amber-800">
@@ -147,33 +251,45 @@ export default function ShopsPage() {
         )}
 
         {/* No Results */}
-        {!loading && shops.length === 0 && !error && (
+        {!loading && filteredShops.length === 0 && !error && (
           <div className="text-center py-12">
-            <p className="text-gray-600">No coffee shops found. Try searching for a different city.</p>
+            <p className="text-gray-600">
+              {activeFilter === 'favorites' && favorites.size === 0
+                ? "No favorites yet. Heart some shops to see them here!"
+                : "No coffee shops found matching this filter."}
+            </p>
           </div>
         )}
 
         {/* Shop Grid */}
-        {!loading && shops.length > 0 && (
+        {!loading && filteredShops.length > 0 && (
           <>
             <div className="mb-4 text-sm text-gray-600">
-              Found {shops.length} coffee shops
+              Showing {filteredShops.length} {activeFilter !== 'all' ? `(${activeFilter}) ` : ''}coffee shops
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {shops.map((shop) => (
+              {filteredShops.map((shop) => (
                 <Link
                   key={shop.place_id}
                   href={`/shops/${shop.place_id}`}
-                  className="bg-white rounded-2xl shadow-md hover:shadow-xl transition p-6 group"
+                  className="bg-white rounded-2xl shadow-md hover:shadow-xl transition p-6 group relative"
                 >
+                  {/* Favorite Button */}
+                  <button
+                    onClick={(e) => handleFavoriteToggle(e, shop.place_id, shop.name, shop.address)}
+                    className="absolute top-4 right-4 text-2xl hover:scale-110 transition z-10"
+                  >
+                    {favorites.has(shop.place_id) ? "❤️" : "🤍"}
+                  </button>
+
                   {/* Shop Icon */}
                   <div className="text-6xl mb-4 group-hover:scale-110 transition">
                     ☕
                   </div>
 
                   {/* Shop Name */}
-                  <h2 className="text-xl font-bold text-gray-900 mb-2">
+                  <h2 className="text-xl font-bold text-gray-900 mb-2 pr-8">
                     {shop.name}
                   </h2>
 
