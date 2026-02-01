@@ -1,107 +1,89 @@
-import Link from "next/link";
-import { CoffeeShop } from "../types";
+'use client';
 
-// Sample coffee shop data
-const coffeeShops: CoffeeShop[] = [
-  {
-    id: "1",
-    name: "The Roasted Bean",
-    description: "Artisanal coffee with a cozy atmosphere and friendly baristas",
-    address: "123 Main Street",
-    city: "Downtown",
-    rating: 4.7,
-    reviewCount: 234,
-    priceRange: "$$",
-    tags: ["Artisan", "Cozy", "Pet-Friendly"],
-    image: "☕",
-    hours: "7am - 8pm",
-    wifi: true,
-    outlets: true,
-    quiet: false,
-  },
-  {
-    id: "2",
-    name: "Brew & Canvas",
-    description: "Coffee meets creativity - local art on every wall",
-    address: "456 Arts District",
-    city: "Midtown",
-    rating: 4.5,
-    reviewCount: 189,
-    priceRange: "$$",
-    tags: ["Art", "Creative", "Events"],
-    image: "🎨",
-    hours: "8am - 9pm",
-    wifi: true,
-    outlets: true,
-    quiet: false,
-  },
-  {
-    id: "3",
-    name: "Quiet Corner Cafe",
-    description: "Peaceful spot perfect for work and study",
-    address: "789 University Ave",
-    city: "University District",
-    rating: 4.8,
-    reviewCount: 412,
-    priceRange: "$",
-    tags: ["Quiet", "Work-Friendly", "Study"],
-    image: "📚",
-    hours: "6am - 10pm",
-    wifi: true,
-    outlets: true,
-    quiet: true,
-  },
-  {
-    id: "4",
-    name: "Sunrise Espresso",
-    description: "Start your day right with our award-winning espresso",
-    address: "321 Sunrise Blvd",
-    city: "Eastside",
-    rating: 4.6,
-    reviewCount: 156,
-    priceRange: "$$",
-    tags: ["Espresso", "Breakfast", "Quick"],
-    image: "🌅",
-    hours: "6am - 2pm",
-    wifi: false,
-    outlets: false,
-    quiet: false,
-  },
-  {
-    id: "5",
-    name: "The Social Grind",
-    description: "Meet new friends at our community-focused coffee house",
-    address: "555 Community Lane",
-    city: "Suburbs",
-    rating: 4.4,
-    reviewCount: 98,
-    priceRange: "$",
-    tags: ["Social", "Community", "Games"],
-    image: "🤝",
-    hours: "7am - 11pm",
-    wifi: true,
-    outlets: false,
-    quiet: false,
-  },
-  {
-    id: "6",
-    name: "Organic Earth Brew",
-    description: "100% organic, fair-trade coffee in an eco-friendly space",
-    address: "888 Green Way",
-    city: "Westside",
-    rating: 4.9,
-    reviewCount: 267,
-    priceRange: "$$$",
-    tags: ["Organic", "Sustainable", "Vegan"],
-    image: "🌱",
-    hours: "7am - 7pm",
-    wifi: true,
-    outlets: true,
-    quiet: true,
-  },
-];
+import Link from "next/link";
+import { useEffect, useState } from "react";
+
+interface GoogleShop {
+  place_id: string;
+  name: string;
+  address: string;
+  location: { lat: number; lng: number };
+  rating: number;
+  review_count: number;
+  price_level: string;
+  vicinity: string;
+  open_now: boolean | null;
+}
 
 export default function ShopsPage() {
+  const [shops, setShops] = useState<GoogleShop[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [location, setLocation] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Get user's location on page load
+  useEffect(() => {
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          const loc = `${latitude},${longitude}`;
+          setLocation(loc);
+          fetchShops(loc);
+        },
+        (err) => {
+          console.error("Geolocation error:", err);
+          setError("Unable to get your location. Please use the search box below.");
+          setLoading(false);
+
+          // Default to Phoenix, AZ if geolocation fails
+          const defaultLoc = "33.4484,-112.0740";
+          setLocation(defaultLoc);
+          fetchShops(defaultLoc);
+        }
+      );
+    } else {
+      setError("Geolocation not supported by your browser.");
+      setLoading(false);
+
+      // Default to Phoenix, AZ
+      const defaultLoc = "33.4484,-112.0740";
+      setLocation(defaultLoc);
+      fetchShops(defaultLoc);
+    }
+  }, []);
+
+  const fetchShops = async (loc: string, query: string = "coffee shop") => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch(`/api/places?location=${loc}&query=${encodeURIComponent(query)}`);
+      const data = await response.json();
+
+      if (data.error) {
+        setError(data.error);
+        setShops([]);
+      } else {
+        setShops(data.shops || []);
+      }
+    } catch (err) {
+      setError("Failed to load coffee shops. Please try again.");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      // Search for city + coffee shops
+      fetchShops("", `${searchQuery} coffee shops`);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50">
       {/* Navigation */}
@@ -123,90 +105,124 @@ export default function ShopsPage() {
       <main className="max-w-7xl mx-auto px-6 py-12">
         <div className="mb-10">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Explore Coffee Shops
+            Explore Real Coffee Shops ☕
           </h1>
           <p className="text-lg text-gray-600">
-            Discover the best coffee spots in your area
+            Discover actual coffee shops near you (powered by Google)
           </p>
         </div>
 
-        {/* Filters */}
-        <div className="flex flex-wrap gap-3 mb-8">
-          <button className="px-4 py-2 bg-amber-700 text-white rounded-full text-sm font-medium">
-            All Shops
-          </button>
-          <button className="px-4 py-2 bg-white text-gray-700 rounded-full text-sm font-medium hover:bg-amber-50 transition border border-amber-200">
-            ☕ WiFi
-          </button>
-          <button className="px-4 py-2 bg-white text-gray-700 rounded-full text-sm font-medium hover:bg-amber-50 transition border border-amber-200">
-            🔌 Outlets
-          </button>
-          <button className="px-4 py-2 bg-white text-gray-700 rounded-full text-sm font-medium hover:bg-amber-50 transition border border-amber-200">
-            🔇 Quiet
-          </button>
-          <button className="px-4 py-2 bg-white text-gray-700 rounded-full text-sm font-medium hover:bg-amber-50 transition border border-amber-200">
-            ⭐ Top Rated
-          </button>
-        </div>
+        {/* Search Box for Manual Location Search */}
+        <form onSubmit={handleSearch} className="mb-8">
+          <div className="flex gap-3">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search any city (e.g., 'Austin, TX')"
+              className="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500"
+            />
+            <button
+              type="submit"
+              className="px-6 py-3 bg-amber-700 text-white rounded-xl font-semibold hover:bg-amber-800 transition"
+            >
+              Search
+            </button>
+          </div>
+        </form>
+
+        {/* Error Message */}
+        {error && (
+          <div className="mb-6 p-4 bg-amber-100 border border-amber-300 rounded-xl text-amber-800">
+            ⚠️ {error}
+          </div>
+        )}
+
+        {/* Loading State */}
+        {loading && (
+          <div className="text-center py-12">
+            <div className="text-4xl mb-4">☕</div>
+            <p className="text-gray-600">Finding coffee shops near you...</p>
+          </div>
+        )}
+
+        {/* No Results */}
+        {!loading && shops.length === 0 && !error && (
+          <div className="text-center py-12">
+            <p className="text-gray-600">No coffee shops found. Try searching for a different city.</p>
+          </div>
+        )}
 
         {/* Shop Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {coffeeShops.map((shop) => (
-            <Link
-              key={shop.id}
-              href={`/shops/${shop.id}`}
-              className="bg-white rounded-2xl shadow-md hover:shadow-xl transition p-6 group"
-            >
-              {/* Shop Icon */}
-              <div className="text-6xl mb-4 group-hover:scale-110 transition">
-                {shop.image}
-              </div>
+        {!loading && shops.length > 0 && (
+          <>
+            <div className="mb-4 text-sm text-gray-600">
+              Found {shops.length} coffee shops
+            </div>
 
-              {/* Shop Name */}
-              <h2 className="text-xl font-bold text-gray-900 mb-2">
-                {shop.name}
-              </h2>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {shops.map((shop) => (
+                <Link
+                  key={shop.place_id}
+                  href={`/shops/${shop.place_id}`}
+                  className="bg-white rounded-2xl shadow-md hover:shadow-xl transition p-6 group"
+                >
+                  {/* Shop Icon */}
+                  <div className="text-6xl mb-4 group-hover:scale-110 transition">
+                    ☕
+                  </div>
 
-              {/* Rating */}
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-amber-600 font-bold">⭐ {shop.rating}</span>
-                <span className="text-gray-500 text-sm">
-                  ({shop.reviewCount} reviews)
-                </span>
-              </div>
+                  {/* Shop Name */}
+                  <h2 className="text-xl font-bold text-gray-900 mb-2">
+                    {shop.name}
+                  </h2>
 
-              {/* Tags */}
-              <div className="flex flex-wrap gap-2 mb-3">
-                {shop.tags.slice(0, 3).map((tag) => (
-                  <span
-                    key={tag}
-                    className="px-2 py-1 bg-amber-100 text-amber-800 text-xs rounded-full"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
+                  {/* Rating */}
+                  {shop.rating > 0 && (
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="text-amber-600 font-bold">⭐ {shop.rating}</span>
+                      <span className="text-gray-500 text-sm">
+                        ({shop.review_count} reviews)
+                      </span>
+                    </div>
+                  )}
 
-              {/* Amenities */}
-              <div className="flex gap-3 text-sm text-gray-600 mb-3">
-                {shop.wifi && <span>☕ WiFi</span>}
-                {shop.outlets && <span>🔌 Outlets</span>}
-                {shop.quiet && <span>🔇 Quiet</span>}
-              </div>
+                  {/* Open Now */}
+                  {shop.open_now !== null && (
+                    <div className="mb-3">
+                      {shop.open_now ? (
+                        <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                          🟢 Open Now
+                        </span>
+                      ) : (
+                        <span className="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">
+                          🔴 Closed
+                        </span>
+                      )}
+                    </div>
+                  )}
 
-              {/* Price & Location */}
-              <div className="flex items-center justify-between text-sm text-gray-500">
-                <span className="font-medium">{shop.priceRange}</span>
-                <span>{shop.city}</span>
-              </div>
-            </Link>
-          ))}
-        </div>
+                  {/* Address */}
+                  <div className="text-sm text-gray-600 mb-3">
+                    📍 {shop.vicinity || shop.address}
+                  </div>
+
+                  {/* Price Level */}
+                  {shop.price_level !== 'Not available' && (
+                    <div className="text-sm text-gray-700 font-medium">
+                      {shop.price_level}
+                    </div>
+                  )}
+                </Link>
+              ))}
+            </div>
+          </>
+        )}
       </main>
 
       {/* Footer */}
       <footer className="text-center py-8 text-gray-500 text-sm mt-12">
-        <p>Built with Next.js, TypeScript, and Tailwind CSS</p>
+        <p>Built with Next.js, TypeScript, and Google Places API</p>
       </footer>
     </div>
   );
