@@ -2,34 +2,38 @@
 
 A social media web app for coffee enthusiasts to discover, review, and share local coffee shops with friends.
 
-## Quick Start - Ultra Simplified!
+## Quick Start - For Beginners Using Claude Code
 
-### The Only Two Commands You Need:
+### Your Complete Workflow (Just 2 Steps!):
 
 ```bash
-# START: Begin coding session
+# 1. START: Open terminal and type
 coffee
 
-# END: Save and finish
-finished
+# 2. TELL CLAUDE: "I'm done, save my work"
 ```
 
-That's it! The `coffee` command navigates to the project and starts the server.
-The `finished` command stops the server, commits your changes, and exits.
+That's it! Claude handles everything else.
 
 ### What Happens:
-**When you type `coffee`:**
-- Navigates to `~/coffee-shop-app`
-- Starts dev server at http://localhost:3000
-- Opens your browser to see the app
-- Ready to code!
 
-**When you type `finished`:**
-- Checks if you have changes
-- Asks if you want to commit them
-- Saves everything to Git
+**Step 1: Type `coffee`**
+- Opens your project folder
+- Starts the website server (http://localhost:3000)
+- Opens Claude Code automatically
+- You're now ready to code with AI help!
+
+**Step 2: Tell Claude "I'm done, save my work"**
+- Claude saves all your changes
+- Keeps the server running
+- You can continue coding or close terminal
+
+**To Completely Finish:**
+```bash
+finished
+```
 - Stops the server
-- Exits the session
+- Exits everything
 
 ## Project Structure
 
