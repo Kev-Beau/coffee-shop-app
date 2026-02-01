@@ -2,28 +2,34 @@
 
 A social media web app for coffee enthusiasts to discover, review, and share local coffee shops with friends.
 
-## Quick Start
+## Quick Start - Ultra Simplified!
 
-### Start the Development Server
-```bash
-npm run dev
-```
-Then open [http://localhost:3000](http://localhost:3000) in your browser.
+### The Only Two Commands You Need:
 
-### Using Aliases (If Set Up)
 ```bash
-# Navigate to project
+# START: Begin coding session
 coffee
 
-# Start server
-coffeestart
-
-# Check git status
-coffeestatus
-
-# Run linter
-coffeelint
+# END: Save and finish
+finished
 ```
+
+That's it! The `coffee` command navigates to the project and starts the server.
+The `finished` command stops the server, commits your changes, and exits.
+
+### What Happens:
+**When you type `coffee`:**
+- Navigates to `~/coffee-shop-app`
+- Starts dev server at http://localhost:3000
+- Opens your browser to see the app
+- Ready to code!
+
+**When you type `finished`:**
+- Checks if you have changes
+- Asks if you want to commit them
+- Saves everything to Git
+- Stops the server
+- Exits the session
 
 ## Project Structure
 
@@ -66,26 +72,43 @@ coffee-shop-app/
 - 🚧 Map integration (planned)
 - 🚧 Social features (planned)
 
-## Saving Your Work
+## Your Complete Workflow
 
-### When Done Coding for the Day:
-1. **Stop the dev server** - Press `Ctrl+C` in the terminal running the server
-2. **Commit your changes** (if you made any):
-   ```bash
-   git add .
-   git commit -m "Describe what you changed"
-   ```
-3. **Close the terminal** - Your work is safely saved in Git
+### Starting a Coding Session:
+```bash
+coffee
+```
+That's one command! The terminal will show:
+```
+☕ Starting CoffeeConnect...
+📂 Project: ~/coffee-shop-app
+🌐 Server: http://localhost:3000
 
-### Coming Back to Work:
-1. **Open a new terminal**
-2. **Navigate to project**:
-   - Type `coffee` (if using aliases)
-   - Or `cd ~/coffee-shop-app`
-3. **Start the server**:
-   - Type `coffeestart` (if using aliases)
-   - Or `npm run dev`
-4. **Open browser** to http://localhost:3000
+When done coding, type: finished
+
+▲ Next.js 16.1.6
+- Local:        http://localhost:3000
+✓ Ready in 1.2s
+```
+
+### Ending a Coding Session:
+```bash
+finished
+```
+You'll be prompted if you have changes:
+```
+☕ Ending CoffeeConnect session...
+
+📝 You have uncommitted changes!
+
+Would you like to commit these changes? (y/n): y
+Enter commit message: Added new contact page
+✓ Changes committed!
+
+✓ Session saved. Happy caffeination! ☕
+```
+
+**Pro tip:** Type `n` if you don't want to commit - changes will be stashed safely.
 
 ## Git Workflow
 
