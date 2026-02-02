@@ -24,12 +24,18 @@ export default function DrinkLogModal({
   onSuccess,
 }: DrinkLogModalProps) {
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
   const [photoUrl, setPhotoUrl] = useState<string>();
   const [drinkName, setDrinkName] = useState('');
   const [rating, setRating] = useState(0);
   const [locationNotes, setLocationNotes] = useState('');
   const [shopTags, setShopTags] = useState<string[]>([]);
   const [coffeeNotes, setCoffeeNotes] = useState<string[]>([]);
+
+  // Reset success state when modal opens
+  if (isOpen && success) {
+    setSuccess(false);
+  }
 
   if (!isOpen) return null;
 
@@ -76,16 +82,21 @@ export default function DrinkLogModal({
         throw new Error(error.error || 'Failed to log drink');
       }
 
-      // Reset form
-      setPhotoUrl(undefined);
-      setDrinkName('');
-      setRating(0);
-      setLocationNotes('');
-      setShopTags([]);
-      setCoffeeNotes([]);
+      // Show success message
+      setSuccess(true);
 
-      onSuccess?.();
-      onClose();
+      // Reset form after a delay
+      setTimeout(() => {
+        setPhotoUrl(undefined);
+        setDrinkName('');
+        setRating(0);
+        setLocationNotes('');
+        setShopTags([]);
+        setCoffeeNotes([]);
+        setSuccess(false);
+        onSuccess?.();
+        onClose();
+      }, 1500);
     } catch (error: any) {
       console.error('Error logging drink:', error);
       alert(error.message || 'Failed to log drink');
@@ -119,6 +130,19 @@ export default function DrinkLogModal({
               <XMarkIcon className="w-6 h-6" />
             </button>
           </div>
+
+          {/* Success Message */}
+          {success && (
+            <div className="mx-6 mt-4 p-4 bg-green-100 border border-green-300 rounded-xl text-green-800 animate-pulse">
+              <div className="flex items-center">
+                <span className="text-2xl mr-3">✅</span>
+                <div>
+                  <p className="font-semibold">Drink logged successfully!</p>
+                  <p className="text-sm">It will appear on your feed shortly.</p>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
