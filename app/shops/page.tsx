@@ -29,8 +29,6 @@ export default function ShopsPage() {
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
   const [sortBy, setSortBy] = useState<SortType>('rating-desc');
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
-
-  // Price level filters
   const [priceFilters, setPriceFilters] = useState<Set<string>>(new Set());
 
   // Get user's location on page load
@@ -48,7 +46,6 @@ export default function ShopsPage() {
           setError("Unable to get your location. Please use the search box below.");
           setLoading(false);
 
-          // Default to Phoenix, AZ if geolocation fails
           const defaultLoc = "33.4484,-112.0740";
           setLocation(defaultLoc);
           fetchShops(defaultLoc);
@@ -58,7 +55,6 @@ export default function ShopsPage() {
       setError("Geolocation not supported by your browser.");
       setLoading(false);
 
-      // Default to Phoenix, AZ
       const defaultLoc = "33.4484,-112.0740";
       setLocation(defaultLoc);
       fetchShops(defaultLoc);
@@ -203,6 +199,8 @@ export default function ShopsPage() {
     return shops.filter(s => s.price_level === price).length;
   };
 
+  const hasActiveFilters = activeFilter !== 'all' || priceFilters.size > 0;
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50">
       {/* Navigation */}
@@ -222,8 +220,8 @@ export default function ShopsPage() {
 
       {/* Page Header */}
       <main className="max-w-7xl mx-auto px-6 py-12">
-        <div className="mb-10">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+        <div className="mb-6">
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">
             Explore Real Coffee Shops ☕
           </h1>
           <p className="text-lg text-gray-600">
@@ -231,109 +229,82 @@ export default function ShopsPage() {
           </p>
         </div>
 
-        {/* Search Box for Manual Location Search */}
-        <form onSubmit={handleSearch} className="mb-6">
-          <div className="flex gap-3">
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search any city (e.g., 'Austin, TX')"
-              className="flex-1 px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-gray-900 placeholder-gray-500"
-            />
-            <button
-              type="submit"
-              className="px-6 py-3 bg-amber-700 text-white rounded-xl font-semibold hover:bg-amber-800 transition"
-            >
-              Search
-            </button>
-          </div>
-        </form>
+        {/* Unified Control Bar */}
+        <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
+          {/* Row 1: Search, Sort, Results */}
+          <div className="flex flex-col md:flex-row md:items-center gap-3 mb-4">
+            {/* Search Input */}
+            <form onSubmit={handleSearch} className="flex-1 flex gap-2">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search city or zipcode..."
+                className="w-full md:w-auto flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 text-gray-900 placeholder-gray-400"
+              />
+            </form>
 
-        {/* Sort & Filter Controls */}
-        <div className="bg-white rounded-xl shadow-md p-6 mb-6">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             {/* Sort Dropdown */}
-            <div className="flex items-center gap-3">
-              <label className="text-sm font-semibold text-gray-700">Sort by:</label>
-              <select
-                value={sortBy}
-                onChange={(e) => handleSortChange(e.target.value as SortType)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 text-gray-900 bg-white"
-              >
-                <option value="rating-desc">⭐ Rating (High to Low)</option>
-                <option value="rating-asc">⭐ Rating (Low to High)</option>
-                <option value="reviews-desc">💬 Most Reviewed</option>
-                <option value="price-asc">💰 Price ($ to $$$$)</option>
-                <option value="price-desc">💰 Price ($$$$ to $)</option>
-              </select>
-            </div>
+            <select
+              value={sortBy}
+              onChange={(e) => handleSortChange(e.target.value as SortType)}
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 text-gray-900 bg-white whitespace-nowrap"
+            >
+              <option value="rating-desc">⭐ Top Rated</option>
+              <option value="rating-asc">⭐ Lowest Rated</option>
+              <option value="reviews-desc">💬 Most Reviewed</option>
+              <option value="price-asc">💰 $ → $$$$</option>
+              <option value="price-desc">💰 $$$$ → $</option>
+            </select>
 
-            {/* Result Count */}
-            <div className="text-sm text-gray-600">
-              {!loading && `Showing ${filteredShops.length} of ${shops.length} shops`}
-            </div>
+            {/* Results Count */}
+            {!loading && (
+              <div className="text-sm text-gray-600 whitespace-nowrap px-2">
+                {filteredShops.length} found
+              </div>
+            )}
           </div>
 
-          {/* Filters */}
-          <div className="flex flex-wrap gap-3 mt-4 pt-4 border-t border-gray-200">
-            <span className="text-sm font-semibold text-gray-700 mr-2">Filters:</span>
+          {/* Row 2: Filters */}
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-sm text-gray-500 mr-2">Filter:</span>
 
-            {/* Main Filters */}
-            <button
-              onClick={() => handleFilterClick('all')}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition ${
-                activeFilter === 'all'
-                  ? 'bg-amber-700 text-white'
-                  : 'bg-white text-gray-700 hover:bg-amber-50 border border-amber-200'
-              }`}
-            >
-              All ({shops.length})
-            </button>
-            <button
-              onClick={() => handleFilterClick('favorites')}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition ${
-                activeFilter === 'favorites'
-                  ? 'bg-amber-700 text-white'
-                  : 'bg-white text-gray-700 hover:bg-amber-50 border border-amber-200'
-              }`}
-            >
-              ❤️ Favorites ({favorites.size})
-            </button>
-            <button
-              onClick={() => handleFilterClick('open')}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition ${
-                activeFilter === 'open'
-                  ? 'bg-amber-700 text-white'
-                  : 'bg-white text-gray-700 hover:bg-amber-50 border border-amber-200'
-              }`}
-            >
-              🟢 Open Now
-            </button>
-            <button
-              onClick={() => handleFilterClick('high-rated')}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition ${
-                activeFilter === 'high-rated'
-                  ? 'bg-amber-700 text-white'
-                  : 'bg-white text-gray-700 hover:bg-amber-50 border border-amber-200'
-              }`}
-            >
-              ⭐ 4.5+ Stars
-            </button>
-          </div>
+            {['All', 'Favorites', 'Open Now', '4.5+ Stars'].map((filter) => {
+              const filterKey = filter.toLowerCase().replace(/[^a-z]/g, '');
+              const isActive = activeFilter === filterKey || (filterKey === 'all' && activeFilter === 'all');
+              const filterEmoji: Record<string, string> = {
+                'all': '🏠',
+                'favorites': '❤️',
+                'open': '🟢',
+                '4.5+ stars': '⭐'
+              };
 
-          {/* Price Filters */}
-          <div className="flex flex-wrap gap-2 mt-4">
-            <span className="text-sm font-semibold text-gray-700 mr-2">Price:</span>
+              return (
+                <button
+                  key={filter}
+                  onClick={() => handleFilterClick(filterKey as FilterType)}
+                  className={`px-3 py-1.5 rounded-full text-sm font-medium transition ${
+                    isActive
+                      ? 'bg-amber-700 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  {filterEmoji[filter] || '🏠'} {filter}
+                </button>
+              );
+            })}
 
+            <div className="w-px h-4 bg-gray-200 mx-2" />
+
+            {/* Price Filters */}
             {['$', '$$', '$$$', '$$$$'].map((price) => (
               <button
                 key={price}
                 onClick={() => handlePriceFilter(price)}
-                className={`px-3 py-1 rounded-full text-xs font-medium transition ${
+                className={`px-3 py-1.5 rounded-full text-sm font-medium transition ${
                   priceFilters.has(price)
                     ? 'bg-amber-700 text-white'
-                    : 'bg-white text-gray-700 hover:bg-amber-50 border border-gray-300'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
                 {price} ({getActivePriceCount(price)})
@@ -346,9 +317,9 @@ export default function ShopsPage() {
                   setPriceFilters(new Set());
                   applyFilterAndSort(activeFilter, sortBy, shops, favorites, new Set());
                 }}
-                className="px-3 py-1 text-xs text-amber-700 hover:text-amber-800 underline"
+                className="px-3 py-1.5 text-sm text-amber-700 hover:text-amber-800 underline"
               >
-                Clear price filters
+                Clear
               </button>
             )}
           </div>
@@ -384,71 +355,80 @@ export default function ShopsPage() {
 
         {/* Shop Grid */}
         {!loading && filteredShops.length > 0 && (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredShops.map((shop) => (
-              <Link
-                key={shop.place_id}
-                href={`/shops/${shop.place_id}`}
-                className="bg-white rounded-2xl shadow-md hover:shadow-xl transition p-6 group relative"
-              >
-                {/* Favorite Button */}
-                <button
-                  onClick={(e) => handleFavoriteToggle(e, shop.place_id, shop.name, shop.address)}
-                  className="absolute top-4 right-4 text-2xl hover:scale-110 transition z-10"
-                  title={favorites.has(shop.place_id) ? "Remove from favorites" : "Add to favorites"}
+          <>
+            <div className="mb-4 text-sm text-gray-600">
+              {hasActiveFilters && (
+                <span>
+                  Filtered results • {filteredShops.length} of {shops.length} shops shown
+                </span>
+              )}
+            </div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredShops.map((shop) => (
+                <Link
+                  key={shop.place_id}
+                  href={`/shops/${shop.place_id}`}
+                  className="bg-white rounded-2xl shadow-md hover:shadow-xl transition p-6 group relative"
                 >
-                  {favorites.has(shop.place_id) ? "❤️" : "🤍"}
-                </button>
+                  {/* Favorite Button */}
+                  <button
+                    onClick={(e) => handleFavoriteToggle(e, shop.place_id, shop.name, shop.address)}
+                    className="absolute top-4 right-4 text-2xl hover:scale-110 transition z-10"
+                  >
+                    {favorites.has(shop.place_id) ? "❤️" : "🤍"}
+                  </button>
 
-                {/* Shop Icon */}
-                <div className="text-6xl mb-4 group-hover:scale-110 transition">
-                  ☕
-                </div>
-
-                {/* Shop Name */}
-                <h2 className="text-xl font-bold text-gray-900 mb-2 pr-8">
-                  {shop.name}
-                </h2>
-
-                {/* Rating */}
-                {shop.rating > 0 && (
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="text-amber-600 font-bold">⭐ {shop.rating}</span>
-                    <span className="text-gray-500 text-sm">
-                      ({shop.review_count} reviews)
-                    </span>
+                  {/* Shop Icon */}
+                  <div className="text-6xl mb-4 group-hover:scale-110 transition">
+                    ☕
                   </div>
-                )}
 
-                {/* Open Now */}
-                {shop.open_now !== null && (
-                  <div className="mb-3">
-                    {shop.open_now ? (
-                      <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
-                        🟢 Open Now
+                  {/* Shop Name */}
+                  <h2 className="text-xl font-bold text-gray-900 mb-2 pr-8">
+                    {shop.name}
+                  </h2>
+
+                  {/* Rating */}
+                  {shop.rating > 0 && (
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="text-amber-600 font-bold">⭐ {shop.rating}</span>
+                      <span className="text-gray-500 text-sm">
+                        ({shop.review_count} reviews)
                       </span>
-                    ) : (
-                      <span className="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">
-                        🔴 Closed
-                      </span>
-                    )}
-                  </div>
-                )}
+                    </div>
+                  )}
 
-                {/* Address */}
-                <div className="text-sm text-gray-600 mb-3">
-                  📍 {shop.vicinity || shop.address}
-                </div>
+                  {/* Open Now */}
+                  {shop.open_now !== null && (
+                    <div className="mb-3">
+                      {shop.open_now ? (
+                        <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                          🟢 Open Now
+                        </span>
+                      ) : (
+                        <span className="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">
+                          🔴 Closed
+                        </span>
+                      )}
+                    </div>
+                  )}
 
-                {/* Price Level */}
-                {shop.price_level !== 'Not available' && (
-                  <div className="text-sm text-gray-700 font-medium">
-                    {shop.price_level}
+                  {/* Address */}
+                  <div className="text-sm text-gray-600 mb-3">
+                    📍 {shop.vicinity || shop.address}
                   </div>
-                )}
-              </Link>
-            ))}
-          </div>
+
+                  {/* Price Level */}
+                  {shop.price_level !== 'Not available' && (
+                    <div className="text-sm text-gray-700 font-medium">
+                      {shop.price_level}
+                    </div>
+                  )}
+                </Link>
+              ))}
+            </div>
+          </>
         )}
       </main>
 
