@@ -39,6 +39,10 @@ export default function SignUpPage() {
     }
 
     try {
+      if (!supabase) {
+        throw new Error('Supabase is not configured');
+      }
+
       // Check if username is taken
       const { data: existingUser } = await supabase
         .from('profiles')
