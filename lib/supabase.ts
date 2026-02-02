@@ -28,7 +28,7 @@ export const supabase = isSupabaseConfigured
 export const db = {
   // Profiles
   async getProfile(userId: string) {
-    const { data, error } = await supabase
+    const { data, error } = await supabase!
       .from('profiles')
       .select('*')
       .eq('id', userId)
@@ -48,7 +48,7 @@ export const db = {
     brewing_method: string;
     coffee_strength: string;
   }>) {
-    const { data, error } = await supabase
+    const { data, error } = await supabase!
       .from('profiles')
       .update({ ...updates, updated_at: new Date().toISOString() })
       .eq('id', userId)
@@ -61,7 +61,7 @@ export const db = {
 
   // Drink Preferences
   async getDrinkPreferences(userId: string) {
-    const { data, error } = await supabase
+    const { data, error } = await supabase!
       .from('drink_preferences')
       .select('*')
       .eq('user_id', userId)
@@ -77,7 +77,7 @@ export const db = {
     strength: 'strong' | 'light' | 'both';
     milk: 'black' | 'cream' | 'both';
   }) {
-    const { data, error } = await supabase
+    const { data, error } = await supabase!
       .from('drink_preferences')
       .upsert({ user_id: userId, ...preferences })
       .select()
@@ -99,7 +99,7 @@ export const db = {
     shop_tags?: string[];
     coffee_notes?: string[];
   }) {
-    const { data, error } = await supabase
+    const { data, error } = await supabase!
       .from('posts')
       .insert(post)
       .select(`
@@ -151,7 +151,7 @@ export const db = {
   },
 
   async getPostById(postId: string) {
-    const { data, error } = await supabase
+    const { data, error } = await supabase!
       .from('posts')
       .select(`
         *,
@@ -170,7 +170,7 @@ export const db = {
   },
 
   async deletePost(postId: string, userId: string) {
-    const { data, error } = await supabase
+    const { data, error } = await supabase!
       .from('posts')
       .delete()
       .eq('id', postId)
@@ -188,7 +188,7 @@ export const db = {
     place_name: string;
     address: string;
   }) {
-    const { data, error } = await supabase
+    const { data, error } = await supabase!
       .from('visits')
       .insert(visit)
       .select()
@@ -199,7 +199,7 @@ export const db = {
   },
 
   async getVisits(userId: string, limit = 50) {
-    const { data, error } = await supabase
+    const { data, error } = await supabase!
       .from('visits')
       .select('*')
       .eq('user_id', userId)
@@ -217,7 +217,7 @@ export const db = {
     place_name: string;
     address: string;
   }) {
-    const { data, error } = await supabase
+    const { data, error } = await supabase!
       .from('favorites')
       .insert(favorite)
       .select()
@@ -228,7 +228,7 @@ export const db = {
   },
 
   async removeFavorite(userId: string, placeId: string) {
-    const { data, error } = await supabase
+    const { data, error } = await supabase!
       .from('favorites')
       .delete()
       .eq('user_id', userId)
@@ -240,7 +240,7 @@ export const db = {
   },
 
   async getFavorites(userId: string) {
-    const { data, error } = await supabase
+    const { data, error } = await supabase!
       .from('favorites')
       .select('*')
       .eq('user_id', userId)
@@ -251,7 +251,7 @@ export const db = {
   },
 
   async isFavorite(userId: string, placeId: string) {
-    const { data, error } = await supabase
+    const { data, error } = await supabase!
       .from('favorites')
       .select('*')
       .eq('user_id', userId)
@@ -264,7 +264,7 @@ export const db = {
 
   // Friendships
   async sendFriendRequest(initiatorId: string, receiverId: string) {
-    const { data, error } = await supabase
+    const { data, error } = await supabase!
       .from('friendships')
       .insert({
         initiator_id: initiatorId,
@@ -283,7 +283,7 @@ export const db = {
   },
 
   async acceptFriendRequest(friendshipId: string, receiverId: string) {
-    const { data, error } = await supabase
+    const { data, error } = await supabase!
       .from('friendships')
       .update({
         status: 'accepted',
@@ -303,7 +303,7 @@ export const db = {
   },
 
   async removeFriend(friendshipId: string, userId: string) {
-    const { data, error } = await supabase
+    const { data, error } = await supabase!
       .from('friendships')
       .delete()
       .eq('id', friendshipId)
@@ -315,7 +315,7 @@ export const db = {
   },
 
   async getFriends(userId: string) {
-    const { data, error } = await supabase
+    const { data, error } = await supabase!
       .from('friendships')
       .select(`
         *,
@@ -341,7 +341,7 @@ export const db = {
   },
 
   async getPendingRequests(userId: string) {
-    const { data, error } = await supabase
+    const { data, error } = await supabase!
       .from('friendships')
       .select(`
         *,
@@ -356,7 +356,7 @@ export const db = {
   },
 
   async searchUsers(query: string, currentUserId: string) {
-    const { data, error } = await supabase
+    const { data, error } = await supabase!
       .from('profiles')
       .select('id, username, display_name, avatar_url, bio')
       .or(`username.ilike.%${query}%,display_name.ilike.%${query}%`)
@@ -369,7 +369,7 @@ export const db = {
 
   // Likes
   async likePost(postId: string, userId: string) {
-    const { data, error } = await supabase
+    const { data, error } = await supabase!
       .from('likes')
       .insert({ post_id: postId, user_id: userId })
       .select()
@@ -380,7 +380,7 @@ export const db = {
   },
 
   async unlikePost(postId: string, userId: string) {
-    const { data, error } = await supabase
+    const { data, error } = await supabase!
       .from('likes')
       .delete()
       .eq('post_id', postId)
@@ -392,7 +392,7 @@ export const db = {
   },
 
   async getPostLikes(postId: string) {
-    const { data, error } = await supabase
+    const { data, error } = await supabase!
       .from('likes')
       .select('*, profiles(id, username, display_name, avatar_url)')
       .eq('post_id', postId);
@@ -402,7 +402,7 @@ export const db = {
   },
 
   async checkUserLike(postId: string, userId: string) {
-    const { data, error } = await supabase
+    const { data, error } = await supabase!
       .from('likes')
       .select('*')
       .eq('post_id', postId)
