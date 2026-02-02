@@ -1,22 +1,34 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { db } from '@/lib/supabase';
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
 
-async function createSupabaseClient() {
-  const cookieStore = await cookies();
+function createSupabaseClient(request: NextRequest) {
+  // Extract cookies from request headers
+  const cookieHeader = request.headers.get('cookie') || '';
 
-  return createServerClient(
+  // Parse cookies into a record
+  const cookies: Record<string, string> = {};
+  cookieHeader.split(';').forEach((cookie) => {
+    const [name, value] = cookie.trim().split('=');
+    if (name && value) {
+      cookies[name] = value;
+    }
+  });
+
+  // Create Supabase client with cookie storage
+  return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value;
+      auth: {
+        storage: {
+          getItem: (key: string) => {
+            return cookies[key] || null;
+          },
+          setItem: () => {},
+          removeItem: () => {},
         },
-        set() {},
-        remove() {},
+        persistSession: true,
       },
     }
   );
@@ -25,7 +37,7 @@ async function createSupabaseClient() {
 // GET /api/posts - Fetch posts
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await createSupabaseClient();
+    const supabase = createSupabaseClient(request);
     const { searchParams } = new URL(request.url);
     const feedType = searchParams.get('feedType') || 'explore';
     const limit = parseInt(searchParams.get('limit') || '20');
@@ -133,8 +145,20 @@ export async function GET(request: NextRequest) {
 // POST /api/posts - Create a new post
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createSupabaseClient();
+    const supabase = createSupabaseClient(request);
+
+    // Debug logging
+    console.log('Cookies header:', request.headers.get('cookie')?.substring(0, 100));
+
     const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    console.log('Auth error:', authError?.message);
+    console.log('User:', user?.id || 'No user');
+
+    if (authError || !user) {
+      console.log('Unauthorized attempt');
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
