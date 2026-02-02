@@ -330,7 +330,7 @@ export const db = {
   },
 
   async getFriendsCount(userId: string) {
-    const { count, error } = await supabase
+    const { count, error } = await supabase!
       .from('friendships')
       .select('*', { count: 'exact', head: true })
       .or(`initiator_id.eq.${userId},receiver_id.eq.${userId}`)
