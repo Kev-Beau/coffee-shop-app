@@ -93,8 +93,8 @@ export default function OnboardingPage() {
       // Update profile
       await db.updateProfile(userId, {
         privacy_level: formData.privacy_level,
-        display_name: formData.display_name || null,
-        bio: formData.bio || null,
+        display_name: formData.display_name || undefined,
+        bio: formData.bio || undefined,
       });
 
       router.push('/');
