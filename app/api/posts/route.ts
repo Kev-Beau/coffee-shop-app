@@ -3,16 +3,24 @@ import { createClient } from '@supabase/supabase-js';
 import { db } from '@/lib/supabase';
 
 function createSupabaseClient(request: NextRequest) {
+  // Extract all cookies and convert to storage format
+  const cookieHeader = request.headers.get('cookie') || '';
+  const cookies: Record<string, string> = {};
+
+  cookieHeader.split(';').forEach(cookie => {
+    const [name, value] = cookie.trim().split('=');
+    if (name && value) {
+      cookies[name] = value;
+    }
+  });
+
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       auth: {
         storage: {
-          getItem: (key) => {
-            const cookie = request.cookies.get(key);
-            return cookie?.value ?? null;
-          },
+          getItem: (key) => cookies[key] || null,
           setItem: () => {},
           removeItem: () => {},
         },
