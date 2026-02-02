@@ -1,16 +1,18 @@
 {
-  "name": "CoffeeConnect - Discover Great Coffee Shops",
+  "name": "CoffeeConnect",
   "short_name": "CoffeeConnect",
   "description": "Find and share the best local coffee shops with friends",
-  "start_url": "/",
+  "start_url": "/?source=pwa",
   "display": "standalone",
+  "display_override": ["standalone", "fullscreen"],
   "background_color": "#fffbeb",
   "theme_color": "#92400e",
   "orientation": "portrait",
+  "scope": "/",
   "icons": [
     {
       "src": "/icon.svg",
-      "sizes": "512x512",
+      "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
     }

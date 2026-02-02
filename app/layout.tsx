@@ -27,6 +27,13 @@ export const metadata: Metadata = {
     initialScale: 1,
     maximumScale: 1,
     userScalable: false,
+    viewportFit: "cover",
+  },
+  other: {
+    "mobile-web-app-capable": "yes",
+    "apple-mobile-web-app-capable": "yes",
+    "apple-mobile-web-app-status-bar-style": "default",
+    "apple-mobile-web-app-title": "CoffeeConnect",
   },
 };
 
@@ -40,9 +47,7 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="/icon.svg" />
         <link rel="apple-touch-icon" href="/icon.svg" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
