@@ -8,7 +8,7 @@ import {
   getShopStats,
   getFavorites,
   getVisitCount,
-} from "../../lib/storage";
+} from "../lib/storage";
 
 export default function ProfilePage() {
   const [stats, setStats] = useState({ totalVisits: 0, uniqueShops: 0, favoriteCount: 0 });
