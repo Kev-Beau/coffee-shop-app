@@ -26,7 +26,7 @@ export default function Navigation() {
 
     // Get initial session
     const getSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { session } } = await supabase!.auth.getSession();
       setUser(session?.user || null);
       setLoading(false);
     };
@@ -34,7 +34,7 @@ export default function Navigation() {
     getSession();
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase!.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user || null);
     });
 
