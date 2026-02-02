@@ -130,8 +130,8 @@ export default function ShopPage({ params }: ShopPageProps) {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50">
-      {/* Navigation */}
-      <nav className="flex items-center justify-between px-4 py-3 md:px-6 md:py-6 bg-white shadow-sm">
+      {/* Navigation - Sticky */}
+      <nav className="sticky top-0 z-50 flex items-center justify-between px-4 py-3 md:px-6 md:py-6 bg-white shadow-md">
         <Link href="/" className="text-lg md:text-2xl font-bold text-amber-800">
           ☕ CoffeeConnect
         </Link>

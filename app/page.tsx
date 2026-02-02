@@ -3,8 +3,8 @@ import Link from "next/link";
 export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50">
-      {/* Navigation */}
-      <nav className="flex items-center justify-between p-6 bg-white shadow-sm">
+      {/* Navigation - Sticky */}
+      <nav className="sticky top-0 z-50 flex items-center justify-between p-6 bg-white shadow-md">
         <div className="text-2xl font-bold text-amber-800">☕ CoffeeConnect</div>
         <div className="flex gap-6">
           <Link href="/shops" className="text-gray-700 hover:text-amber-700 transition">
