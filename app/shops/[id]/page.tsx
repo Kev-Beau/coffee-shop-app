@@ -9,7 +9,7 @@ import {
   toggleFavorite,
   isFavorite,
 } from "../../lib/storage";
-import DrinkLogModal from "../../../components/DrinkLogModal";
+import DrinkLogModal from "../../components/DrinkLogModal";
 
 interface GoogleReview {
   author_name: string;
