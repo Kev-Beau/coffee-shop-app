@@ -132,7 +132,7 @@ export default function DrinkLogModal({
                 onChange={(e) => setDrinkName(e.target.value)}
                 placeholder="e.g., Caramel Macchiato, Cold Brew, Latte..."
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none transition"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none transition text-gray-900 placeholder:text-gray-400"
               />
             </div>
 
@@ -164,7 +164,7 @@ export default function DrinkLogModal({
                 placeholder="Share your thoughts about this shop..."
                 rows={3}
                 maxLength={500}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none transition resize-none"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none transition resize-none text-gray-900 placeholder:text-gray-400"
               />
               <p className="mt-1 text-sm text-gray-500">{locationNotes.length}/500</p>
             </div>

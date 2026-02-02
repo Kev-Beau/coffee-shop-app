@@ -63,12 +63,12 @@ export default function TagSelector({
         <>
           {/* Backdrop */}
           <div
-            className="fixed inset-0 z-10"
+            className="fixed inset-0 z-50"
             onClick={() => setIsOpen(false)}
           />
 
           {/* Dropdown */}
-          <div className="absolute z-20 w-full mt-2 bg-white border border-gray-200 rounded-lg shadow-lg max-h-64 overflow-y-auto">
+          <div className="absolute z-[60] w-full mt-2 bg-white border border-gray-200 rounded-lg shadow-lg max-h-64 overflow-y-auto">
             <div className="p-2 space-y-1">
               {tags.map((tag) => {
                 const isSelected = selectedTags.includes(tag);
