@@ -3,7 +3,7 @@
 import { useState } from 'react';
 
 interface TagSelectorProps {
-  tags: string[];
+  tags: readonly string[] | string[];
   selectedTags: string[];
   onChange: (tags: string[]) => void;
   label?: string;
