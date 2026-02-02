@@ -9,6 +9,7 @@ import {
   toggleFavorite,
   isFavorite,
 } from "../../lib/storage";
+import DrinkLogModal from "../../../components/DrinkLogModal";
 
 interface GoogleReview {
   author_name: string;
@@ -48,6 +49,7 @@ export default function ShopPage({ params }: ShopPageProps) {
   const [visited, setVisited] = useState(false);
   const [favorite, setFavorite] = useState(false);
   const [showVisitMessage, setShowVisitMessage] = useState(false);
+  const [showDrinkModal, setShowDrinkModal] = useState(false);
 
   useEffect(() => {
     const loadShop = async () => {
@@ -89,6 +91,15 @@ export default function ShopPage({ params }: ShopPageProps) {
     // Show success message
     setShowVisitMessage(true);
     setTimeout(() => setShowVisitMessage(false), 3000);
+  };
+
+  const handleLogDrink = () => {
+    setShowDrinkModal(true);
+  };
+
+  const handleDrinkLogged = () => {
+    setShowDrinkModal(false);
+    // Optionally show a success message
   };
 
   const handleFavorite = () => {
@@ -234,7 +245,13 @@ export default function ShopPage({ params }: ShopPageProps) {
               onClick={handleVisit}
               className="flex-1 py-2.5 md:py-3 bg-amber-700 text-white rounded-lg md:rounded-xl font-semibold hover:bg-amber-800 transition text-sm md:text-base"
             >
-              📍 I'm Here! Log Visit
+              📍 Log Visit
+            </button>
+            <button
+              onClick={handleLogDrink}
+              className="flex-1 py-2.5 md:py-3 bg-gradient-to-r from-amber-600 to-amber-800 text-white rounded-lg md:rounded-xl font-semibold hover:from-amber-700 hover:to-amber-900 transition text-sm md:text-base"
+            >
+              ☕ Log Drink
             </button>
             {visited && visitCount > 0 && (
               <div className="px-4 md:px-6 py-2.5 md:py-3 bg-amber-100 text-amber-800 rounded-lg md:rounded-xl font-semibold text-sm md:text-base text-center">
@@ -297,6 +314,15 @@ export default function ShopPage({ params }: ShopPageProps) {
           </div>
         )}
       </main>
+
+      {/* Drink Log Modal */}
+      <DrinkLogModal
+        shopId={shop.place_id}
+        shopName={shop.name}
+        isOpen={showDrinkModal}
+        onClose={() => setShowDrinkModal(false)}
+        onSuccess={handleDrinkLogged}
+      />
 
       {/* Footer */}
       <footer className="text-center py-6 md:py-8 text-gray-500 text-xs md:text-sm mt-6 md:mt-12">

@@ -152,7 +152,7 @@ export default function FeedPage() {
     setRefreshing(false);
   };
 
-  if (loading && posts.length === 0) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50 flex items-center justify-center">
         <div className="text-center">
