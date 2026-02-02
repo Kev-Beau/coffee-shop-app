@@ -66,13 +66,13 @@ export default function OnboardingPage() {
 
   const handleNext = async () => {
     if (step < 5) {
-      setStep(step + 1);
+      setStep((step + 1) as OnboardingStep);
     }
   };
 
   const handleBack = () => {
     if (step > 1) {
-      setStep(step - 1);
+      setStep((step - 1) as OnboardingStep);
     }
   };
 
