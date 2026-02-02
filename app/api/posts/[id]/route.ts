@@ -10,11 +10,12 @@ const supabase = createClient(
 // GET /api/posts/[id] - Get a single post
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const { data: { user } } = await supabase.auth.getUser();
-    const post = await db.getPostById(params.id);
+    const post = await db.getPostById(id);
 
     if (!post) {
       return NextResponse.json({ error: 'Post not found' }, { status: 404 });
@@ -41,7 +42,7 @@ export async function GET(
     }
 
     // Get likes
-    const likes = await db.getPostLikes(params.id);
+    const likes = await db.getPostLikes(id);
 
     return NextResponse.json({
       data: {
@@ -63,9 +64,10 @@ export async function GET(
 // PUT /api/posts/[id] - Update a post
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {
@@ -78,7 +80,7 @@ export async function PUT(
     const { data: existingPost } = await supabase
       .from('posts')
       .select('user_id')
-      .eq('id', params.id)
+      .eq('id', id)
       .single();
 
     if (!existingPost) {
@@ -96,7 +98,7 @@ export async function PUT(
         ...body,
         updated_at: new Date().toISOString(),
       })
-      .eq('id', params.id)
+      .eq('id', id)
       .select()
       .single();
 
@@ -115,16 +117,17 @@ export async function PUT(
 // DELETE /api/posts/[id] - Delete a post
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    await db.deletePost(params.id, user.id);
+    await db.deletePost(id, user.id);
 
     return NextResponse.json({ success: true });
   } catch (error: any) {
