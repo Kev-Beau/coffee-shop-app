@@ -22,12 +22,16 @@ export default function SignInPage() {
         throw new Error('Supabase is not configured');
       }
 
+      console.log('Attempting sign in...');
       const { data, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (signInError) throw signInError;
+      if (signInError) {
+        console.error('Sign in error:', signInError);
+        throw signInError;
+      }
 
       // Check if user has completed onboarding
       const { data: profile } = await supabase

@@ -11,17 +11,23 @@ export const isSupabaseConfigured = !!(supabaseUrl && supabaseAnonKey &&
 if (!supabaseUrl || !supabaseAnonKey) {
   console.warn('⚠️ Supabase credentials not configured. Social features will be disabled.');
   console.warn('📝 See SOCIAL_SETUP.md for setup instructions.');
+} else {
+  console.log('✅ Supabase configured:', supabaseUrl);
 }
 
 export const supabase = isSupabaseConfigured
-  ? createClient(supabaseUrl!, supabaseAnonKey!, {
-      auth: {
-        persistSession: true,
-        autoRefreshToken: true,
-        detectSessionInUrl: true,
-        flowType: 'pkce',
-      },
-    })
+  ? createClient(
+      supabaseUrl!,
+      supabaseAnonKey!,
+      {
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
+          detectSessionInUrl: true,
+          flowType: 'pkce',
+        },
+      }
+    )
   : null;
 
 // Database helper functions
