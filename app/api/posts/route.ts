@@ -145,18 +145,22 @@ export async function GET(request: NextRequest) {
 // POST /api/posts - Create a new post
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createSupabaseClient(request);
+    const cookieHeader = request.headers.get('cookie');
+    console.log('=== AUTH DEBUG ===');
+    console.log('Raw cookies length:', cookieHeader?.length || 0);
+    console.log('Raw cookies (first 200 chars):', cookieHeader?.substring(0, 200) || 'NONE');
 
-    // Debug logging
-    console.log('Cookies header:', request.headers.get('cookie')?.substring(0, 100));
+    const supabase = createSupabaseClient(request);
 
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    console.log('Auth error:', authError?.message);
-    console.log('User:', user?.id || 'No user');
+    console.log('Auth error:', authError?.message || 'None');
+    console.log('User ID:', user?.id || 'No user');
+    console.log('User email:', user?.email || 'No user email');
+    console.log('=== END DEBUG ===');
 
     if (authError || !user) {
-      console.log('Unauthorized attempt');
+      console.log('REJECTING: Unauthorized');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
