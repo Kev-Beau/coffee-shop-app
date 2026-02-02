@@ -76,6 +76,11 @@ export default function FeedPage() {
       const response = await fetch(
         `/api/posts?feedType=${feedType}&limit=20`
       );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
       const data = await response.json();
 
       if (data.error) {
@@ -84,8 +89,10 @@ export default function FeedPage() {
       }
 
       setPosts(data.data || []);
-    } catch (error) {
+      console.log(`Loaded ${data.data?.length || 0} posts for ${feedType}`);
+    } catch (error: any) {
       console.error('Error fetching posts:', error);
+      console.error('Error details:', error.message);
     } finally {
       setLoading(false);
     }

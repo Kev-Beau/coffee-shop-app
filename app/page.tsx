@@ -1,6 +1,28 @@
-import Link from "next/link";
+'use client';
+
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 
 export default function Home() {
+  const router = useRouter();
+
+  useEffect(() => {
+    // Check if user is logged in and redirect to feed
+    const checkSession = async () => {
+      if (!isSupabaseConfigured || !supabase) return;
+
+      const { data: { session } } = await supabase.auth.getSession();
+
+      if (session) {
+        router.replace('/feed');
+      }
+    };
+
+    checkSession();
+  }, [router]);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50">
       {/* Hero Section */}
@@ -16,16 +38,16 @@ export default function Home() {
           </p>
           <div className="flex gap-4 justify-center">
             <Link
-              href="/shops"
+              href="/feed"
               className="px-8 py-4 bg-amber-700 text-white rounded-full font-semibold hover:bg-amber-800 transition shadow-lg"
             >
-              Explore Coffee Shops
+              View Feed
             </Link>
             <Link
-              href="/about"
+              href="/shops"
               className="px-8 py-4 bg-white text-amber-700 rounded-full font-semibold hover:bg-amber-50 transition shadow-lg border border-amber-200"
             >
-              Learn More
+              Find Shops
             </Link>
           </div>
         </div>

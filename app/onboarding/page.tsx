@@ -45,7 +45,7 @@ export default function OnboardingPage() {
       // Check if already onboarded
       const { data: preferences } = await db.getDrinkPreferences(session.user.id);
       if (preferences) {
-        router.push('/');
+        router.push('/feed');
         return;
       }
 

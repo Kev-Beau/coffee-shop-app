@@ -40,7 +40,7 @@ export default function SignInPage() {
         .eq('id', data.user.id)
         .single();
 
-      const { data: preferences } = await supabase
+      const { data: preferences } = await supabase!
         .from('drink_preferences')
         .select('*')
         .eq('user_id', data.user.id)
@@ -49,7 +49,7 @@ export default function SignInPage() {
       if (!preferences) {
         router.push('/onboarding');
       } else {
-        router.push('/');
+        router.push('/feed');
       }
     } catch (err: any) {
       setError(err.message || 'Failed to sign in');
