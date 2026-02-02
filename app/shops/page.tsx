@@ -204,11 +204,11 @@ export default function ShopsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50">
       {/* Navigation */}
-      <nav className="flex items-center justify-between p-6 bg-white shadow-sm">
-        <Link href="/" className="text-2xl font-bold text-amber-800">
+      <nav className="flex items-center justify-between px-4 py-3 md:px-6 md:py-6 bg-white shadow-sm">
+        <Link href="/" className="text-lg md:text-2xl font-bold text-amber-800">
           ☕ CoffeeConnect
         </Link>
-        <div className="flex gap-6">
+        <div className="flex gap-3 md:gap-6 text-sm md:text-base">
           <Link href="/shops" className="text-amber-700 font-semibold">
             Find Shops
           </Link>
@@ -219,28 +219,28 @@ export default function ShopsPage() {
       </nav>
 
       {/* Page Header */}
-      <main className="max-w-7xl mx-auto px-6 py-12">
+      <main className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-12">
         <div className="mb-6">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">
+          <h1 className="text-2xl md:text-4xl font-bold text-gray-900 mb-2">
             Explore Real Coffee Shops ☕
           </h1>
-          <p className="text-lg text-gray-600">
+          <p className="text-base md:text-lg text-gray-600">
             Discover actual coffee shops near you (powered by Google)
           </p>
         </div>
 
         {/* Unified Control Bar */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
+        <div className="bg-white rounded-xl md:rounded-2xl shadow-lg p-4 md:p-6 mb-6 md:mb-8">
           {/* Row 1: Search, Sort, Results */}
-          <div className="flex flex-col md:flex-row md:items-center gap-3 mb-4">
+          <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-3 mb-3 md:mb-4">
             {/* Search Input */}
-            <form onSubmit={handleSearch} className="flex-1 flex gap-2">
+            <form onSubmit={handleSearch} className="flex-1 flex gap-2 w-full">
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search city or zipcode..."
-                className="w-full md:w-auto flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 text-gray-900 placeholder-gray-400"
+                className="w-full px-3 py-2 md:px-4 md:py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 text-gray-900 placeholder-gray-400 text-sm md:text-base"
               />
             </form>
 
@@ -248,7 +248,7 @@ export default function ShopsPage() {
             <select
               value={sortBy}
               onChange={(e) => handleSortChange(e.target.value as SortType)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 text-gray-900 bg-white whitespace-nowrap"
+              className="px-3 py-2 md:px-4 md:py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 text-gray-900 bg-white whitespace-nowrap text-sm md:text-base"
             >
               <option value="rating-desc">⭐ Top Rated</option>
               <option value="rating-asc">⭐ Lowest Rated</option>
@@ -259,15 +259,15 @@ export default function ShopsPage() {
 
             {/* Results Count */}
             {!loading && (
-              <div className="text-sm text-gray-600 whitespace-nowrap px-2">
+              <div className="text-xs md:text-sm text-gray-600 whitespace-nowrap px-1 md:px-2">
                 {filteredShops.length} found
               </div>
             )}
           </div>
 
           {/* Row 2: Filters */}
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="text-sm text-gray-500 mr-2">Filter:</span>
+          <div className="flex flex-wrap items-center gap-1.5 md:gap-2">
+            <span className="text-xs md:text-sm text-gray-500 mr-1 md:mr-2">Filter:</span>
 
             {['All', 'Favorites', 'Open Now', '4.5+ Stars'].map((filter) => {
               const filterKey = filter.toLowerCase().replace(/[^a-z]/g, '');
@@ -283,7 +283,7 @@ export default function ShopsPage() {
                 <button
                   key={filter}
                   onClick={() => handleFilterClick(filterKey as FilterType)}
-                  className={`px-3 py-1.5 rounded-full text-sm font-medium transition ${
+                  className={`px-2 md:px-3 py-1 md:py-1.5 rounded-full text-xs md:text-sm font-medium transition ${
                     isActive
                       ? 'bg-amber-700 text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -294,14 +294,14 @@ export default function ShopsPage() {
               );
             })}
 
-            <div className="w-px h-4 bg-gray-200 mx-2" />
+            <div className="w-px h-3 md:h-4 bg-gray-200 mx-1 md:mx-2" />
 
             {/* Price Filters */}
             {['$', '$$', '$$$', '$$$$'].map((price) => (
               <button
                 key={price}
                 onClick={() => handlePriceFilter(price)}
-                className={`px-3 py-1.5 rounded-full text-sm font-medium transition ${
+                className={`px-2 md:px-3 py-1 md:py-1.5 rounded-full text-xs md:text-sm font-medium transition ${
                   priceFilters.has(price)
                     ? 'bg-amber-700 text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -317,7 +317,7 @@ export default function ShopsPage() {
                   setPriceFilters(new Set());
                   applyFilterAndSort(activeFilter, sortBy, shops, favorites, new Set());
                 }}
-                className="px-3 py-1.5 text-sm text-amber-700 hover:text-amber-800 underline"
+                className="px-2 md:px-3 py-1 md:py-1.5 text-xs md:text-sm text-amber-700 hover:text-amber-800 underline"
               >
                 Clear
               </button>
@@ -327,23 +327,23 @@ export default function ShopsPage() {
 
         {/* Error Message */}
         {error && (
-          <div className="mb-6 p-4 bg-amber-100 border border-amber-300 rounded-xl text-amber-800">
+          <div className="mb-4 md:mb-6 p-3 md:p-4 bg-amber-100 border border-amber-300 rounded-lg md:rounded-xl text-amber-800 text-sm md:text-base">
             ⚠️ {error}
           </div>
         )}
 
         {/* Loading State */}
         {loading && (
-          <div className="text-center py-12">
-            <div className="text-4xl mb-4">☕</div>
-            <p className="text-gray-600">Finding coffee shops near you...</p>
+          <div className="text-center py-8 md:py-12">
+            <div className="text-3xl md:text-4xl mb-3 md:mb-4">☕</div>
+            <p className="text-gray-600 text-sm md:text-base">Finding coffee shops near you...</p>
           </div>
         )}
 
         {/* No Results */}
         {!loading && filteredShops.length === 0 && !error && (
-          <div className="text-center py-12">
-            <p className="text-gray-600">
+          <div className="text-center py-8 md:py-12">
+            <p className="text-gray-600 text-sm md:text-base">
               {activeFilter === 'favorites' && favorites.size === 0
                 ? "No favorites yet. Heart some shops to see them here!"
                 : priceFilters.size > 0 && activeFilter === 'all'
@@ -364,36 +364,36 @@ export default function ShopsPage() {
               )}
             </div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
               {filteredShops.map((shop) => (
                 <Link
                   key={shop.place_id}
                   href={`/shops/${shop.place_id}`}
-                  className="bg-white rounded-2xl shadow-md hover:shadow-xl transition p-6 group relative"
+                  className="bg-white rounded-xl md:rounded-2xl shadow-md hover:shadow-xl transition p-4 md:p-6 group relative"
                 >
                   {/* Favorite Button */}
                   <button
                     onClick={(e) => handleFavoriteToggle(e, shop.place_id, shop.name, shop.address)}
-                    className="absolute top-4 right-4 text-2xl hover:scale-110 transition z-10"
+                    className="absolute top-3 md:top-4 right-3 md:right-4 text-xl md:text-2xl hover:scale-110 transition z-10"
                   >
                     {favorites.has(shop.place_id) ? "❤️" : "🤍"}
                   </button>
 
                   {/* Shop Icon */}
-                  <div className="text-6xl mb-4 group-hover:scale-110 transition">
+                  <div className="text-4xl md:text-6xl mb-3 md:mb-4 group-hover:scale-110 transition">
                     ☕
                   </div>
 
                   {/* Shop Name */}
-                  <h2 className="text-xl font-bold text-gray-900 mb-2 pr-8">
+                  <h2 className="text-lg md:text-xl font-bold text-gray-900 mb-2 pr-8">
                     {shop.name}
                   </h2>
 
                   {/* Rating */}
                   {shop.rating > 0 && (
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="text-amber-600 font-bold">⭐ {shop.rating}</span>
-                      <span className="text-gray-500 text-sm">
+                    <div className="flex items-center gap-1.5 md:gap-2 mb-2 md:mb-3">
+                      <span className="text-amber-600 font-bold text-sm md:text-base">⭐ {shop.rating}</span>
+                      <span className="text-gray-500 text-xs md:text-sm">
                         ({shop.review_count} reviews)
                       </span>
                     </div>
@@ -401,7 +401,7 @@ export default function ShopsPage() {
 
                   {/* Open Now */}
                   {shop.open_now !== null && (
-                    <div className="mb-3">
+                    <div className="mb-2 md:mb-3">
                       {shop.open_now ? (
                         <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
                           🟢 Open Now
@@ -415,13 +415,13 @@ export default function ShopsPage() {
                   )}
 
                   {/* Address */}
-                  <div className="text-sm text-gray-600 mb-3">
+                  <div className="text-xs md:text-sm text-gray-600 mb-2 md:mb-3">
                     📍 {shop.vicinity || shop.address}
                   </div>
 
                   {/* Price Level */}
                   {shop.price_level !== 'Not available' && (
-                    <div className="text-sm text-gray-700 font-medium">
+                    <div className="text-xs md:text-sm text-gray-700 font-medium">
                       {shop.price_level}
                     </div>
                   )}
@@ -433,7 +433,7 @@ export default function ShopsPage() {
       </main>
 
       {/* Footer */}
-      <footer className="text-center py-8 text-gray-500 text-sm mt-12">
+      <footer className="text-center py-6 md:py-8 text-gray-500 text-xs md:text-sm mt-6 md:mt-12">
         <p>Built with Next.js, TypeScript, and Google Places API</p>
       </footer>
     </div>
