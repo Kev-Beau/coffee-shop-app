@@ -37,7 +37,27 @@ function createSupabaseClient(request: NextRequest) {
 // GET /api/posts - Fetch posts
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createSupabaseClient(request);
+    const authHeader = request.headers.get('authorization');
+    let supabase;
+
+    // Try auth header first, fallback to cookies
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const accessToken = authHeader.substring(7);
+      supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+          global: {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          },
+        }
+      );
+    } else {
+      supabase = createSupabaseClient(request);
+    }
+
     const { searchParams } = new URL(request.url);
     const feedType = searchParams.get('feedType') || 'explore';
     const limit = parseInt(searchParams.get('limit') || '20');
@@ -145,18 +165,45 @@ export async function GET(request: NextRequest) {
 // POST /api/posts - Create a new post
 export async function POST(request: NextRequest) {
   try {
+    // Get authorization header from client
+    const authHeader = request.headers.get('authorization');
     const cookieHeader = request.headers.get('cookie');
+
     console.log('=== AUTH DEBUG ===');
-    console.log('Raw cookies length:', cookieHeader?.length || 0);
-    console.log('Raw cookies (first 200 chars):', cookieHeader?.substring(0, 200) || 'NONE');
+    console.log('Has Authorization header:', !!authHeader);
+    console.log('Auth header (first 50 chars):', authHeader?.substring(0, 50) || 'NONE');
+    console.log('Has cookies:', !!cookieHeader);
 
-    const supabase = createSupabaseClient(request);
+    // Try to get user from auth header first
+    let user, authError;
 
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      // Use token from Authorization header
+      const accessToken = authHeader.substring(7);
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+          global: {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          },
+        }
+      );
+      const result = await supabase.auth.getUser();
+      user = result.data.user;
+      authError = result.error;
+    } else {
+      // Fallback to cookies
+      const supabase = createSupabaseClient(request);
+      const result = await supabase.auth.getUser();
+      user = result.data.user;
+      authError = result.error;
+    }
 
-    console.log('Auth error:', authError?.message || 'None');
     console.log('User ID:', user?.id || 'No user');
-    console.log('User email:', user?.email || 'No user email');
+    console.log('Auth error:', authError?.message || 'None');
     console.log('=== END DEBUG ===');
 
     if (authError || !user) {

@@ -6,6 +6,7 @@ import PhotoUpload from './PhotoUpload';
 import StarRating from './StarRating';
 import TagSelector from './TagSelector';
 import { SHOP_TAG_OPTIONS, COFFEE_NOTE_OPTIONS } from '@/lib/types';
+import { supabase } from '@/lib/supabase';
 
 interface DrinkLogModalProps {
   shopId: string;
@@ -43,11 +44,21 @@ export default function DrinkLogModal({
     setLoading(true);
 
     try {
+      // Get current session to include auth token
+      const { data: { session } } = await supabase!.auth.getSession();
+
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+      };
+
+      // Include auth token if available
+      if (session?.access_token) {
+        headers['Authorization'] = `Bearer ${session.access_token}`;
+      }
+
       const response = await fetch('/api/posts', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
         body: JSON.stringify({
           shop_id: shopId,
           shop_name: shopName,
