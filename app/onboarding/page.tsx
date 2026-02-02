@@ -28,6 +28,11 @@ export default function OnboardingPage() {
   useEffect(() => {
     // Check authentication
     const checkAuth = async () => {
+      if (!supabase) {
+        router.push('/auth/signin');
+        return;
+      }
+
       const { data: { session } } = await supabase.auth.getSession();
 
       if (!session) {
