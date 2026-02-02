@@ -74,8 +74,8 @@ export default function SettingsPage() {
 
     try {
       await db.updateProfile(user.id, {
-        display_name: displayName || null,
-        bio: bio || null,
+        display_name: displayName || undefined,
+        bio: bio || undefined,
         privacy_level: privacyLevel,
         favorite_drinks: favoriteDrinks,
         preferred_roast: preferredRoast,
