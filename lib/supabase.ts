@@ -123,7 +123,7 @@ export const db = {
     limit?: number;
     offset?: number;
   }) {
-    let query = supabase
+    let query = supabase!
       .from('posts')
       .select(`
         *,
