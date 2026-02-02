@@ -4,8 +4,8 @@ import { db } from '@/lib/supabase';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 
-function createSupabaseClient(request: NextRequest) {
-  const cookieStore = cookies();
+async function createSupabaseClient() {
+  const cookieStore = await cookies();
 
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -25,7 +25,7 @@ function createSupabaseClient(request: NextRequest) {
 // GET /api/posts - Fetch posts
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createSupabaseClient(request);
+    const supabase = await createSupabaseClient();
     const { searchParams } = new URL(request.url);
     const feedType = searchParams.get('feedType') || 'explore';
     const limit = parseInt(searchParams.get('limit') || '20');
@@ -133,7 +133,7 @@ export async function GET(request: NextRequest) {
 // POST /api/posts - Create a new post
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createSupabaseClient(request);
+    const supabase = await createSupabaseClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {
