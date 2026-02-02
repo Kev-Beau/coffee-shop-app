@@ -168,7 +168,7 @@ export default function FeedPage() {
               { id: 'explore', label: 'Explore', icon: '🌍' },
             ]}
             activeTab={feedType}
-            onChange={setFeedType}
+            onChange={(tabId) => setFeedType(tabId as FeedType)}
           />
         </div>
       </div>
