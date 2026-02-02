@@ -199,10 +199,10 @@ export default function ShopsPage() {
         case 'reviews-desc':
           return b.review_count - a.review_count;
         case 'price-asc':
-          const priceOrder = { '$': 1, '$$': 2, '$$$': 3, '$$$$': 4, 'Not available': 999 };
+          const priceOrder: Record<string, number> = { '$': 1, '$$': 2, '$$$': 3, '$$$$': 4, 'Not available': 999 };
           return (priceOrder[a.price_level] || 999) - (priceOrder[b.price_level] || 999);
         case 'price-desc':
-          const priceOrderDesc = { '$': 4, '$$': 3, '$$$': 2, '$$$$': 1, 'Not available': 0 };
+          const priceOrderDesc: Record<string, number> = { '$': 4, '$$': 3, '$$$': 2, '$$$$': 1, 'Not available': 0 };
           return (priceOrderDesc[a.price_level] || 0) - (priceOrderDesc[b.price_level] || 0);
         default:
           return 0;
