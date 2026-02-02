@@ -30,6 +30,7 @@ export default function ShopsPage() {
   const [sortBy, setSortBy] = useState<SortType>('rating-desc');
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [priceFilters, setPriceFilters] = useState<Set<string>>(new Set());
+  const [locationRetried, setLocationRetried] = useState(false);
 
   // Get user's location on page load
   useEffect(() => {
@@ -43,16 +44,42 @@ export default function ShopsPage() {
         },
         (err) => {
           console.error("Geolocation error:", err);
-          setError("Unable to get your location. Please use the search box below.");
+          let errorMsg = "Unable to get your location. ";
+
+          switch (err.code) {
+            case err.PERMISSION_DENIED:
+              errorMsg += "Location permission was denied. Please enable location in your browser settings or use the search box below.";
+              break;
+            case err.POSITION_UNAVAILABLE:
+              errorMsg += "Location information unavailable. Please use the search box below.";
+              break;
+            case err.TIMEOUT:
+              errorMsg += "Location request timed out. Please use the search box below.";
+              break;
+            default:
+              errorMsg += "Please use the search box below to find coffee shops.";
+          }
+
+          // Add HTTPS note for mobile
+          if (typeof window !== 'undefined' && window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {
+            errorMsg += " (Note: Mobile browsers require HTTPS for location access)";
+          }
+
+          setError(errorMsg);
           setLoading(false);
 
           const defaultLoc = "33.4484,-112.0740";
           setLocation(defaultLoc);
           fetchShops(defaultLoc);
+        },
+        {
+          enableHighAccuracy: false,
+          timeout: 10000,
+          maximumAge: 300000 // 5 minutes cache
         }
       );
     } else {
-      setError("Geolocation not supported by your browser.");
+      setError("Geolocation not supported by your browser. Please use the search box.");
       setLoading(false);
 
       const defaultLoc = "33.4484,-112.0740";
@@ -201,6 +228,33 @@ export default function ShopsPage() {
 
   const hasActiveFilters = activeFilter !== 'all' || priceFilters.size > 0;
 
+  const retryLocation = () => {
+    setLocationRetried(true);
+    setError(null);
+    setLoading(true);
+
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          const loc = `${latitude},${longitude}`;
+          setLocation(loc);
+          fetchShops(loc);
+        },
+        (err) => {
+          console.error("Geolocation retry error:", err);
+          setError("Still unable to get your location. Please use the search box above to find coffee shops.");
+          setLoading(false);
+        },
+        {
+          enableHighAccuracy: false,
+          timeout: 10000,
+          maximumAge: 300000
+        }
+      );
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50">
       {/* Navigation - Sticky */}
@@ -328,7 +382,15 @@ export default function ShopsPage() {
         {/* Error Message */}
         {error && (
           <div className="mb-4 md:mb-6 p-3 md:p-4 bg-amber-100 border border-amber-300 rounded-lg md:rounded-xl text-amber-800 text-sm md:text-base">
-            ⚠️ {error}
+            <p className="mb-2">⚠️ {error}</p>
+            {!locationRetried && (
+              <button
+                onClick={retryLocation}
+                className="bg-amber-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-amber-800 transition"
+              >
+                📍 Try Location Again
+              </button>
+            )}
           </div>
         )}
 

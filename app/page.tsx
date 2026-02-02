@@ -3,19 +3,6 @@ import Link from "next/link";
 export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50">
-      {/* Navigation - Sticky */}
-      <nav className="sticky top-0 z-50 flex items-center justify-between p-6 bg-white shadow-md">
-        <div className="text-2xl font-bold text-amber-800">☕ CoffeeConnect</div>
-        <div className="flex gap-6">
-          <Link href="/shops" className="text-gray-700 hover:text-amber-700 transition">
-            Find Shops
-          </Link>
-          <Link href="/about" className="text-gray-700 hover:text-amber-700 transition">
-            About
-          </Link>
-        </div>
-      </nav>
-
       {/* Hero Section */}
       <main className="max-w-6xl mx-auto px-6 py-20">
         <div className="text-center mb-16">
@@ -24,7 +11,7 @@ export default function Home() {
             <span className="block text-amber-700">Favorite Coffee Spot</span>
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-10">
-            Join friends in exploring the best local coffee shops. Share reviews,
+            Join friends in exploring the best local coffee shops. Share drinks,
             find hidden gems, and connect over your love of great coffee.
           </p>
           <div className="flex gap-4 justify-center">
