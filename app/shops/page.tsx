@@ -99,6 +99,13 @@ export default function ShopsPage() {
     setFavorites(favs);
   }, [shops]);
 
+  // Auto-update filtered shops when shops or filters change
+  useEffect(() => {
+    if (shops.length > 0) {
+      applyFilterAndSort(activeFilter, sortBy, shops, favorites, priceFilters);
+    }
+  }, [shops, favorites]);
+
   const fetchShops = async (loc: string, query: string = "coffee shop") => {
     setLoading(true);
     setError(null);
