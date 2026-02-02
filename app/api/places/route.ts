@@ -15,16 +15,14 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  if (!location) {
-    return NextResponse.json(
-      { error: 'Location parameter required' },
-      { status: 400 }
-    );
-  }
-
   try {
     // Google Places Text Search API
-    const url = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(query)}&location=${location}&radius=${radius}&key=${apiKey}`;
+    // If location is provided, use it; otherwise search globally (for city searches like "Portland, OR coffee shops")
+    let url = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(query)}&key=${apiKey}`;
+
+    if (location) {
+      url += `&location=${location}&radius=${radius}`;
+    }
 
     const response = await fetch(url);
     const data = await response.json();
