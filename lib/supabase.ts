@@ -415,7 +415,7 @@ export const db = {
 
   // Real-time subscriptions
   subscribeToPosts(userId: string, callback: (payload: any) => void) {
-    return supabase
+    return supabase!
       .channel('posts-channel')
       .on(
         'postgres_changes',
@@ -430,7 +430,7 @@ export const db = {
   },
 
   subscribeToFriendships(userId: string, callback: (payload: any) => void) {
-    return supabase
+    return supabase!
       .channel('friendships-channel')
       .on(
         'postgres_changes',
