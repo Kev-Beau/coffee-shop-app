@@ -50,21 +50,11 @@ export default function DrinkLogModal({
     setLoading(true);
 
     try {
-      // Get current session to include auth token
-      const { data: { session } } = await supabase!.auth.getSession();
-
-      const headers: HeadersInit = {
-        'Content-Type': 'application/json',
-      };
-
-      // Include auth token if available
-      if (session?.access_token) {
-        headers['Authorization'] = `Bearer ${session.access_token}`;
-      }
-
       const response = await fetch('/api/posts', {
         method: 'POST',
-        headers,
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({
           shop_id: shopId,
           shop_name: shopName,
@@ -75,6 +65,7 @@ export default function DrinkLogModal({
           shop_tags: shopTags,
           coffee_notes: coffeeNotes,
         }),
+        credentials: 'include', // Include cookies
       });
 
       if (!response.ok) {

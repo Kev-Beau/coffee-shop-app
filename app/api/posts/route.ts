@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { createServerClient } from '@supabase/ssr';
 import { db } from '@/lib/supabase';
 
 function createSupabaseClient(request: NextRequest) {
-  // Extract cookies from request headers
   const cookieHeader = request.headers.get('cookie') || '';
 
   // Parse cookies into a record
@@ -15,20 +14,16 @@ function createSupabaseClient(request: NextRequest) {
     }
   });
 
-  // Create Supabase client with cookie storage
-  return createClient(
+  return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
-      auth: {
-        storage: {
-          getItem: (key: string) => {
-            return cookies[key] || null;
-          },
-          setItem: () => {},
-          removeItem: () => {},
+      cookies: {
+        get(name: string) {
+          return cookies[name];
         },
-        persistSession: true,
+        set() {},
+        remove() {},
       },
     }
   );
@@ -37,27 +32,7 @@ function createSupabaseClient(request: NextRequest) {
 // GET /api/posts - Fetch posts
 export async function GET(request: NextRequest) {
   try {
-    const authHeader = request.headers.get('authorization');
-    let supabase;
-
-    // Try auth header first, fallback to cookies
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      const accessToken = authHeader.substring(7);
-      supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-        {
-          global: {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          },
-        }
-      );
-    } else {
-      supabase = createSupabaseClient(request);
-    }
-
+    const supabase = createSupabaseClient(request);
     const { searchParams } = new URL(request.url);
     const feedType = searchParams.get('feedType') || 'explore';
     const limit = parseInt(searchParams.get('limit') || '20');
@@ -165,49 +140,10 @@ export async function GET(request: NextRequest) {
 // POST /api/posts - Create a new post
 export async function POST(request: NextRequest) {
   try {
-    // Get authorization header from client
-    const authHeader = request.headers.get('authorization');
-    const cookieHeader = request.headers.get('cookie');
-
-    console.log('=== AUTH DEBUG ===');
-    console.log('Has Authorization header:', !!authHeader);
-    console.log('Auth header (first 50 chars):', authHeader?.substring(0, 50) || 'NONE');
-    console.log('Has cookies:', !!cookieHeader);
-
-    // Try to get user from auth header first
-    let user, authError;
-
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      // Use token from Authorization header
-      const accessToken = authHeader.substring(7);
-      const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-        {
-          global: {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          },
-        }
-      );
-      const result = await supabase.auth.getUser();
-      user = result.data.user;
-      authError = result.error;
-    } else {
-      // Fallback to cookies
-      const supabase = createSupabaseClient(request);
-      const result = await supabase.auth.getUser();
-      user = result.data.user;
-      authError = result.error;
-    }
-
-    console.log('User ID:', user?.id || 'No user');
-    console.log('Auth error:', authError?.message || 'None');
-    console.log('=== END DEBUG ===');
+    const supabase = createSupabaseClient(request);
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      console.log('REJECTING: Unauthorized');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
