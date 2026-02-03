@@ -154,7 +154,9 @@ export default function ProfilePage() {
             <PencilIcon className="w-5 h-5" />
           </button>
         </div>
+      </div>
 
+      {/* Content */}
       <div className="max-w-4xl mx-auto px-4 md:py-6 space-y-4">
         {/* Profile Card */}
         <div className="bg-white rounded-3xl shadow-lg overflow-hidden">
