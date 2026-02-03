@@ -80,7 +80,7 @@ export default function FeedPage() {
   }, [feedType]);
 
   const fetchPosts = async () => {
-    if (!user || !supabase) return;
+    if (!supabase) return;
 
     setLoading(true);
     setError(null);
