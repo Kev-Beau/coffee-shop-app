@@ -14,6 +14,7 @@ export default function FeedPage() {
   const [feedType, setFeedType] = useState<FeedType>('explore');
   const [posts, setPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
 
   // Show setup message if Supabase not configured
@@ -71,20 +72,32 @@ export default function FeedPage() {
     if (!user || !supabase) return;
 
     setLoading(true);
+    setError(null);
 
     try {
+      console.log('Fetching posts for', feedType, 'feed...');
+
       // Get current session for auth token
       const { data: { session } } = await supabase.auth.getSession();
+
+      if (!session) {
+        setError('No active session. Please sign in again.');
+        return;
+      }
 
       const headers: HeadersInit = {};
       if (session?.access_token) {
         headers['Authorization'] = `Bearer ${session.access_token}`;
       }
 
+      console.log('Fetching from /api/posts?feedType=', feedType);
+
       const response = await fetch(
         `/api/posts?feedType=${feedType}&limit=20`,
         { headers }
       );
+
+      console.log('Response status:', response.status);
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -92,7 +105,10 @@ export default function FeedPage() {
 
       const data = await response.json();
 
+      console.log('Response data:', data);
+
       if (data.error) {
+        setError(data.error);
         console.error('Error fetching posts:', data.error);
         return;
       }
@@ -102,6 +118,7 @@ export default function FeedPage() {
     } catch (error: any) {
       console.error('Error fetching posts:', error);
       console.error('Error details:', error.message);
+      setError(error.message || 'Failed to load feed');
     } finally {
       setLoading(false);
     }
@@ -167,6 +184,24 @@ export default function FeedPage() {
         <div className="text-center">
           <div className="w-12 h-12 border-4 border-amber-700 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
           <p className="text-gray-600">Loading feed...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50 flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-8 text-center">
+          <div className="text-5xl mb-4">⚠️</div>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">Error Loading Feed</h2>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-6 py-3 bg-amber-700 text-white rounded-lg font-semibold hover:bg-amber-800 transition"
+          >
+            Reload Page
+          </button>
         </div>
       </div>
     );
