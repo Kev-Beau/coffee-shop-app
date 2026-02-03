@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import FeedCard from '../components/FeedCard';
 import TabNavigation from '../components/TabNavigation';
+import Navigation from '../components/Navigation';
 
 type FeedType = 'friends' | 'explore';
 
@@ -220,23 +221,24 @@ export default function FeedPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50 pb-20">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-2xl mx-auto px-4 py-4">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Feed</h1>
-          <TabNavigation
-            tabs={[
-              { id: 'friends', label: 'Friends', icon: '👥' },
-              { id: 'explore', label: 'Explore', icon: '🌍' },
-            ]}
-            activeTab={feedType}
-            onChange={(tabId) => setFeedType(tabId as FeedType)}
-          />
-        </div>
+      {/* Navigation */}
+      <Navigation />
+
+      {/* Page Header */}
+      <div className="max-w-2xl mx-auto px-4 py-6">
+        <h1 className="text-2xl font-bold text-gray-900 mb-4">Feed</h1>
+        <TabNavigation
+          tabs={[
+            { id: 'friends', label: 'Friends', icon: '👥' },
+            { id: 'explore', label: 'Explore', icon: '🌍' },
+          ]}
+          activeTab={feedType}
+          onChange={(tabId) => setFeedType(tabId as FeedType)}
+        />
       </div>
 
       {/* Content */}
-      <div className="max-w-2xl mx-auto px-4 py-6">
+      <div className="max-w-2xl mx-auto px-4 pb-6">
         {loading ? (
           <div className="text-center py-12">
             <div className="w-12 h-12 border-4 border-amber-700 border-t-transparent rounded-full animate-spin mx-auto mb-4" />

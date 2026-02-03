@@ -71,38 +71,26 @@ export default function Navigation() {
   }
 
   return (
-    <nav className="sticky top-0 z-50 bg-white shadow-md">
+    <nav className="sticky top-0 z-50 bg-white border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-14">
           {/* Logo */}
           <Link
             href="/"
-            className="text-2xl font-bold text-amber-800 hover:text-amber-900 transition"
+            className="flex items-center gap-2 text-xl font-bold text-amber-800 hover:text-amber-900 transition"
           >
             ☕ CoffeeConnect
           </Link>
 
-          {/* Setup Warning */}
-          {!isSupabaseConfigured && (
-            <Link
-              href="https://supabase.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hidden md:inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800 hover:bg-amber-200 transition"
-            >
-              ⚠️ Setup Required
-            </Link>
-          )}
-
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-6">
+          <div className="hidden md:flex items-center gap-6">
             {currentNav.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className="text-gray-700 hover:text-amber-700 transition flex items-center gap-1"
+                className="text-gray-600 hover:text-amber-700 transition font-medium flex items-center gap-1"
               >
-                {item.icon && <span>{item.icon}</span>}
+                {item.icon && <span className="text-lg">{item.icon}</span>}
                 <span>{item.label}</span>
               </Link>
             ))}
@@ -111,13 +99,19 @@ export default function Navigation() {
               <>
                 <Link
                   href="/profile"
-                  className="text-gray-700 hover:text-amber-700 transition"
+                  className="text-gray-600 hover:text-amber-700 transition font-medium"
                 >
                   Profile
                 </Link>
+                <Link
+                  href="/settings"
+                  className="text-gray-600 hover:text-amber-700 transition font-medium"
+                >
+                  Settings
+                </Link>
                 <button
                   onClick={handleSignOut}
-                  className="text-gray-700 hover:text-amber-700 transition"
+                  className="text-gray-600 hover:text-amber-700 transition font-medium"
                 >
                   Sign Out
                 </button>
@@ -125,7 +119,7 @@ export default function Navigation() {
             ) : (
               <Link
                 href="/auth/signin"
-                className="bg-amber-700 text-white px-4 py-2 rounded-lg font-medium hover:bg-amber-800 transition"
+                className="bg-amber-700 text-white px-4 py-2 rounded-lg font-medium hover:bg-amber-800 transition text-sm"
               >
                 Sign In
               </Link>
