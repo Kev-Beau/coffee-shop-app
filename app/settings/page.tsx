@@ -20,6 +20,7 @@ export default function SettingsPage() {
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   // Form state
+  const [username, setUsername] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [bio, setBio] = useState('');
   const [privacyLevel, setPrivacyLevel] = useState<'public' | 'friends_only' | 'private'>('public');
@@ -51,6 +52,7 @@ export default function SettingsPage() {
       setProfile(data);
 
       // Set form values
+      setUsername(data?.username || '');
       setDisplayName(data?.display_name || '');
       setBio(data?.bio || '');
       setPrivacyLevel(data?.privacy_level || 'public');
@@ -73,7 +75,32 @@ export default function SettingsPage() {
     setMessage(null);
 
     try {
+      // Validate username
+      if (username.length < 3) {
+        showMessage('error', 'Username must be at least 3 characters');
+        setSaving(false);
+        return;
+      }
+
+      // Check if username changed
+      if (username !== profile?.username) {
+        // Check if new username is already taken
+        const { data: existingUser } = await supabase
+          .from('profiles')
+          .select('username')
+          .eq('username', username)
+          .neq('id', user.id)  // Exclude current user
+          .maybeSingle();
+
+        if (existingUser) {
+          showMessage('error', 'This username is already taken');
+          setSaving(false);
+          return;
+        }
+      }
+
       await db.updateProfile(user.id, {
+        username,
         display_name: displayName || undefined,
         bio: bio || undefined,
         privacy_level: privacyLevel,
@@ -182,6 +209,23 @@ export default function SettingsPage() {
           <h2 className="text-lg font-bold text-gray-900 mb-4">Profile Settings</h2>
 
           <div className="space-y-4">
+            {/* Username */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Username
+              </label>
+              <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="coffee-lover"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none transition"
+              />
+              <p className="mt-1 text-sm text-gray-500">
+                Your unique username (3+ characters, lowercase letters, numbers, hyphens)
+              </p>
+            </div>
+
             {/* Display Name */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
