@@ -138,7 +138,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-900 via-amber-800 to-amber-50 pb-20">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-amber-100 pb-20">
       {/* Content */}
       <div className="max-w-4xl mx-auto px-4 md:py-6 space-y-4 pt-6">
         {/* Profile Card */}
@@ -146,7 +146,7 @@ export default function ProfilePage() {
           {/* Cover & Profile */}
           <div className="relative">
             {/* Cover gradient */}
-            <div className="h-24 md:h-32 bg-gradient-to-r from-amber-900 via-amber-800 to-amber-700" />
+            <div className="h-24 md:h-32 bg-gradient-to-r from-amber-800 via-amber-700 to-orange-800" />
 
             {/* Profile Picture */}
             <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 md:left-8 md:translate-x-0">
