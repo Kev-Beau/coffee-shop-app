@@ -1,11 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@supabase/ssr';
+import { createClient } from '@supabase/supabase-js';
 import { db } from '@/lib/supabase';
 
 function createSupabaseClient(request: NextRequest) {
-  const cookieHeader = request.headers.get('cookie') || '';
+  const authHeader = request.headers.get('authorization');
 
-  // Parse cookies into a record
+  // If Authorization header is present, use it
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const accessToken = authHeader.substring(7);
+    return createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        global: {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      }
+    );
+  }
+
+  // Otherwise, fall back to cookies
+  const cookieHeader = request.headers.get('cookie') || '';
   const cookies: Record<string, string> = {};
   cookieHeader.split(';').forEach((cookie) => {
     const [name, value] = cookie.trim().split('=');
@@ -14,16 +31,16 @@ function createSupabaseClient(request: NextRequest) {
     }
   });
 
-  return createServerClient(
+  return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
-      cookies: {
-        get(name: string) {
-          return cookies[name];
+      auth: {
+        storage: {
+          getItem: (key: string) => cookies[key] || null,
+          setItem: () => {},
+          removeItem: () => {},
         },
-        set() {},
-        remove() {},
       },
     }
   );
