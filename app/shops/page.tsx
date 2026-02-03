@@ -268,18 +268,8 @@ export default function ShopsPage() {
       {/* Navigation */}
       <Navigation />
 
-      {/* Page Header */}
+      {/* Search & Controls */}
       <main className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-12">
-        <div className="mb-6">
-          <h1 className="text-2xl md:text-4xl font-bold text-gray-900 mb-2">
-            Explore Real Coffee Shops ☕
-          </h1>
-          <p className="text-base md:text-lg text-gray-600">
-            Discover actual coffee shops near you (powered by Google)
-          </p>
-        </div>
-
-        {/* Unified Control Bar */}
         <div className="bg-white rounded-xl md:rounded-2xl shadow-lg p-4 md:p-6 mb-6 md:mb-8">
           {/* Row 1: Search, Sort, Results */}
           <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-3 mb-3 md:mb-4">

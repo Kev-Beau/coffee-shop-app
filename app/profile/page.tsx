@@ -143,21 +143,8 @@ export default function ProfilePage() {
       {/* Navigation */}
       <Navigation />
 
-      {/* Page Header */}
-      <div className="max-w-4xl mx-auto px-4 md:px-6 py-6">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">{profile?.username}</h1>
-          <button
-            onClick={() => router.push('/settings')}
-            className="p-2.5 bg-amber-100 rounded-xl text-amber-900 hover:bg-amber-200 transition"
-          >
-            <PencilIcon className="w-5 h-5" />
-          </button>
-        </div>
-      </div>
-
       {/* Content */}
-      <div className="max-w-4xl mx-auto px-4 md:py-6 space-y-4">
+      <div className="max-w-4xl mx-auto px-4 md:py-6 space-y-4 pt-6">
         {/* Profile Card */}
         <div className="bg-white rounded-3xl shadow-lg overflow-hidden">
           {/* Cover & Profile */}
