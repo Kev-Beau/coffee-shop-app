@@ -164,10 +164,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
     const body = await request.json();
     const { shop_id, shop_name, drink_name, rating, photo_url, location_notes, shop_tags, coffee_notes } = body;
 
@@ -186,18 +182,30 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create post
-    const { data: post, error } = await db.createPost({
-      user_id: user.id,
-      shop_id,
-      shop_name,
-      drink_name,
-      rating,
-      photo_url: photo_url || null,
-      location_notes: location_notes || null,
-      shop_tags: shop_tags || [],
-      coffee_notes: coffee_notes || [],
-    });
+    // Create post using the AUTHENTICATED supabase client (not the global one)
+    const { data: post, error } = await supabase
+      .from('posts')
+      .insert({
+        user_id: user.id,
+        shop_id,
+        shop_name,
+        drink_name,
+        rating,
+        photo_url: photo_url || null,
+        location_notes: location_notes || null,
+        shop_tags: shop_tags || [],
+        coffee_notes: coffee_notes || [],
+      })
+      .select(`
+        *,
+        profiles (
+          id,
+          username,
+          display_name,
+          avatar_url
+        )
+      `)
+      .single();
 
     if (error) throw error;
 
