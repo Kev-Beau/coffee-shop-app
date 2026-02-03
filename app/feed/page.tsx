@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import FeedCard from '../components/FeedCard';
 import TabNavigation from '../components/TabNavigation';
-import Navigation from '../components/Navigation';
 
 type FeedType = 'friends' | 'explore';
 
@@ -221,9 +220,6 @@ export default function FeedPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50 pb-20">
-      {/* Navigation */}
-      <Navigation />
-
       {/* Tab Navigation */}
       <div className="max-w-2xl mx-auto px-4 py-6">
         <TabNavigation

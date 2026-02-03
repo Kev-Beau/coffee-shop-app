@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
 import { PencilIcon, Squares2X2Icon, BookmarkIcon, MapPinIcon, UserGroupIcon } from '@heroicons/react/24/outline';
 import { db } from '@/lib/supabase';
-import Navigation from '../components/Navigation';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -140,9 +139,6 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-amber-100 pb-20">
-      {/* Navigation */}
-      <Navigation />
-
       {/* Content */}
       <div className="max-w-4xl mx-auto px-4 md:py-6 space-y-4 pt-6">
         {/* Profile Card */}

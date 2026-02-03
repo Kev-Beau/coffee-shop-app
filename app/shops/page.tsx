@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { isFavorite, toggleFavorite } from "../lib/storage";
-import Navigation from "../components/Navigation";
 
 interface GoogleShop {
   place_id: string;
@@ -265,9 +264,6 @@ export default function ShopsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50 pb-20">
-      {/* Navigation */}
-      <Navigation />
-
       {/* Search & Controls */}
       <main className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-12">
         <div className="bg-white rounded-xl md:rounded-2xl shadow-lg p-4 md:p-6 mb-6 md:mb-8">
