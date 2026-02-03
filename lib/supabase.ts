@@ -44,6 +44,7 @@ export const db = {
   },
 
   async updateProfile(userId: string, updates: Partial<{
+    username: string;
     display_name: string;
     bio: string;
     avatar_url: string;
