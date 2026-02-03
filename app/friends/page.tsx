@@ -21,6 +21,16 @@ export default function FriendsPage() {
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<'friends' | 'requests' | 'search'>('friends');
 
+  // Helper to get auth headers
+  const getAuthHeaders = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    const headers: HeadersInit = {};
+    if (session?.access_token) {
+      headers['Authorization'] = `Bearer ${session.access_token}`;
+    }
+    return headers;
+  };
+
   useEffect(() => {
     // Check authentication
     const checkAuth = async () => {
@@ -40,9 +50,11 @@ export default function FriendsPage() {
 
   const loadData = async () => {
     try {
+      const headers = await getAuthHeaders();
+
       const [friendsRes, requestsRes] = await Promise.all([
-        fetch('/api/friends/list'),
-        fetch('/api/friends/list'),
+        fetch('/api/friends/list', { headers }),
+        fetch('/api/friends/list', { headers }),
       ]);
 
       const friendsData = await friendsRes.json();
@@ -64,7 +76,8 @@ export default function FriendsPage() {
     if (!searchQuery.trim() || searchQuery.length < 2) return;
 
     try {
-      const response = await fetch(`/api/friends/search?q=${encodeURIComponent(searchQuery)}`);
+      const headers = await getAuthHeaders();
+      const response = await fetch(`/api/friends/search?q=${encodeURIComponent(searchQuery)}`, { headers });
       const data = await response.json();
 
       if (data.data) {
@@ -77,9 +90,12 @@ export default function FriendsPage() {
 
   const handleSendRequest = async (receiverId: string) => {
     try {
+      const headers = await getAuthHeaders();
+      headers['Content-Type'] = 'application/json';
+
       const response = await fetch('/api/friends/request', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({ receiverId }),
       });
 
@@ -102,9 +118,12 @@ export default function FriendsPage() {
 
   const handleAcceptRequest = async (friendshipId: string) => {
     try {
+      const headers = await getAuthHeaders();
+      headers['Content-Type'] = 'application/json';
+
       const response = await fetch('/api/friends/accept', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({ friendshipId }),
       });
 
@@ -123,8 +142,10 @@ export default function FriendsPage() {
 
   const handleRemoveFriend = async (friendshipId: string) => {
     try {
+      const headers = await getAuthHeaders();
       const response = await fetch(`/api/friends/remove?friendshipId=${friendshipId}`, {
         method: 'DELETE',
+        headers,
       });
 
       if (response.ok) {

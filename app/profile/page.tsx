@@ -70,7 +70,15 @@ export default function ProfilePage() {
 
     try {
       if (tab === 'posts') {
-        const response = await fetch(`/api/posts?userId=${user.id}`);
+        // Get auth token
+        const { data: { session } } = await supabase.auth.getSession();
+
+        const headers: HeadersInit = {};
+        if (session?.access_token) {
+          headers['Authorization'] = `Bearer ${session.access_token}`;
+        }
+
+        const response = await fetch(`/api/posts?userId=${user.id}`, { headers });
         const data = await response.json();
         setPosts(data.data || []);
       } else if (tab === 'visits') {
