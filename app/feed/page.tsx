@@ -43,19 +43,30 @@ export default function FeedPage() {
   useEffect(() => {
     // Check authentication
     const checkAuth = async () => {
-      if (!supabase) return;
+      console.log('Feed: Checking authentication...');
+      console.log('Feed: supabase exists?', !!supabase);
+
+      if (!supabase) {
+        console.log('Feed: No supabase client');
+        return;
+      }
 
       const { data: { session } } = await supabase.auth.getSession();
 
+      console.log('Feed: session exists?', !!session);
+
       if (!session) {
+        console.log('Feed: No session, redirecting to signin');
         // Redirect to signin if not authenticated
         window.location.href = '/auth/signin';
         return;
       }
 
+      console.log('Feed: User authenticated:', session.user.id);
       setUser(session.user);
 
       // Load posts
+      console.log('Feed: Calling fetchPosts');
       fetchPosts();
     };
 
