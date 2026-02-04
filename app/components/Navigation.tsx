@@ -50,14 +50,11 @@ export default function Navigation() {
   };
 
   const loggedOutNav: NavItem[] = [
-    { label: 'Find Shops', href: '/shops', icon: '🔍' },
     { label: 'About', href: '/about', icon: 'ℹ️' },
   ];
 
   const loggedInNav: NavItem[] = [
-    { label: 'Find Shops', href: '/shops', icon: '🔍' },
-    { label: 'Feed', href: '/feed', icon: '📰' },
-    { label: 'Friends', href: '/friends', icon: '👥' },
+    // Empty - main nav is in bottom bar on mobile
   ];
 
   const currentNav = user ? loggedInNav : loggedOutNav;
@@ -161,13 +158,6 @@ export default function Navigation() {
 
             {user ? (
               <>
-                <Link
-                  href="/profile"
-                  className="block px-3 py-2 rounded-lg text-gray-700 hover:bg-amber-50 hover:text-amber-700 transition"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Profile
-                </Link>
                 <Link
                   href="/settings"
                   className="block px-3 py-2 rounded-lg text-gray-700 hover:bg-amber-50 hover:text-amber-700 transition"
