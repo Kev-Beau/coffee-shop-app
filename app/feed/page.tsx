@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import FeedCard from '../components/FeedCard';
 import TabNavigation from '../components/TabNavigation';
+import { usePullToRefresh } from '../hooks/usePullToRefresh';
 
 type FeedType = 'friends' | 'explore';
 
@@ -189,6 +190,10 @@ export default function FeedPage() {
     setRefreshing(false);
   };
 
+  const { containerRef, pullDistance, refreshing: pullRefreshing } = usePullToRefresh({
+    onRefresh: handleRefresh,
+  });
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50 flex items-center justify-center">
@@ -220,8 +225,19 @@ export default function FeedPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50 pb-20">
-      {/* Tab Navigation */}
-      <div className="max-w-2xl mx-auto px-4 py-6">
+      {/* Pull to Refresh Indicator */}
+      <div className="flex justify-center pt-2" style={{ height: pullDistance > 0 ? pullDistance : 0, overflow: 'hidden' }}>
+        {pullDistance > 40 && (
+          <div className="flex items-center gap-2 text-amber-700">
+            <div className="w-5 h-5 border-2 border-amber-700 border-t-transparent rounded-full animate-spin" />
+            <span className="text-sm font-medium">Refreshing...</span>
+          </div>
+        )}
+      </div>
+
+      <div ref={containerRef}>
+        {/* Tab Navigation */}
+        <div className="max-w-2xl mx-auto px-4 py-6">
         <TabNavigation
           tabs={[
             { id: 'friends', label: 'Friends', icon: '👥' },
@@ -296,6 +312,7 @@ export default function FeedPage() {
             </div>
           </>
         )}
+      </div>
       </div>
     </div>
   );

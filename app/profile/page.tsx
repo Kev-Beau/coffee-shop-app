@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
 import { PencilIcon, Squares2X2Icon, BookmarkIcon, MapPinIcon, UserGroupIcon } from '@heroicons/react/24/outline';
 import { db } from '@/lib/supabase';
+import { usePullToRefresh } from '../hooks/usePullToRefresh';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -102,6 +103,17 @@ export default function ProfilePage() {
     }
   };
 
+  const handleRefresh = async () => {
+    if (user) {
+      await loadProfileData(user.id);
+      await loadTabData(activeTab);
+    }
+  };
+
+  const { containerRef, pullDistance } = usePullToRefresh({
+    onRefresh: handleRefresh,
+  });
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -139,8 +151,19 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-amber-100 pb-20">
-      {/* Content */}
-      <div className="max-w-4xl mx-auto px-4 md:py-6 space-y-4 pt-6">
+      {/* Pull to Refresh Indicator */}
+      <div className="flex justify-center pt-2" style={{ height: pullDistance > 0 ? pullDistance : 0, overflow: 'hidden' }}>
+        {pullDistance > 40 && (
+          <div className="flex items-center gap-2 text-amber-700">
+            <div className="w-5 h-5 border-2 border-amber-700 border-t-transparent rounded-full animate-spin" />
+            <span className="text-sm font-medium">Refreshing...</span>
+          </div>
+        )}
+      </div>
+
+      <div ref={containerRef}>
+        {/* Content */}
+        <div className="max-w-4xl mx-auto px-4 md:py-6 space-y-4 pt-6">
         {/* Profile Card */}
         <div className="bg-white rounded-3xl shadow-lg overflow-hidden">
           {/* Cover & Profile */}
@@ -358,6 +381,7 @@ export default function ProfilePage() {
             </>
           )}
         </div>
+      </div>
       </div>
     </div>
   );
