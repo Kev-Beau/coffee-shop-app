@@ -55,6 +55,7 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '20');
     const offset = parseInt(searchParams.get('offset') || '0');
     const userId = searchParams.get('userId');
+    const search = searchParams.get('search');
 
     // Check authentication
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -76,10 +77,17 @@ export async function GET(request: NextRequest) {
         )
       `)
       .order('created_at', { ascending: false })
-      .range(offset, offset + limit - 1);
+      .limit(search ? 20 : limit);
+
+    // If searching, filter by drink name or shop name
+    if (search) {
+      query = query.or(`drink_name.ilike.%${search}%,shop_name.ilike.%${search}%,coffee_notes.cs.{${search}}`);
+    } else {
+      query = query.range(offset, offset + limit - 1);
+    }
 
     // If getting specific user's posts
-    if (userId) {
+    if (userId && !search) {
       query = query.eq('user_id', userId);
     }
 

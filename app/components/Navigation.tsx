@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import { Bars3Icon, XMarkIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 
 interface NavItem {
   label: string;
@@ -91,6 +91,13 @@ export default function Navigation() {
                 <span>{item.label}</span>
               </Link>
             ))}
+
+            <Link
+              href="/search"
+              className="text-gray-600 hover:text-amber-700 transition font-medium"
+            >
+              <MagnifyingGlassIcon className="w-5 h-5" />
+            </Link>
 
             {user ? (
               <>
