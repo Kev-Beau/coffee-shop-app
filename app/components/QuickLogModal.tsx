@@ -130,9 +130,9 @@ export default function QuickLogModal({ isOpen, onClose }: QuickLogModalProps) {
 
         {/* Modal */}
         <div className="flex min-h-full items-end justify-center">
-          <div className="relative bg-white w-full max-w-lg rounded-t-3xl shadow-xl">
+          <div className="relative bg-white w-full max-w-lg rounded-t-3xl shadow-xl max-h-[85vh] flex flex-col">
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-gray-200">
+            <div className="flex items-center justify-between p-4 border-b border-gray-200 flex-shrink-0">
               <h2 className="text-xl font-bold text-gray-900">Quick Log</h2>
               <button
                 onClick={onClose}
@@ -142,8 +142,10 @@ export default function QuickLogModal({ isOpen, onClose }: QuickLogModalProps) {
               </button>
             </div>
 
-            {/* Search Bar */}
-            <div className="p-4 pb-2">
+            {/* Content Area - scrollable */}
+            <div className="overflow-y-auto flex-1">
+              {/* Search Bar */}
+              <div className="p-4 pb-2">
               <div className="relative">
                 <MagnifyingGlassIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400 pointer-events-none" />
                 <input
@@ -178,7 +180,7 @@ export default function QuickLogModal({ isOpen, onClose }: QuickLogModalProps) {
                 ) : searchResults.length > 0 ? (
                   <>
                     <p className="text-sm text-gray-600 mb-3">{searchResults.length} result{searchResults.length !== 1 ? 's' : ''}</p>
-                    <div className="space-y-3 pb-8">
+                    <div className="space-y-3 pb-4">
                       {searchResults.map((shop) => (
                         <button
                           key={shop.place_id}
@@ -222,7 +224,7 @@ export default function QuickLogModal({ isOpen, onClose }: QuickLogModalProps) {
                 ) : recentShops.length > 0 ? (
                   <>
                     <p className="text-sm text-gray-600 mb-3">Or tap a recent shop:</p>
-                    <div className="space-y-3 pb-8">
+                    <div className="space-y-3 pb-4">
                       {recentShops.map((shop) => (
                         <button
                           key={shop.place_id}
@@ -244,6 +246,7 @@ export default function QuickLogModal({ isOpen, onClose }: QuickLogModalProps) {
                 )}
               </div>
             )}
+            </div>
           </div>
         </div>
       </div>
