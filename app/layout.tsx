@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   title: "CoffeeConnect - Discover Great Coffee Shops",
   description: "Find and share the best local coffee shops with friends. Discover new spots, read reviews, and connect over coffee.",
   manifest: "/manifest.json",
-  themeColor: "#92400e",
+  themeColor: "#fef3c7",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
