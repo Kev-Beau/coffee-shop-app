@@ -78,7 +78,7 @@ export default function QuickLogModal({ isOpen, onClose }: QuickLogModalProps) {
   const handleSearchShops = (e?: React.FormEvent) => {
     e?.preventDefault();
     if (searchQuery.trim()) {
-      onClose(); // Close modal before redirecting
+      onClose();
       router.push(`/shops?search=${encodeURIComponent(searchQuery)}`);
     }
   };
@@ -86,87 +86,88 @@ export default function QuickLogModal({ isOpen, onClose }: QuickLogModalProps) {
   const handleDrinkModalClose = () => {
     setShowDrinkModal(false);
     setSelectedShop(null);
-    onClose();
   };
 
   if (!isOpen) return null;
 
   return (
     <>
-      <div className="fixed inset-0 z-50 bg-black/50" onClick={onClose} />
-      <div className="fixed inset-0 z-50 flex items-end justify-center pointer-events-none">
-        <div
-          className="bg-white rounded-t-3xl w-full max-w-lg max-h-[80vh] animate-slide-up pointer-events-auto flex flex-col"
-          onClick={(e) => e.stopPropagation()}
-        >
-          {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-gray-200 flex-shrink-0">
-            <h2 className="text-xl font-bold text-gray-900">Quick Log</h2>
-            <button
-              onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-full transition"
-            >
-              <XMarkIcon className="w-6 h-6 text-gray-600" />
-            </button>
-          </div>
+      <div className="fixed inset-0 z-50 overflow-y-auto">
+        {/* Backdrop */}
+        <div className="fixed inset-0 bg-black bg-opacity-50 transition-opacity" onClick={onClose} />
 
-          {/* Content - Scrollable */}
-          <div className="p-4 overflow-y-auto flex-1 min-h-0">
-            {/* Search Bar */}
-            <div className="mb-5">
-              <form onSubmit={handleSearchShops}>
-                <div className="relative mb-3">
-                  <MagnifyingGlassIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" />
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search for any coffee shop..."
-                    className="w-full pl-12 pr-4 py-4 text-base bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 text-gray-900 placeholder-gray-400"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  disabled={!searchQuery.trim()}
-                  className="w-full py-3 bg-amber-700 text-white rounded-xl font-medium hover:bg-amber-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Search All Shops
-                </button>
-              </form>
+        {/* Modal */}
+        <div className="relative min-h-screen flex items-end justify-center p-4">
+          <div className="bg-white rounded-t-3xl w-full max-w-lg animate-slide-up">
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b border-gray-200">
+              <h2 className="text-xl font-bold text-gray-900">Quick Log</h2>
+              <button
+                onClick={onClose}
+                className="p-2 hover:bg-gray-100 rounded-full transition"
+              >
+                <XMarkIcon className="w-6 h-6 text-gray-600" />
+              </button>
             </div>
 
-            {/* Recent Shops */}
-            {!searchQuery && (
-              <>
-                {loading ? (
-                  <div className="text-center py-8">
-                    <div className="w-10 h-10 border-4 border-amber-700 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-                    <p className="text-gray-600 text-sm">Loading recent shops...</p>
+            {/* Content */}
+            <div className="p-4 max-h-[70vh] overflow-y-auto">
+              {/* Search Bar */}
+              <div className="mb-5">
+                <form onSubmit={handleSearchShops}>
+                  <div className="relative mb-3">
+                    <MagnifyingGlassIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" />
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="Search for any coffee shop..."
+                      className="w-full pl-12 pr-4 py-4 text-base bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 text-gray-900 placeholder-gray-400"
+                    />
                   </div>
-                ) : recentShops.length > 0 ? (
-                  <>
-                    <p className="text-sm text-gray-600 mb-3">Or tap a recent shop:</p>
-                    <div className="space-y-3">
-                      {recentShops.map((shop) => (
-                        <button
-                          key={shop.place_id}
-                          onClick={() => handleShopSelect(shop)}
-                          className="w-full bg-amber-50 hover:bg-amber-100 rounded-xl p-4 text-left transition"
-                        >
-                          <p className="font-semibold text-gray-900 text-base">{shop.place_name}</p>
-                          <p className="text-sm text-gray-600 truncate">{shop.address}</p>
-                        </button>
-                      ))}
+                  <button
+                    type="submit"
+                    disabled={!searchQuery.trim()}
+                    className="w-full py-3 bg-amber-700 text-white rounded-xl font-medium hover:bg-amber-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Search All Shops
+                  </button>
+                </form>
+              </div>
+
+              {/* Recent Shops */}
+              {!searchQuery && (
+                <>
+                  {loading ? (
+                    <div className="text-center py-8">
+                      <div className="w-10 h-10 border-4 border-amber-700 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+                      <p className="text-gray-600 text-sm">Loading recent shops...</p>
                     </div>
-                  </>
-                ) : (
-                  <div className="text-center py-8">
-                    <div className="text-5xl mb-3">📍</div>
-                    <p className="text-gray-600 text-sm">No recent visits</p>
-                  </div>
-                )}
-              </>
-            )}
+                  ) : recentShops.length > 0 ? (
+                    <>
+                      <p className="text-sm text-gray-600 mb-3">Or tap a recent shop:</p>
+                      <div className="space-y-3">
+                        {recentShops.map((shop) => (
+                          <button
+                            key={shop.place_id}
+                            onClick={() => handleShopSelect(shop)}
+                            className="w-full bg-amber-50 hover:bg-amber-100 rounded-xl p-4 text-left transition"
+                          >
+                            <p className="font-semibold text-gray-900 text-base">{shop.place_name}</p>
+                            <p className="text-sm text-gray-600 truncate">{shop.address}</p>
+                          </button>
+                        ))}
+                      </div>
+                    </>
+                  ) : (
+                    <div className="text-center py-8">
+                      <div className="text-5xl mb-3">📍</div>
+                      <p className="text-gray-600 text-sm">No recent visits</p>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
           </div>
         </div>
       </div>
