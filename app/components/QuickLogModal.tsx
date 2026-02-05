@@ -94,10 +94,13 @@ export default function QuickLogModal({ isOpen, onClose }: QuickLogModalProps) {
   return (
     <>
       <div className="fixed inset-0 z-50 bg-black/50" onClick={onClose} />
-      <div className="fixed inset-0 z-50 flex items-end justify-center">
-        <div className="bg-white rounded-t-3xl w-full max-w-lg max-h-[90vh] overflow-hidden animate-slide-up">
+      <div className="fixed inset-0 z-50 flex items-end justify-center pointer-events-none">
+        <div
+          className="bg-white rounded-t-3xl w-full max-w-lg max-h-[90vh] animate-slide-up pointer-events-auto flex flex-col"
+          onClick={(e) => e.stopPropagation()}
+        >
           {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-gray-200">
+          <div className="flex items-center justify-between p-4 border-b border-gray-200 flex-shrink-0">
             <h2 className="text-xl font-bold text-gray-900">Quick Log</h2>
             <button
               onClick={onClose}
@@ -108,7 +111,7 @@ export default function QuickLogModal({ isOpen, onClose }: QuickLogModalProps) {
           </div>
 
           {/* Content - Scrollable */}
-          <div className="p-4 overflow-y-auto" style={{ maxHeight: 'calc(90vh - 72px)' }}>
+          <div className="p-4 overflow-y-auto flex-1" style={{ maxHeight: 'calc(90vh - 72px)' }}>
             {/* Search Bar */}
             <div className="mb-5">
               <form onSubmit={handleSearchShops}>
