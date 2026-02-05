@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { Coffee } from 'lucide-react';
 import { HeartIcon, ChatBubbleLeftIcon } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid';
 import StarRating from './StarRating';
@@ -71,7 +72,7 @@ export default function FeedCard({ post, currentUserId, onLike, onUnlike }: Feed
             {post.profiles.avatar_url ? (
               <img src={post.profiles.avatar_url} alt="" className="w-full h-full object-cover" />
             ) : (
-              <span className="text-lg">☕</span>
+              <Coffee className="w-5 h-5 text-amber-700" />
             )}
           </div>
           <div>

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
 import { XMarkIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { MapPin, SearchX } from 'lucide-react';
 import DrinkLogModal from './DrinkLogModal';
 
 const supabase = createClient(
@@ -205,7 +206,7 @@ export default function QuickLogModal({ isOpen, onClose }: QuickLogModalProps) {
                   </>
                 ) : (
                   <div className="text-center py-8">
-                    <div className="text-5xl mb-3">😕</div>
+                    <SearchX className="w-12 h-12 mx-auto mb-3 text-gray-400" />
                     <p className="text-gray-600 text-sm">No results found</p>
                     <p className="text-xs text-gray-500 mt-2">Try a different search term</p>
                   </div>
@@ -239,7 +240,7 @@ export default function QuickLogModal({ isOpen, onClose }: QuickLogModalProps) {
                   </>
                 ) : (
                   <div className="text-center py-8">
-                    <div className="text-5xl mb-3">📍</div>
+                    <MapPin className="w-12 h-12 mx-auto mb-3 text-gray-400" />
                     <p className="text-gray-600 text-sm">No recent visits</p>
                     <p className="text-xs text-gray-500 mt-2">Tap search to find coffee shops</p>
                   </div>

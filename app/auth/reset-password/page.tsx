@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
+import { Coffee } from 'lucide-react';
 
 export default function ResetPasswordPage() {
   const [email, setEmail] = useState('');
@@ -64,7 +65,9 @@ export default function ResetPasswordPage() {
       <div className="max-w-md w-full">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="text-5xl mb-4">☕</div>
+          <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+            <Coffee className="w-16 h-16 text-amber-700" />
+          </div>
           <h1 className="text-3xl font-bold text-gray-900">CoffeeConnect</h1>
           <p className="text-gray-600 mt-2">Reset your password</p>
         </div>

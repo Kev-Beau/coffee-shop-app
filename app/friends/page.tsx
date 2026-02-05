@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
 import { MagnifyingGlassIcon, UserPlusIcon, UserMinusIcon, CheckIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { Coffee } from 'lucide-react';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -216,7 +217,11 @@ export default function FriendsPage() {
           <div className="space-y-4">
             {friends.length === 0 ? (
               <div className="text-center py-16">
-                <div className="text-6xl mb-4">👥</div>
+                <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                  <svg className="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                </div>
                 <h2 className="text-xl font-bold text-gray-900 mb-2">No Friends Yet</h2>
                 <p className="text-gray-600 mb-6">Find people to connect with!</p>
                 <button
@@ -239,7 +244,7 @@ export default function FriendsPage() {
                         {profile?.avatar_url ? (
                           <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
                         ) : (
-                          <span className="text-xl">☕</span>
+                          <Coffee className="w-5 h-5 text-amber-700" />
                         )}
                       </div>
                       <div>
@@ -267,7 +272,11 @@ export default function FriendsPage() {
           <div className="space-y-4">
             {incomingRequests.length === 0 && outgoingRequests.length === 0 ? (
               <div className="text-center py-16">
-                <div className="text-6xl mb-4">📬</div>
+                <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                  <svg className="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 19v-8.93a2 2 0 01.89-1.664l7-4.666a2 2 0 012.22 0l7 4.666A2 2 0 0121 10.07V19M3 19a2 2 0 002 2h14a2 2 0 002-2M3 19l6.75-4.5M21 19l-6.75-4.5M3 10l6.75 4.5M21 10l-6.75 4.5m0 0l-1.14.76a2 2 0 01-2.22 0l-1.14-.76" />
+                  </svg>
+                </div>
                 <h2 className="text-xl font-bold text-gray-900 mb-2">No Pending Requests</h2>
                 <p className="text-gray-600">
                   {friends.length === 0
@@ -293,7 +302,7 @@ export default function FriendsPage() {
                                 {profile?.avatar_url ? (
                                   <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
                                 ) : (
-                                  <span className="text-xl">☕</span>
+                                  <Coffee className="w-5 h-5 text-amber-700" />
                                 )}
                               </div>
                               <div>
@@ -342,7 +351,7 @@ export default function FriendsPage() {
                                 {profile?.avatar_url ? (
                                   <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
                                 ) : (
-                                  <span className="text-xl">☕</span>
+                                  <Coffee className="w-5 h-5 text-amber-700" />
                                 )}
                               </div>
                               <div>
@@ -403,7 +412,7 @@ export default function FriendsPage() {
                           {user.avatar_url ? (
                             <img src={user.avatar_url} alt="" className="w-full h-full object-cover" />
                           ) : (
-                            <span className="text-xl">☕</span>
+                            <Coffee className="w-5 h-5 text-amber-700" />
                           )}
                         </div>
                         <div>

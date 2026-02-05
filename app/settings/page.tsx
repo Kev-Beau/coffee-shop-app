@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
 import { ArrowLeftIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { db } from '@/lib/supabase';
+import { Coffee } from 'lucide-react';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -258,7 +259,10 @@ export default function SettingsPage() {
 
             {/* Coffee Preferences */}
             <div className="mt-6 pt-6 border-t border-gray-200">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">☕ Coffee Preferences</h3>
+              <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <Coffee className="w-5 h-5 text-amber-700" />
+                Coffee Preferences
+              </h3>
 
               {/* Favorite Drinks - Multi-select chips */}
               <div className="mb-4">

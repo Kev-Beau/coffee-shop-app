@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase, db } from '@/lib/supabase';
 import type { OnboardingStep } from '@/lib/types';
+import { Coffee, MapPin, Home, Settings } from 'lucide-react';
 
 export default function OnboardingPage() {
   const router = useRouter();
@@ -179,7 +180,9 @@ export default function OnboardingPage() {
 function Step1({ onNext }: { onNext: () => void }) {
   return (
     <div className="text-center">
-      <div className="text-6xl mb-6">☕</div>
+      <div className="w-20 h-20 mx-auto mb-6 flex items-center justify-center">
+        <Coffee className="w-20 h-20 text-amber-700" />
+      </div>
       <h1 className="text-4xl font-bold text-gray-900 mb-4">
         Welcome to CoffeeConnect!
       </h1>
@@ -190,20 +193,22 @@ function Step1({ onNext }: { onNext: () => void }) {
       <div className="bg-white rounded-2xl shadow-lg p-8 mb-8 text-left">
         <h2 className="text-xl font-bold text-gray-900 mb-4">You'll be able to:</h2>
         <ul className="space-y-3">
-          <li className="flex items-start">
-            <span className="text-2xl mr-3">📍</span>
+          <li className="flex items-start gap-3">
+            <div className="w-8 h-8 flex-shrink-0 flex items-center justify-center">
+              <MapPin className="w-8 h-8 text-amber-700" />
+            </div>
             <span className="text-gray-700">Discover and save local coffee shops</span>
           </li>
-          <li className="flex items-start">
-            <span className="text-2xl mr-3">📸</span>
+          <li className="flex items-start gap-3">
+            <span className="text-2xl flex-shrink-0">📸</span>
             <span className="text-gray-700">Share photos and reviews of your drinks</span>
           </li>
-          <li className="flex items-start">
-            <span className="text-2xl mr-3">👥</span>
+          <li className="flex items-start gap-3">
+            <span className="text-2xl flex-shrink-0">👥</span>
             <span className="text-gray-700">Connect with friends and see their recommendations</span>
           </li>
-          <li className="flex items-start">
-            <span className="text-2xl mr-3">🔍</span>
+          <li className="flex items-start gap-3">
+            <span className="text-2xl flex-shrink-0">🔍</span>
             <span className="text-gray-700">Find your perfect cup based on your preferences</span>
           </li>
         </ul>
@@ -517,7 +522,11 @@ function Step5({
 }) {
   return (
     <div className="text-center">
-      <div className="text-6xl mb-6">🎉</div>
+      <div className="w-20 h-20 mx-auto mb-6 flex items-center justify-center">
+        <svg className="w-20 h-20 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      </div>
       <h1 className="text-4xl font-bold text-gray-900 mb-4">
         You're All Set!
       </h1>
@@ -528,7 +537,7 @@ function Step5({
       <div className="bg-white rounded-2xl shadow-lg p-8 mb-8 text-left space-y-6">
         <div className="flex items-start">
           <div className="bg-amber-100 rounded-full p-3 mr-4">
-            <span className="text-2xl">🏠</span>
+            <Home className="w-8 h-8 text-amber-700" />
           </div>
           <div>
             <h3 className="text-lg font-bold text-gray-900">Explore Coffee Shops</h3>
@@ -558,7 +567,7 @@ function Step5({
 
         <div className="flex items-start">
           <div className="bg-amber-100 rounded-full p-3 mr-4">
-            <span className="text-2xl">⚙️</span>
+            <Settings className="w-8 h-8 text-amber-700" />
           </div>
           <div>
             <h3 className="text-lg font-bold text-gray-900">Customize Settings</h3>

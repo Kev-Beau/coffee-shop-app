@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
+import { Coffee, SearchX } from 'lucide-react';
 import { MagnifyingGlassIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { UserIcon, DocumentTextIcon, MapPinIcon } from '@heroicons/react/24/outline';
 
@@ -169,7 +170,7 @@ export default function SearchPage() {
           </div>
         ) : results.length === 0 ? (
           <div className="text-center py-12">
-            <div className="text-6xl mb-4">😕</div>
+            <SearchX className="w-16 h-16 mx-auto mb-4 text-gray-400" />
             <h2 className="text-xl font-bold text-gray-900 mb-2">No Results Found</h2>
             <p className="text-gray-600">Try a different search term</p>
           </div>
@@ -188,7 +189,7 @@ export default function SearchPage() {
                     {result.avatar_url ? (
                       <img src={result.avatar_url} alt="" className="w-full h-full object-cover" />
                     ) : (
-                      <span className="text-2xl">☕</span>
+                      <Coffee className="w-5 h-5 text-amber-700" />
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -213,7 +214,7 @@ export default function SearchPage() {
                     {result.profiles?.avatar_url ? (
                       <img src={result.profiles.avatar_url} alt="" className="w-full h-full object-cover" />
                     ) : (
-                      <span className="text-2xl">☕</span>
+                      <Coffee className="w-5 h-5 text-amber-700" />
                     )}
                   </div>
                   <div className="flex-1 min-w-0">

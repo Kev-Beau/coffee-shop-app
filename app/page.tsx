@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
+import { MapPin } from 'lucide-react';
 
 export default function Home() {
   const router = useRouter();
@@ -55,7 +56,9 @@ export default function Home() {
         {/* Feature Cards */}
         <div className="grid md:grid-cols-3 gap-8 mt-20">
           <div className="bg-white p-8 rounded-2xl shadow-md hover:shadow-xl transition">
-            <div className="text-4xl mb-4">📍</div>
+            <div className="w-12 h-12 mb-4 flex items-center justify-center">
+              <MapPin className="w-12 h-12 text-amber-700" />
+            </div>
             <h3 className="text-xl font-bold text-gray-900 mb-2">Discover Local</h3>
             <p className="text-gray-600">
               Find coffee shops near you with detailed maps and directions

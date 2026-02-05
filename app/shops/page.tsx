@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { isFavorite, toggleFavorite } from "../lib/storage";
+import { Home, MapPin, Coffee } from 'lucide-react';
 
 interface GoogleShop {
   place_id: string;
@@ -308,24 +309,22 @@ export default function ShopsPage() {
             {['All', 'Favorites', 'Open Now', '4.5+ Stars'].map((filter) => {
               const filterKey = filter.toLowerCase().replace(/[^a-z]/g, '');
               const isActive = activeFilter === filterKey || (filterKey === 'all' && activeFilter === 'all');
-              const filterEmoji: Record<string, string> = {
-                'all': '🏠',
-                'favorites': '❤️',
-                'open': '🟢',
-                '4.5+ stars': '⭐'
-              };
 
               return (
                 <button
                   key={filter}
                   onClick={() => handleFilterClick(filterKey as FilterType)}
-                  className={`px-2 md:px-3 py-1 md:py-1.5 rounded-full text-xs md:text-sm font-medium transition ${
+                  className={`px-2 md:px-3 py-1 md:py-1.5 rounded-full text-xs md:text-sm font-medium transition flex items-center gap-1 ${
                     isActive
                       ? 'bg-amber-700 text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
-                  {filterEmoji[filter] || '🏠'} {filter}
+                  {filterKey === 'all' && <Home className="w-4 h-4" />}
+                  {filterKey === 'favorites' && <span className="text-sm">❤️</span>}
+                  {filterKey === 'open' && <span className="text-sm">🟢</span>}
+                  {filterKey === '45stars' && <span className="text-sm">⭐</span>}
+                  {filter}
                 </button>
               );
             })}
@@ -368,9 +367,10 @@ export default function ShopsPage() {
             {!locationRetried && (
               <button
                 onClick={retryLocation}
-                className="bg-amber-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-amber-800 transition"
+                className="bg-amber-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-amber-800 transition flex items-center gap-2"
               >
-                📍 Try Location Again
+                <MapPin className="w-4 h-4" />
+                Try Location Again
               </button>
             )}
           </div>
@@ -379,7 +379,9 @@ export default function ShopsPage() {
         {/* Loading State */}
         {loading && (
           <div className="text-center py-8 md:py-12">
-            <div className="text-3xl md:text-4xl mb-3 md:mb-4">☕</div>
+            <div className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-3 md:mb-4 flex items-center justify-center">
+              <Coffee className="w-12 h-12 md:w-16 md:h-16 text-amber-700" />
+            </div>
             <p className="text-gray-600 text-sm md:text-base">Finding coffee shops near you...</p>
           </div>
         )}
@@ -424,8 +426,8 @@ export default function ShopsPage() {
                   </button>
 
                   {/* Shop Icon */}
-                  <div className="text-4xl md:text-6xl mb-3 md:mb-4 group-hover:scale-110 transition">
-                    ☕
+                  <div className="w-12 h-12 md:w-16 md:h-16 mb-3 md:mb-4 group-hover:scale-110 transition flex items-center justify-center">
+                    <Coffee className="w-12 h-12 md:w-16 md:h-16 text-amber-700" />
                   </div>
 
                   {/* Shop Name */}
@@ -459,8 +461,9 @@ export default function ShopsPage() {
                   )}
 
                   {/* Address */}
-                  <div className="text-xs md:text-sm text-gray-600 mb-2 md:mb-3">
-                    📍 {shop.vicinity || shop.address}
+                  <div className="text-xs md:text-sm text-gray-600 mb-2 md:mb-3 flex items-center gap-1">
+                    <MapPin className="w-3 h-3 md:w-4 md:h-4 flex-shrink-0" />
+                    <span>{shop.vicinity || shop.address}</span>
                   </div>
 
                   {/* Price Level */}

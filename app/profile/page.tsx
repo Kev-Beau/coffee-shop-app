@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
+import { Coffee, MapPin as MapPinLucide } from 'lucide-react';
 import { PencilIcon, Squares2X2Icon, BookmarkIcon, MapPinIcon, UserGroupIcon } from '@heroicons/react/24/outline';
 import { db } from '@/lib/supabase';
 import { usePullToRefresh } from '../hooks/usePullToRefresh';
@@ -174,11 +175,11 @@ export default function ProfilePage() {
             {/* Profile Picture */}
             <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 md:left-8 md:translate-x-0">
               <div className="w-24 h-24 md:w-32 md:h-32 rounded-2xl md:rounded-3xl bg-gradient-to-br from-amber-200 to-amber-300 p-1 shadow-xl">
-                <div className="w-full h-full rounded-xl md:rounded-2xl bg-white flex items-center justify-center overflow-hidden">
+                <div className="w-full h-full rounded-xl md:rounded-2xl bg-gradient-to-br from-amber-200 to-amber-300 flex items-center justify-center overflow-hidden">
                   {profile?.avatar_url ? (
                     <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
                   ) : (
-                    <span className="text-4xl md:text-5xl">☕</span>
+                    <Coffee className="w-16 h-16 md:w-20 md:h-20 text-amber-700" />
                   )}
                 </div>
               </div>
@@ -225,7 +226,7 @@ export default function ProfilePage() {
           <div className="bg-gradient-to-br from-amber-800 to-amber-900 rounded-3xl shadow-lg p-5 md:p-6 text-white">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-                <span className="text-2xl">☕</span>
+                <Coffee className="w-6 h-6 text-white" />
               </div>
               <h3 className="text-lg md:text-xl font-bold">Coffee Preferences</h3>
             </div>
@@ -337,7 +338,7 @@ export default function ProfilePage() {
             <>
               {visits.length === 0 ? (
                 <div className="col-span-3 bg-white rounded-3xl shadow-lg p-8 text-center">
-                  <div className="text-6xl mb-4">📍</div>
+                  <MapPinLucide className="w-16 h-16 mx-auto mb-4 text-gray-400" />
                   <h2 className="text-xl font-bold text-gray-900 mb-2">No Visits Yet</h2>
                   <p className="text-gray-600">Start exploring coffee shops!</p>
                 </div>

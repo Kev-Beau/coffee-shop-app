@@ -5,8 +5,11 @@ export default function AboutPage() {
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50">
       {/* Navigation */}
       <nav className="flex items-center justify-between p-6 bg-white shadow-sm">
-        <Link href="/" className="text-2xl font-bold text-amber-800">
-          ☕ CoffeeConnect
+        <Link href="/" className="text-2xl font-bold text-amber-800 flex items-center gap-2">
+          <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M2,21V19H20V21H2M20,8V5H18V8H20M20,3A2,2 0 0,1 22,5V8A2,2 0 0,1 20,10H18V13A4,4 0 0,1 14,17H8A4,4 0 0,1 4,13V3H20M16,5H6V13A2,2 0 0,0 8,15H14A2,2 0 0,0 16,13V5Z" />
+          </svg>
+          CoffeeConnect
         </Link>
         <div className="flex gap-6">
           <Link href="/shops" className="text-gray-700 hover:text-amber-700 transition">

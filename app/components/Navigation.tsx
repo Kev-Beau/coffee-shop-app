@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
+import { Coffee } from 'lucide-react';
 import { Bars3Icon, XMarkIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 
 interface NavItem {
@@ -62,7 +63,10 @@ export default function Navigation() {
   if (loading) {
     return (
       <nav className="sticky top-0 z-50 flex items-center justify-between p-6 bg-white shadow-md">
-        <div className="text-2xl font-bold text-amber-800">☕ CoffeeConnect</div>
+        <div className="text-2xl font-bold text-amber-800 flex items-center gap-2">
+          <Coffee className="w-6 h-6" />
+          CoffeeConnect
+        </div>
       </nav>
     );
   }
@@ -76,7 +80,8 @@ export default function Navigation() {
             href="/"
             className="flex items-center gap-2 text-xl font-bold text-amber-800 hover:text-amber-900 transition"
           >
-            ☕ CoffeeConnect
+            <Coffee className="w-5 h-5" />
+            CoffeeConnect
           </Link>
 
           {/* Desktop Navigation */}

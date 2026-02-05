@@ -10,6 +10,7 @@ import {
   isFavorite,
 } from "../../lib/storage";
 import DrinkLogModal from "../../components/DrinkLogModal";
+import { Coffee, MapPin } from 'lucide-react';
 
 interface GoogleReview {
   author_name: string;
@@ -113,7 +114,9 @@ export default function ShopPage({ params }: ShopPageProps) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="text-4xl md:text-6xl mb-3 md:mb-4">☕</div>
+          <div className="w-16 h-16 md:w-24 md:h-24 mx-auto mb-3 md:mb-4 flex items-center justify-center">
+            <Coffee className="w-16 h-16 md:w-24 md:h-24 text-amber-700" />
+          </div>
           <p className="text-gray-600 text-sm md:text-base">Loading shop details...</p>
         </div>
       </div>
@@ -228,15 +231,17 @@ export default function ShopPage({ params }: ShopPageProps) {
           <div className="flex flex-col sm:flex-row gap-2 md:gap-3 mb-4 md:mb-6">
             <button
               onClick={handleVisit}
-              className="flex-1 py-2.5 md:py-3 bg-amber-700 text-white rounded-lg md:rounded-xl font-semibold hover:bg-amber-800 transition text-sm md:text-base"
+              className="flex-1 py-2.5 md:py-3 bg-amber-700 text-white rounded-lg md:rounded-xl font-semibold hover:bg-amber-800 transition text-sm md:text-base flex items-center justify-center gap-2"
             >
-              📍 Log Visit
+              <MapPin className="w-4 h-4 md:w-5 md:h-5" />
+              Log Visit
             </button>
             <button
               onClick={handleLogDrink}
-              className="flex-1 py-2.5 md:py-3 bg-gradient-to-r from-amber-600 to-amber-800 text-white rounded-lg md:rounded-xl font-semibold hover:from-amber-700 hover:to-amber-900 transition text-sm md:text-base"
+              className="flex-1 py-2.5 md:py-3 bg-gradient-to-r from-amber-600 to-amber-800 text-white rounded-lg md:rounded-xl font-semibold hover:from-amber-700 hover:to-amber-900 transition text-sm md:text-base flex items-center justify-center gap-2"
             >
-              ☕ Log Drink
+              <Coffee className="w-4 h-4 md:w-5 md:h-5" />
+              Log Drink
             </button>
             {visited && visitCount > 0 && (
               <div className="px-4 md:px-6 py-2.5 md:py-3 bg-amber-100 text-amber-800 rounded-lg md:rounded-xl font-semibold text-sm md:text-base text-center">
