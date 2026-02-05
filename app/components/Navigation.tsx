@@ -140,8 +140,8 @@ export default function Navigation() {
 
       {/* Mobile menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-gray-200">
-          <div className="px-4 pt-2 pb-4 space-y-1">
+        <div className="md:hidden absolute top-14 right-0 left-0 bg-white border-t border-gray-200 shadow-lg">
+          <div className="px-4 pt-2 pb-4 space-y-1 text-right">
             {currentNav.map((item) => (
               <Link
                 key={item.href}
@@ -149,9 +149,9 @@ export default function Navigation() {
                 className="block px-3 py-2 rounded-lg text-gray-700 hover:bg-amber-50 hover:text-amber-700 transition"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                <span className="flex items-center gap-2">
-                  {item.icon && <span>{item.icon}</span>}
+                <span className="flex items-center gap-2 justify-end">
                   <span>{item.label}</span>
+                  {item.icon && <span>{item.icon}</span>}
                 </span>
               </Link>
             ))}
@@ -167,7 +167,7 @@ export default function Navigation() {
                 </Link>
                 <button
                   onClick={handleSignOut}
-                  className="w-full text-left px-3 py-2 rounded-lg text-gray-700 hover:bg-amber-50 hover:text-amber-700 transition"
+                  className="w-full text-right px-3 py-2 rounded-lg text-gray-700 hover:bg-amber-50 hover:text-amber-700 transition"
                 >
                   Sign Out
                 </button>
@@ -175,7 +175,7 @@ export default function Navigation() {
             ) : (
               <Link
                 href="/auth/signin"
-                className="block px-3 py-2 rounded-lg bg-amber-700 text-white font-medium hover:bg-amber-800 transition"
+                className="inline-block px-3 py-2 rounded-lg bg-amber-700 text-white font-medium hover:bg-amber-800 transition"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Sign In
