@@ -130,7 +130,7 @@ export default function QuickLogModal({ isOpen, onClose }: QuickLogModalProps) {
 
         {/* Modal */}
         <div className="flex min-h-full items-end justify-center p-4">
-          <div className="relative bg-white w-full max-w-md rounded-t-3xl shadow-xl overflow-hidden">
+          <div className="relative bg-white w-full max-w-lg rounded-t-3xl shadow-xl overflow-hidden">
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold text-gray-900">Quick Log</h2>
@@ -183,9 +183,9 @@ export default function QuickLogModal({ isOpen, onClose }: QuickLogModalProps) {
                         <button
                           key={shop.place_id}
                           onClick={() => handleShopSelect(shop)}
-                          className="w-full bg-amber-50 hover:bg-amber-100 rounded-xl p-4 text-left transition"
+                          className="w-full bg-amber-50 hover:bg-amber-100 rounded-xl p-4 text-left transition overflow-hidden"
                         >
-                          <div className="flex items-start justify-between gap-2">
+                          <div className="flex items-start justify-between gap-3">
                             <div className="flex-1 min-w-0">
                               <p className="font-semibold text-gray-900 text-base truncate">{shop.name}</p>
                               <p className="text-sm text-gray-600 truncate">{shop.address}</p>
