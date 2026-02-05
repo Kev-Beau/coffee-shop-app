@@ -23,6 +23,13 @@ interface QuickLogModalProps {
   onClose: () => void;
 }
 
+interface SearchResult {
+  place_id: string;
+  name: string;
+  address: string;
+  rating?: number;
+}
+
 export default function QuickLogModal({ isOpen, onClose }: QuickLogModalProps) {
   const router = useRouter();
   const [recentShops, setRecentShops] = useState<RecentShop[]>([]);
@@ -30,17 +37,13 @@ export default function QuickLogModal({ isOpen, onClose }: QuickLogModalProps) {
   const [selectedShop, setSelectedShop] = useState<{ id: string; name: string } | null>(null);
   const [showDrinkModal, setShowDrinkModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [searchLoading, setSearchLoading] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
       loadRecentShops();
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
     }
-    return () => {
-      document.body.style.overflow = '';
-    };
   }, [isOpen]);
 
   const loadRecentShops = async () => {
@@ -76,19 +79,40 @@ export default function QuickLogModal({ isOpen, onClose }: QuickLogModalProps) {
     }
   };
 
-  const handleShopSelect = (shop: RecentShop) => {
-    setSelectedShop({ id: shop.place_id, name: shop.place_name });
+  const handleShopSelect = (shop: RecentShop | SearchResult) => {
+    const name = 'place_name' in shop ? shop.place_name : shop.name;
+    setSelectedShop({ id: shop.place_id, name });
     setShowDrinkModal(true);
     onClose();
   };
 
-  const handleSearchShops = (e?: React.FormEvent) => {
-    e?.preventDefault();
-    if (searchQuery.trim()) {
-      onClose();
-      router.push(`/shops?search=${encodeURIComponent(searchQuery)}`);
+  const handleSearchShops = async () => {
+    if (searchQuery.trim().length < 2) return;
+
+    setSearchLoading(true);
+    try {
+      const response = await fetch(`/api/shops/search?q=${encodeURIComponent(searchQuery)}`);
+      const data = await response.json();
+      setSearchResults(data.data || []);
+    } catch (error) {
+      console.error('Error searching shops:', error);
+      setSearchResults([]);
+    } finally {
+      setSearchLoading(false);
     }
   };
+
+  // Auto-search when query changes
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (searchQuery.trim().length >= 2) {
+        handleSearchShops();
+      } else {
+        setSearchResults([]);
+      }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   const handleDrinkModalClose = () => {
     setShowDrinkModal(false);
@@ -99,53 +123,97 @@ export default function QuickLogModal({ isOpen, onClose }: QuickLogModalProps) {
 
   return (
     <>
-      {/* Backdrop */}
-      <div className="fixed inset-0 z-50 bg-black/50" onClick={onClose} />
+      {/* Scrollable container */}
+      <div className="fixed inset-0 z-50 overflow-y-auto">
+        {/* Backdrop */}
+        <div className="fixed inset-0 bg-black/50" onClick={onClose} />
 
-      {/* Modal */}
-      <div className="fixed inset-0 z-50 flex items-end justify-center pointer-events-none">
-        <div
-          className="bg-white rounded-t-3xl w-full max-w-lg max-h-[75vh] pointer-events-auto flex flex-col animate-slide-up"
-        >
-          {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-gray-200 flex-shrink-0">
-            <h2 className="text-xl font-bold text-gray-900">Quick Log</h2>
-            <button
-              onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-full transition"
-            >
-              <XMarkIcon className="w-6 h-6 text-gray-600" />
-            </button>
-          </div>
-
-          {/* Scrollable Content */}
-          <div className="flex-1 overflow-y-auto p-4">
-            {/* Search Bar */}
-            <div className="mb-5">
-              <form onSubmit={handleSearchShops}>
-                <div className="relative mb-3">
-                  <MagnifyingGlassIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" />
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search for any coffee shop..."
-                    className="w-full pl-12 pr-4 py-4 text-base bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 text-gray-900 placeholder-gray-400"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  disabled={!searchQuery.trim()}
-                  className="w-full py-3 bg-amber-700 text-white rounded-xl font-medium hover:bg-amber-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Search All Shops
-                </button>
-              </form>
+        {/* Modal */}
+        <div className="flex min-h-full items-end justify-center">
+          <div className="relative bg-white w-full max-w-lg rounded-t-3xl shadow-xl p-4 my-4">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-gray-900">Quick Log</h2>
+              <button
+                onClick={onClose}
+                className="p-2 hover:bg-gray-100 rounded-full transition"
+              >
+                <XMarkIcon className="w-6 h-6 text-gray-600" />
+              </button>
             </div>
+
+            {/* Search Bar */}
+            <div className="mb-4">
+              <div className="relative">
+                <MagnifyingGlassIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search for any coffee shop..."
+                  className="w-full pl-12 pr-10 py-4 text-base bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 text-gray-900 placeholder-gray-400"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => {
+                      setSearchQuery('');
+                      setSearchResults([]);
+                    }}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600"
+                  >
+                    <XMarkIcon className="w-5 h-5" />
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Search Results */}
+            {searchQuery && (
+              <div className="max-h-96 overflow-y-auto">
+                {searchLoading ? (
+                  <div className="text-center py-8">
+                    <div className="w-10 h-10 border-4 border-amber-700 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+                    <p className="text-gray-600 text-sm">Searching...</p>
+                  </div>
+                ) : searchResults.length > 0 ? (
+                  <>
+                    <p className="text-sm text-gray-600 mb-3">{searchResults.length} result{searchResults.length !== 1 ? 's' : ''}</p>
+                    <div className="space-y-3 pb-4">
+                      {searchResults.map((shop) => (
+                        <button
+                          key={shop.place_id}
+                          onClick={() => handleShopSelect(shop)}
+                          className="w-full bg-amber-50 hover:bg-amber-100 rounded-xl p-4 text-left transition"
+                        >
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <p className="font-semibold text-gray-900 text-base">{shop.name}</p>
+                              <p className="text-sm text-gray-600 truncate">{shop.address}</p>
+                            </div>
+                            {shop.rating && (
+                              <div className="flex items-center gap-1 ml-2">
+                                <span className="text-amber-700">★</span>
+                                <span className="text-sm text-gray-700">{shop.rating}</span>
+                              </div>
+                            )}
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-center py-8">
+                    <div className="text-5xl mb-3">😕</div>
+                    <p className="text-gray-600 text-sm">No results found</p>
+                    <p className="text-xs text-gray-500 mt-2">Try a different search term</p>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Recent Shops */}
             {!searchQuery && (
-              <>
+              <div className="max-h-96 overflow-y-auto">
                 {loading ? (
                   <div className="text-center py-8">
                     <div className="w-10 h-10 border-4 border-amber-700 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
@@ -174,7 +242,7 @@ export default function QuickLogModal({ isOpen, onClose }: QuickLogModalProps) {
                     <p className="text-xs text-gray-500 mt-2">Tap search to find coffee shops</p>
                   </div>
                 )}
-              </>
+              </div>
             )}
           </div>
         </div>

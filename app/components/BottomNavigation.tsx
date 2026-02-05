@@ -23,8 +23,8 @@ export default function BottomNavigation() {
   ];
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 12px)' }}>
-      <div className="flex items-center justify-around h-16 px-2">
+    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 12px)' }}>
+      <div className="flex items-center justify-around h-16 px-2 max-w-md mx-auto">
         {navItems.map((item) => {
           const isActive = pathname === item.href || (item.href !== '/log' && pathname.startsWith(item.href));
           const Icon = isActive && item.solidIcon ? item.solidIcon : item.icon;
