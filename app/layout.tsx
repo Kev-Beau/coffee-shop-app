@@ -32,6 +32,9 @@ export const metadata: Metadata = {
     viewportFit: "cover",
   },
   other: {
+    "viewport-fit": "cover",
+  },
+  other: {
     "mobile-web-app-capable": "yes",
     "apple-mobile-web-app-capable": "yes",
     "apple-mobile-web-app-status-bar-style": "default",

@@ -140,22 +140,7 @@ export default function ShopPage({ params }: ShopPageProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50">
-      {/* Navigation - Sticky */}
-      <nav className="sticky top-0 z-50 flex items-center justify-between px-4 py-3 md:px-6 md:py-6 bg-white shadow-md">
-        <Link href="/" className="text-lg md:text-2xl font-bold text-amber-800">
-          ☕ CoffeeConnect
-        </Link>
-        <div className="flex gap-3 md:gap-6 text-sm md:text-base">
-          <Link href="/shops" className="text-gray-700 hover:text-amber-700 transition">
-            Find Shops
-          </Link>
-          <Link href="/profile" className="text-gray-700 hover:text-amber-700 transition">
-            Profile
-          </Link>
-        </div>
-      </nav>
-
+    <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50 pb-20">
       {/* Back Button */}
       <main className="max-w-4xl mx-auto px-4 md:px-6 py-6 md:py-8">
         <Link
