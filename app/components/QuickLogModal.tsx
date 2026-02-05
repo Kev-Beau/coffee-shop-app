@@ -95,7 +95,7 @@ export default function QuickLogModal({ isOpen, onClose }: QuickLogModalProps) {
     <>
       <div className="fixed inset-0 z-50 bg-black/50" onClick={onClose} />
       <div className="fixed inset-0 z-50 flex items-end justify-center">
-        <div className="bg-white rounded-t-3xl w-full max-w-lg max-h-[85vh] overflow-hidden animate-slide-up">
+        <div className="bg-white rounded-t-3xl w-full max-w-lg max-h-[90vh] overflow-hidden animate-slide-up">
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-gray-200">
             <h2 className="text-xl font-bold text-gray-900">Quick Log</h2>
@@ -107,25 +107,25 @@ export default function QuickLogModal({ isOpen, onClose }: QuickLogModalProps) {
             </button>
           </div>
 
-          {/* Content */}
-          <div className="p-4 overflow-y-auto" style={{ maxHeight: 'calc(85vh - 80px)' }}>
+          {/* Content - Scrollable */}
+          <div className="p-4 overflow-y-auto" style={{ maxHeight: 'calc(90vh - 72px)' }}>
             {/* Search Bar */}
-            <div className="mb-4">
+            <div className="mb-5">
               <form onSubmit={handleSearchShops}>
-                <div className="relative">
-                  <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <div className="relative mb-3">
+                  <MagnifyingGlassIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" />
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search for any coffee shop..."
-                    className="w-full pl-10 pr-4 py-3 bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 text-gray-900 placeholder-gray-400"
+                    className="w-full pl-12 pr-4 py-4 text-base bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 text-gray-900 placeholder-gray-400"
                   />
                 </div>
                 <button
                   type="submit"
                   disabled={!searchQuery.trim()}
-                  className="w-full mt-2 py-2 bg-amber-700 text-white rounded-lg font-medium hover:bg-amber-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full py-3 bg-amber-700 text-white rounded-xl font-medium hover:bg-amber-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Search All Shops
                 </button>
@@ -142,15 +142,15 @@ export default function QuickLogModal({ isOpen, onClose }: QuickLogModalProps) {
                   </div>
                 ) : recentShops.length > 0 ? (
                   <>
-                    <p className="text-sm text-gray-600 mb-3 mt-4">Or tap a recent shop:</p>
-                    <div className="space-y-2">
+                    <p className="text-sm text-gray-600 mb-3">Or tap a recent shop:</p>
+                    <div className="space-y-3">
                       {recentShops.map((shop) => (
                         <button
                           key={shop.place_id}
                           onClick={() => handleShopSelect(shop)}
-                          className="w-full bg-amber-50 hover:bg-amber-100 rounded-xl p-3 text-left transition"
+                          className="w-full bg-amber-50 hover:bg-amber-100 rounded-xl p-4 text-left transition"
                         >
-                          <p className="font-semibold text-gray-900">{shop.place_name}</p>
+                          <p className="font-semibold text-gray-900 text-base">{shop.place_name}</p>
                           <p className="text-sm text-gray-600 truncate">{shop.address}</p>
                         </button>
                       ))}
