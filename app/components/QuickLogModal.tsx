@@ -96,7 +96,7 @@ export default function QuickLogModal({ isOpen, onClose }: QuickLogModalProps) {
       <div className="fixed inset-0 z-50 bg-black/50" onClick={onClose} />
       <div className="fixed inset-0 z-50 flex items-end justify-center pointer-events-none">
         <div
-          className="bg-white rounded-t-3xl w-full max-w-lg max-h-[90vh] animate-slide-up pointer-events-auto flex flex-col"
+          className="bg-white rounded-t-3xl w-full max-w-lg max-h-[80vh] animate-slide-up pointer-events-auto flex flex-col"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
@@ -111,7 +111,7 @@ export default function QuickLogModal({ isOpen, onClose }: QuickLogModalProps) {
           </div>
 
           {/* Content - Scrollable */}
-          <div className="p-4 overflow-y-auto flex-1" style={{ maxHeight: 'calc(90vh - 72px)' }}>
+          <div className="p-4 overflow-y-auto flex-1 min-h-0">
             {/* Search Bar */}
             <div className="mb-5">
               <form onSubmit={handleSearchShops}>
