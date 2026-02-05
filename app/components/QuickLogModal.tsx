@@ -143,7 +143,7 @@ export default function QuickLogModal({ isOpen, onClose }: QuickLogModalProps) {
             </div>
 
             {/* Content Area - scrollable */}
-            <div className="overflow-y-auto flex-1">
+            <div className="overflow-y-auto flex-1" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 80px)' }}>
               {/* Search Bar */}
               <div className="p-4 pb-2">
               <div className="relative">
