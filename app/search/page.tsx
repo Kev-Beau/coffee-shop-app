@@ -17,7 +17,7 @@ export default function SearchPage() {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
   const [query, setQuery] = useState('');
-  const [activeTab, setActiveTab] = useState<SearchTab>('users');
+  const [activeTab, setActiveTab] = useState<SearchTab>('shops');
   const [results, setResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
@@ -88,14 +88,8 @@ export default function SearchPage() {
   };
 
   const searchShops = async () => {
-    // Search in visits and favorites
-    const { data: visits } = await supabase
-      .from('visits')
-      .select('place_id, place_name, address')
-      .or(`place_name.ilike.%${query}%,address.ilike.%${query}%`)
-      .limit(20);
-
-    setResults(visits || []);
+    // Redirect to shops page with search query (uses Google Places API)
+    router.push(`/shops?search=${encodeURIComponent(query)}`);
   };
 
   const clearSearch = () => {
@@ -164,7 +158,12 @@ export default function SearchPage() {
           <div className="text-center py-12">
             <div className="text-6xl mb-4">🔍</div>
             <h2 className="text-xl font-bold text-gray-900 mb-2">Search CoffeeConnect</h2>
-            <p className="text-gray-600">Find users, posts, and coffee shops</p>
+            <p className="text-gray-600">Find friends, posts, and coffee shops</p>
+          </div>
+        ) : activeTab === 'shops' ? (
+          <div className="text-center py-12">
+            <div className="w-12 h-12 border-4 border-amber-700 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-gray-600">Searching nearby coffee shops...</p>
           </div>
         ) : results.length === 0 ? (
           <div className="text-center py-12">
@@ -229,17 +228,6 @@ export default function SearchPage() {
                     </div>
                   </div>
                 </div>
-              </button>
-            ))}
-
-            {activeTab === 'shops' && results.map((result: any, index: number) => (
-              <button
-                key={`${result.place_id}-${index}`}
-                onClick={() => router.push(`/shops/${result.place_id}`)}
-                className="w-full bg-white rounded-xl shadow-sm p-4 text-left hover:shadow-md transition"
-              >
-                <h3 className="font-semibold text-gray-900">{result.place_name}</h3>
-                <p className="text-sm text-gray-600">{result.address}</p>
               </button>
             ))}
           </div>

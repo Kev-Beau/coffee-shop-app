@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
 import { XMarkIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import DrinkLogModal from './DrinkLogModal';
@@ -23,10 +24,12 @@ interface QuickLogModalProps {
 }
 
 export default function QuickLogModal({ isOpen, onClose }: QuickLogModalProps) {
+  const router = useRouter();
   const [recentShops, setRecentShops] = useState<RecentShop[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedShop, setSelectedShop] = useState<{ id: string; name: string } | null>(null);
   const [showDrinkModal, setShowDrinkModal] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     if (isOpen) {
@@ -72,6 +75,13 @@ export default function QuickLogModal({ isOpen, onClose }: QuickLogModalProps) {
     setShowDrinkModal(true);
   };
 
+  const handleSearchShops = () => {
+    if (searchQuery.trim()) {
+      router.push(`/shops?search=${encodeURIComponent(searchQuery)}`);
+      onClose();
+    }
+  };
+
   const handleDrinkModalClose = () => {
     setShowDrinkModal(false);
     setSelectedShop(null);
@@ -98,44 +108,60 @@ export default function QuickLogModal({ isOpen, onClose }: QuickLogModalProps) {
 
           {/* Content */}
           <div className="p-4 overflow-y-auto" style={{ maxHeight: 'calc(85vh - 80px)' }}>
-            {loading ? (
-              <div className="text-center py-8">
-                <div className="w-10 h-10 border-4 border-amber-700 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-                <p className="text-gray-600 text-sm">Loading recent shops...</p>
+            {/* Search Bar */}
+            <div className="mb-4">
+              <div className="relative">
+                <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleSearchShops()}
+                  placeholder="Search for any coffee shop..."
+                  className="w-full pl-10 pr-4 py-3 bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 text-gray-900 placeholder-gray-400"
+                />
               </div>
-            ) : recentShops.length > 0 ? (
-              <>
-                <p className="text-sm text-gray-600 mb-3">Tap a shop to log a drink:</p>
-                <div className="space-y-2 mb-4">
-                  {recentShops.map((shop) => (
-                    <button
-                      key={shop.place_id}
-                      onClick={() => handleShopSelect(shop)}
-                      className="w-full bg-amber-50 hover:bg-amber-100 rounded-xl p-3 text-left transition"
-                    >
-                      <p className="font-semibold text-gray-900">{shop.place_name}</p>
-                      <p className="text-sm text-gray-600 truncate">{shop.address}</p>
-                    </button>
-                  ))}
-                </div>
-              </>
-            ) : (
-              <div className="text-center py-8">
-                <div className="text-5xl mb-3">📍</div>
-                <p className="text-gray-600 mb-4">No recent visits yet</p>
-              </div>
-            )}
-
-            <div className="border-t border-gray-200 pt-4">
-              <a
-                href="/shops"
-                onClick={onClose}
-                className="flex items-center justify-center gap-2 w-full py-3 bg-gray-100 hover:bg-gray-200 rounded-xl text-gray-700 transition"
+              <button
+                onClick={handleSearchShops}
+                disabled={!searchQuery.trim()}
+                className="w-full mt-2 py-2 bg-amber-700 text-white rounded-lg font-medium hover:bg-amber-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <MagnifyingGlassIcon className="w-5 h-5" />
-                <span>Browse all coffee shops</span>
-              </a>
+                Search All Shops
+              </button>
             </div>
+
+            {/* Recent Shops */}
+            {!searchQuery && (
+              <>
+                {loading ? (
+                  <div className="text-center py-8">
+                    <div className="w-10 h-10 border-4 border-amber-700 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+                    <p className="text-gray-600 text-sm">Loading recent shops...</p>
+                  </div>
+                ) : recentShops.length > 0 ? (
+                  <>
+                    <p className="text-sm text-gray-600 mb-3 mt-4">Or tap a recent shop:</p>
+                    <div className="space-y-2">
+                      {recentShops.map((shop) => (
+                        <button
+                          key={shop.place_id}
+                          onClick={() => handleShopSelect(shop)}
+                          className="w-full bg-amber-50 hover:bg-amber-100 rounded-xl p-3 text-left transition"
+                        >
+                          <p className="font-semibold text-gray-900">{shop.place_name}</p>
+                          <p className="text-sm text-gray-600 truncate">{shop.address}</p>
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-center py-8">
+                    <div className="text-5xl mb-3">📍</div>
+                    <p className="text-gray-600 text-sm">No recent visits</p>
+                  </div>
+                )}
+              </>
+            )}
           </div>
         </div>
       </div>
