@@ -88,8 +88,15 @@ export default function SearchPage() {
   };
 
   const searchShops = async () => {
-    // Redirect to shops page with search query (uses Google Places API)
-    router.push(`/shops?search=${encodeURIComponent(query)}`);
+    // Search using Google Places API via shops page
+    try {
+      const response = await fetch(`/api/shops/search?q=${encodeURIComponent(query)}`);
+      const data = await response.json();
+      setResults(data.data || []);
+    } catch (error) {
+      console.error('Error searching shops:', error);
+      setResults([]);
+    }
   };
 
   const clearSearch = () => {
@@ -160,11 +167,6 @@ export default function SearchPage() {
             <h2 className="text-xl font-bold text-gray-900 mb-2">Search CoffeeConnect</h2>
             <p className="text-gray-600">Find friends, posts, and coffee shops</p>
           </div>
-        ) : activeTab === 'shops' ? (
-          <div className="text-center py-12">
-            <div className="w-12 h-12 border-4 border-amber-700 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-            <p className="text-gray-600">Searching nearby coffee shops...</p>
-          </div>
         ) : results.length === 0 ? (
           <div className="text-center py-12">
             <div className="text-6xl mb-4">😕</div>
@@ -227,6 +229,27 @@ export default function SearchPage() {
                       </div>
                     </div>
                   </div>
+                </div>
+              </button>
+            ))}
+
+            {activeTab === 'shops' && results.map((result: any, index: number) => (
+              <button
+                key={`${result.place_id}-${index}`}
+                onClick={() => router.push(`/shops/${result.place_id}`)}
+                className="w-full bg-white rounded-xl shadow-sm p-4 text-left hover:shadow-md transition"
+              >
+                <div className="flex items-start justify-between mb-2">
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-gray-900">{result.name}</h3>
+                    <p className="text-sm text-gray-600">{result.address}</p>
+                  </div>
+                  {result.rating && (
+                    <div className="flex items-center gap-1 ml-2">
+                      <span className="text-amber-700">★</span>
+                      <span className="text-sm text-gray-700">{result.rating}</span>
+                    </div>
+                  )}
                 </div>
               </button>
             ))}

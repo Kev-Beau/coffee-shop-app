@@ -75,10 +75,11 @@ export default function QuickLogModal({ isOpen, onClose }: QuickLogModalProps) {
     setShowDrinkModal(true);
   };
 
-  const handleSearchShops = () => {
+  const handleSearchShops = (e?: React.FormEvent) => {
+    e?.preventDefault();
     if (searchQuery.trim()) {
+      onClose(); // Close modal before redirecting
       router.push(`/shops?search=${encodeURIComponent(searchQuery)}`);
-      onClose();
     }
   };
 
@@ -110,24 +111,25 @@ export default function QuickLogModal({ isOpen, onClose }: QuickLogModalProps) {
           <div className="p-4 overflow-y-auto" style={{ maxHeight: 'calc(85vh - 80px)' }}>
             {/* Search Bar */}
             <div className="mb-4">
-              <div className="relative">
-                <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleSearchShops()}
-                  placeholder="Search for any coffee shop..."
-                  className="w-full pl-10 pr-4 py-3 bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 text-gray-900 placeholder-gray-400"
-                />
-              </div>
-              <button
-                onClick={handleSearchShops}
-                disabled={!searchQuery.trim()}
-                className="w-full mt-2 py-2 bg-amber-700 text-white rounded-lg font-medium hover:bg-amber-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Search All Shops
-              </button>
+              <form onSubmit={handleSearchShops}>
+                <div className="relative">
+                  <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search for any coffee shop..."
+                    className="w-full pl-10 pr-4 py-3 bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 text-gray-900 placeholder-gray-400"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={!searchQuery.trim()}
+                  className="w-full mt-2 py-2 bg-amber-700 text-white rounded-lg font-medium hover:bg-amber-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Search All Shops
+                </button>
+              </form>
             </div>
 
             {/* Recent Shops */}
