@@ -6,6 +6,7 @@ import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import FeedCard from '../components/FeedCard';
 import TabNavigation from '../components/TabNavigation';
 import { usePullToRefresh } from '../hooks/usePullToRefresh';
+import { Users, Globe, AlertTriangle } from 'lucide-react';
 
 type FeedType = 'friends' | 'explore';
 
@@ -23,7 +24,7 @@ export default function FeedPage() {
     return (
       <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50 flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-8 text-center">
-          <div className="text-5xl mb-4">⚠️</div>
+          <AlertTriangle className="w-16 h-16 mx-auto mb-4 text-amber-500" />
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Setup Required</h1>
           <p className="text-gray-600 mb-6">
             Social features require Supabase configuration. See <code className="bg-gray-100 px-2 py-1 rounded">SOCIAL_SETUP.md</code> for instructions.
@@ -209,7 +210,7 @@ export default function FeedPage() {
     return (
       <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50 flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-8 text-center">
-          <div className="text-5xl mb-4">⚠️</div>
+          <AlertTriangle className="w-16 h-16 mx-auto mb-4 text-amber-500" />
           <h2 className="text-xl font-bold text-gray-900 mb-2">Error Loading Feed</h2>
           <p className="text-gray-600 mb-4">{error}</p>
           <button
@@ -240,8 +241,8 @@ export default function FeedPage() {
         <div className="max-w-2xl mx-auto px-4 py-6">
         <TabNavigation
           tabs={[
-            { id: 'friends', label: 'Friends', icon: '👥' },
-            { id: 'explore', label: 'Explore', icon: '🌍' },
+            { id: 'friends', label: 'Friends', icon: <Users className="w-5 h-5" /> },
+            { id: 'explore', label: 'Explore', icon: <Globe className="w-5 h-5" /> },
           ]}
           activeTab={feedType}
           onChange={(tabId) => setFeedType(tabId as FeedType)}
@@ -257,8 +258,8 @@ export default function FeedPage() {
           </div>
         ) : posts.length === 0 ? (
           <div className="text-center py-16">
-            <div className="text-6xl mb-4">
-              {feedType === 'friends' ? '👥' : '🌍'}
+            <div className="w-20 h-20 mx-auto mb-4 flex items-center justify-center bg-amber-100 rounded-full">
+              {feedType === 'friends' ? <Users className="w-10 h-10 text-amber-700" /> : <Globe className="w-10 h-10 text-amber-700" />}
             </div>
             <h2 className="text-xl font-bold text-gray-900 mb-2">
               {feedType === 'friends' ? 'No Friends Posts Yet' : 'No Posts Yet'}

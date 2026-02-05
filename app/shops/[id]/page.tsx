@@ -10,7 +10,7 @@ import {
   isFavorite,
 } from "../../lib/storage";
 import DrinkLogModal from "../../components/DrinkLogModal";
-import { Coffee, MapPin } from 'lucide-react';
+import { Coffee, MapPin, Star, Heart, MessageCircle, Sparkles, Phone, Globe, Clock, MapIcon } from 'lucide-react';
 
 interface GoogleReview {
   author_name: string;
@@ -155,8 +155,9 @@ export default function ShopPage({ params }: ShopPageProps) {
 
         {/* Visit Success Message */}
         {showVisitMessage && (
-          <div className="mb-3 md:mb-4 p-3 md:p-4 bg-green-100 border border-green-300 rounded-lg md:rounded-xl text-green-800 animate-pulse text-sm md:text-base">
-            🎉 Visit logged! You've been here {visitCount} {visitCount === 1 ? 'time' : 'times'}!
+          <div className="mb-3 md:mb-4 p-3 md:p-4 bg-green-100 border border-green-300 rounded-lg md:rounded-xl text-green-800 animate-pulse text-sm md:text-base flex items-center gap-2">
+            <Sparkles className="w-5 h-5" />
+            <span>Visit logged! You've been here {visitCount} {visitCount === 1 ? 'time' : 'times'}!</span>
           </div>
         )}
 
@@ -168,24 +169,26 @@ export default function ShopPage({ params }: ShopPageProps) {
                 <h1 className="text-2xl md:text-4xl font-bold text-gray-900 truncate">{shop.name}</h1>
                 <button
                   onClick={handleFavorite}
-                  className="text-2xl md:text-3xl hover:scale-110 transition flex-shrink-0"
+                  className="hover:scale-110 transition flex-shrink-0"
                   title={favorite ? "Remove from favorites" : "Add to favorites"}
                 >
-                  {favorite ? "❤️" : "🤍"}
+                  <Heart className={`w-6 h-6 md:w-8 md:h-8 ${favorite ? 'fill-current text-red-500' : 'text-gray-300'}`} />
                 </button>
               </div>
               <p className="text-sm md:text-base text-gray-600 mb-1 md:mb-2">{shop.address}</p>
               {shop.phone && (
-                <p className="text-sm md:text-base text-gray-600 mb-1 md:mb-2">📞 {shop.phone}</p>
+                <p className="text-sm md:text-base text-gray-600 mb-1 md:mb-2 flex items-center gap-2">
+                  <Phone className="w-4 h-4" /> {shop.phone}
+                </p>
               )}
               {shop.website && (
                 <a
                   href={shop.website}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-amber-700 hover:underline text-xs md:text-sm"
+                  className="text-amber-700 hover:underline text-xs md:text-sm inline-flex items-center gap-1"
                 >
-                  🌐 Visit Website
+                  <Globe className="w-4 h-4" /> Visit Website
                 </a>
               )}
             </div>
@@ -210,19 +213,21 @@ export default function ShopPage({ params }: ShopPageProps) {
           {/* Rating & Reviews */}
           <div className="flex flex-wrap items-center gap-2 md:gap-4 mb-4 md:mb-6">
             <div className="flex items-center gap-1 md:gap-2">
+              <Star className="w-5 h-5 md:w-6 md:h-6 text-amber-500 fill-current" />
               <span className="text-lg md:text-2xl font-bold text-amber-600">
-                ⭐ {shop.rating}
+                {shop.rating}
               </span>
               <span className="text-xs md:text-base text-gray-500">({shop.review_count} reviews)</span>
             </div>
             <span className="text-lg md:text-2xl">{shop.price_level}</span>
             {shop.opening_hours && (
-              <span className={`px-2 md:px-3 py-1 rounded-full text-xs md:text-sm font-medium ${
+              <span className={`px-2 md:px-3 py-1 rounded-full text-xs md:text-sm font-medium inline-flex items-center gap-1 ${
                 shop.opening_hours.open_now
                   ? 'bg-green-100 text-green-800'
                   : 'bg-red-100 text-red-800'
               }`}>
-                {shop.opening_hours.open_now ? '🟢 Open Now' : '🔴 Closed'}
+                <div className={`w-2 h-2 rounded-full ${shop.opening_hours.open_now ? 'bg-green-500' : 'bg-red-500'}`} />
+                {shop.opening_hours.open_now ? 'Open Now' : 'Closed'}
               </span>
             )}
           </div>
@@ -253,7 +258,10 @@ export default function ShopPage({ params }: ShopPageProps) {
           {/* Opening Hours */}
           {shop.opening_hours && shop.opening_hours.weekday_text && (
             <div className="mt-4 md:mt-6 pt-4 md:pt-6 border-t border-gray-200">
-              <h3 className="font-semibold text-gray-900 mb-2 md:mb-3 text-sm md:text-base">🕐 Opening Hours</h3>
+              <h3 className="font-semibold text-gray-900 mb-2 md:mb-3 text-sm md:text-base flex items-center gap-2">
+                <Clock className="w-4 h-4 md:w-5 md:h-5" />
+                Opening Hours
+              </h3>
               <div className="space-y-1 text-xs md:text-sm text-gray-600">
                 {shop.opening_hours.weekday_text.map((day, index) => (
                   <div key={index}>{day}</div>
@@ -270,7 +278,8 @@ export default function ShopPage({ params }: ShopPageProps) {
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 text-amber-700 hover:text-amber-800 font-semibold text-sm md:text-base"
             >
-              🗺️ Open in Google Maps
+              <MapIcon className="w-4 h-4 md:w-5 md:h-5" />
+              Open in Google Maps
             </a>
           </div>
         </div>
@@ -294,7 +303,8 @@ export default function ShopPage({ params }: ShopPageProps) {
                       </div>
                     </div>
                     <div className="flex items-center gap-1 text-amber-600 font-bold text-sm md:text-base flex-shrink-0">
-                      ⭐ {review.rating}
+                      <Star className="w-4 h-4 md:w-5 md:h-5 fill-current" />
+                      {review.rating}
                     </div>
                   </div>
                   {review.text && <p className="text-gray-700 text-sm md:text-base">{review.text}</p>}

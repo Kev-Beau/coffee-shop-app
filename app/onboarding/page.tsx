@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase, db } from '@/lib/supabase';
 import type { OnboardingStep } from '@/lib/types';
-import { Coffee, MapPin, Home, Settings } from 'lucide-react';
+import { Coffee, MapPin, Home, Settings, Camera, Users, Candy, Ban, RefreshCw, Globe, Search, Flame, Snowflake, Thermometer, Dumbbell, Cloud, Scale, Lightbulb, FileEdit, CircleDot } from 'lucide-react';
 
 export default function OnboardingPage() {
   const router = useRouter();
@@ -200,15 +200,21 @@ function Step1({ onNext }: { onNext: () => void }) {
             <span className="text-gray-700">Discover and save local coffee shops</span>
           </li>
           <li className="flex items-start gap-3">
-            <span className="text-2xl flex-shrink-0">📸</span>
+            <div className="w-8 h-8 flex-shrink-0 flex items-center justify-center">
+              <Camera className="w-8 h-8 text-amber-700" />
+            </div>
             <span className="text-gray-700">Share photos and reviews of your drinks</span>
           </li>
           <li className="flex items-start gap-3">
-            <span className="text-2xl flex-shrink-0">👥</span>
+            <div className="w-8 h-8 flex-shrink-0 flex items-center justify-center">
+              <Users className="w-8 h-8 text-amber-700" />
+            </div>
             <span className="text-gray-700">Connect with friends and see their recommendations</span>
           </li>
           <li className="flex items-start gap-3">
-            <span className="text-2xl flex-shrink-0">🔍</span>
+            <div className="w-8 h-8 flex-shrink-0 flex items-center justify-center">
+              <Search className="w-8 h-8 text-amber-700" />
+            </div>
             <span className="text-gray-700">Find your perfect cup based on your preferences</span>
           </li>
         </ul>
@@ -259,8 +265,8 @@ function Step2({
                     : 'border-gray-200 hover:border-amber-300'
                 }`}
               >
-                <div className="text-2xl mb-1">
-                  {option === 'hot' ? '🔥' : option === 'iced' ? '❄️' : '🌡️'}
+                <div className="w-12 h-12 mx-auto mb-1 flex items-center justify-center">
+                  {option === 'hot' ? <Flame className="w-8 h-8 text-orange-500" /> : option === 'iced' ? <Snowflake className="w-8 h-8 text-blue-500" /> : <Thermometer className="w-8 h-8 text-amber-700" />}
                 </div>
                 <div className="font-medium">{option}</div>
               </button>
@@ -285,8 +291,8 @@ function Step2({
                     : 'border-gray-200 hover:border-amber-300'
                 }`}
               >
-                <div className="text-2xl mb-1">
-                  {option === 'sweet' ? '🍬' : option === 'unsweetened' ? '🚫' : '🔄'}
+                <div className="w-12 h-12 mx-auto mb-1 flex items-center justify-center">
+                  {option === 'sweet' ? <Candy className="w-8 h-8 text-amber-700" /> : option === 'unsweetened' ? <Ban className="w-8 h-8 text-gray-600" /> : <RefreshCw className="w-8 h-8 text-amber-700" />}
                 </div>
                 <div className="font-medium">{option}</div>
               </button>
@@ -311,8 +317,8 @@ function Step2({
                     : 'border-gray-200 hover:border-amber-300'
                 }`}
               >
-                <div className="text-2xl mb-1">
-                  {option === 'strong' ? '💪' : option === 'light' ? '☁️' : '⚖️'}
+                <div className="w-12 h-12 mx-auto mb-1 flex items-center justify-center">
+                  {option === 'strong' ? <Dumbbell className="w-8 h-8 text-amber-700" /> : option === 'light' ? <Cloud className="w-8 h-8 text-gray-400" /> : <Scale className="w-8 h-8 text-amber-700" />}
                 </div>
                 <div className="font-medium">{option}</div>
               </button>
@@ -337,8 +343,8 @@ function Step2({
                     : 'border-gray-200 hover:border-amber-300'
                 }`}
               >
-                <div className="text-2xl mb-1">
-                  {option === 'black' ? '☕' : option === 'cream' ? '🥛' : '🔄'}
+                <div className="w-12 h-12 mx-auto mb-1 flex items-center justify-center">
+                  {option === 'black' ? <Coffee className="w-8 h-8 text-amber-700" /> : option === 'cream' ? <CircleDot className="w-8 h-8 text-amber-700" /> : <RefreshCw className="w-8 h-8 text-amber-700" />}
                 </div>
                 <div className="font-medium">{option}</div>
               </button>
@@ -384,9 +390,9 @@ function Step3({
 
       <div className="space-y-4">
         {([
-          { value: 'public', label: 'Public', icon: '🌍', description: 'Anyone can see your posts and profile' },
-          { value: 'friends_only', label: 'Friends Only', icon: '👥', description: 'Only friends can see your posts and profile' },
-          { value: 'private', label: 'Private', icon: '🔒', description: 'Only you can see your posts and profile' },
+          { value: 'public', label: 'Public', icon: <Globe className="w-6 h-6" />, description: 'Anyone can see your posts and profile' },
+          { value: 'friends_only', label: 'Friends Only', icon: <Users className="w-6 h-6" />, description: 'Only friends can see your posts and profile' },
+          { value: 'private', label: 'Private', icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>, description: 'Only you can see your posts and profile' },
         ] as const).map((option) => (
           <button
             key={option.value}
@@ -397,7 +403,7 @@ function Step3({
             }`}
           >
             <div className="flex items-start">
-              <div className="text-3xl mr-4">{option.icon}</div>
+              <div className="text-gray-600 mr-4">{option.icon}</div>
               <div className="flex-1">
                 <h3 className="text-xl font-bold text-gray-900 mb-1">{option.label}</h3>
                 <p className="text-gray-600">{option.description}</p>
@@ -486,8 +492,9 @@ function Step4({
         </div>
 
         <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-          <p className="text-sm text-amber-800">
-            💡 You can always update your profile later and add a profile picture in Settings
+          <p className="text-sm text-amber-800 flex items-center gap-2">
+            <Lightbulb className="w-4 h-4" />
+            <span>You can always update your profile later and add a profile picture in Settings</span>
           </p>
         </div>
       </div>
@@ -547,7 +554,7 @@ function Step5({
 
         <div className="flex items-start">
           <div className="bg-amber-100 rounded-full p-3 mr-4">
-            <span className="text-2xl">📝</span>
+            <FileEdit className="w-8 h-8 text-amber-700" />
           </div>
           <div>
             <h3 className="text-lg font-bold text-gray-900">Log Your Drinks</h3>
@@ -557,7 +564,7 @@ function Step5({
 
         <div className="flex items-start">
           <div className="bg-amber-100 rounded-full p-3 mr-4">
-            <span className="text-2xl">👥</span>
+            <Users className="w-8 h-8 text-amber-700" />
           </div>
           <div>
             <h3 className="text-lg font-bold text-gray-900">Find Friends</h3>

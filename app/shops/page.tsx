@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { isFavorite, toggleFavorite } from "../lib/storage";
-import { Home, MapPin, Coffee } from 'lucide-react';
+import { Home, MapPin, Coffee, Star, Heart, MessageCircle, Ban, AlertTriangle } from 'lucide-react';
 
 interface GoogleShop {
   place_id: string;
@@ -287,11 +287,11 @@ export default function ShopsPage() {
               onChange={(e) => handleSortChange(e.target.value as SortType)}
               className="px-3 py-2 md:px-4 md:py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 text-gray-900 bg-white whitespace-nowrap text-sm md:text-base"
             >
-              <option value="rating-desc">⭐ Top Rated</option>
-              <option value="rating-asc">⭐ Lowest Rated</option>
-              <option value="reviews-desc">💬 Most Reviewed</option>
-              <option value="price-asc">💰 $ → $$$$</option>
-              <option value="price-desc">💰 $$$$ → $</option>
+              <option value="rating-desc">Top Rated</option>
+              <option value="rating-asc">Lowest Rated</option>
+              <option value="reviews-desc">Most Reviewed</option>
+              <option value="price-asc">Price: $ → $$$$</option>
+              <option value="price-desc">Price: $$$$ → $</option>
             </select>
 
             {/* Results Count */}
@@ -321,9 +321,9 @@ export default function ShopsPage() {
                   }`}
                 >
                   {filterKey === 'all' && <Home className="w-4 h-4" />}
-                  {filterKey === 'favorites' && <span className="text-sm">❤️</span>}
-                  {filterKey === 'open' && <span className="text-sm">🟢</span>}
-                  {filterKey === '45stars' && <span className="text-sm">⭐</span>}
+                  {filterKey === 'favorites' && <Heart className="w-4 h-4" />}
+                  {filterKey === 'open' && <div className="w-2 h-2 rounded-full bg-green-500" />}
+                  {filterKey === '45stars' && <Star className="w-4 h-4" />}
                   {filter}
                 </button>
               );
@@ -363,7 +363,7 @@ export default function ShopsPage() {
         {/* Error Message */}
         {error && (
           <div className="mb-4 md:mb-6 p-3 md:p-4 bg-amber-100 border border-amber-300 rounded-lg md:rounded-xl text-amber-800 text-sm md:text-base">
-            <p className="mb-2">⚠️ {error}</p>
+            <p className="mb-2 flex items-center gap-2"><AlertTriangle className="w-4 h-4" /> <span>{error}</span></p>
             {!locationRetried && (
               <button
                 onClick={retryLocation}
@@ -420,9 +420,9 @@ export default function ShopsPage() {
                   {/* Favorite Button */}
                   <button
                     onClick={(e) => handleFavoriteToggle(e, shop.place_id, shop.name, shop.address)}
-                    className="absolute top-3 md:top-4 right-3 md:right-4 text-xl md:text-2xl hover:scale-110 transition z-10"
+                    className="absolute top-3 md:top-4 right-3 md:right-4 hover:scale-110 transition z-10"
                   >
-                    {favorites.has(shop.place_id) ? "❤️" : "🤍"}
+                    <Heart className={`w-5 h-5 md:w-6 md:h-6 ${favorites.has(shop.place_id) ? 'fill-current text-red-500' : 'text-gray-300'}`} />
                   </button>
 
                   {/* Shop Icon */}
@@ -438,7 +438,8 @@ export default function ShopsPage() {
                   {/* Rating */}
                   {shop.rating > 0 && (
                     <div className="flex items-center gap-1.5 md:gap-2 mb-2 md:mb-3">
-                      <span className="text-amber-600 font-bold text-sm md:text-base">⭐ {shop.rating}</span>
+                      <Star className="w-4 h-4 md:w-5 md:h-5 text-amber-500 fill-current" />
+                      <span className="text-amber-600 font-bold text-sm md:text-base">{shop.rating}</span>
                       <span className="text-gray-500 text-xs md:text-sm">
                         ({shop.review_count} reviews)
                       </span>
@@ -449,12 +450,14 @@ export default function ShopsPage() {
                   {shop.open_now !== null && (
                     <div className="mb-2 md:mb-3">
                       {shop.open_now ? (
-                        <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
-                          🟢 Open Now
+                        <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full inline-flex items-center gap-1">
+                          <div className="w-2 h-2 rounded-full bg-green-500" />
+                          Open Now
                         </span>
                       ) : (
-                        <span className="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">
-                          🔴 Closed
+                        <span className="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full inline-flex items-center gap-1">
+                          <div className="w-2 h-2 rounded-full bg-red-500" />
+                          Closed
                         </span>
                       )}
                     </div>

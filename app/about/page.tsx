@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Search, Star, Users } from 'lucide-react';
 
 export default function AboutPage() {
   return (
@@ -50,7 +51,9 @@ export default function AboutPage() {
             </h2>
             <div className="grid md:grid-cols-3 gap-6 mb-8">
               <div className="text-center p-4">
-                <div className="text-4xl mb-3">🔍</div>
+                <div className="w-16 h-16 mx-auto mb-3 flex items-center justify-center bg-amber-100 rounded-full">
+                  <Search className="w-8 h-8 text-amber-700" />
+                </div>
                 <h3 className="font-bold text-gray-900 mb-2">Discover</h3>
                 <p className="text-gray-600 text-sm">
                   Browse coffee shops in your area with detailed info about
@@ -58,14 +61,18 @@ export default function AboutPage() {
                 </p>
               </div>
               <div className="text-center p-4">
-                <div className="text-4xl mb-3">⭐</div>
+                <div className="w-16 h-16 mx-auto mb-3 flex items-center justify-center bg-amber-100 rounded-full">
+                  <Star className="w-8 h-8 text-amber-700" />
+                </div>
                 <h3 className="font-bold text-gray-900 mb-2">Review</h3>
                 <p className="text-gray-600 text-sm">
                   Share your experiences and help others find great spots
                 </p>
               </div>
               <div className="text-center p-4">
-                <div className="text-4xl mb-3">👥</div>
+                <div className="w-16 h-16 mx-auto mb-3 flex items-center justify-center bg-amber-100 rounded-full">
+                  <Users className="w-8 h-8 text-amber-700" />
+                </div>
                 <h3 className="font-bold text-gray-900 mb-2">Connect</h3>
                 <p className="text-gray-600 text-sm">
                   See where friends are going and plan coffee meetups

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
 import { ArrowLeftIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { db } from '@/lib/supabase';
-import { Coffee } from 'lucide-react';
+import { Coffee, Users, Globe, Lock } from 'lucide-react';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -356,9 +356,9 @@ export default function SettingsPage() {
               </label>
               <div className="space-y-2">
                 {[
-                  { value: 'public', label: 'Public', description: 'Anyone can view your profile', icon: '🌍' },
-                  { value: 'friends_only', label: 'Friends Only', description: 'Only friends can view your profile', icon: '👥' },
-                  { value: 'private', label: 'Private', description: 'Only you can view your profile', icon: '🔒' },
+                  { value: 'public', label: 'Public', description: 'Anyone can view your profile', icon: <Globe className="w-5 h-5" /> },
+                  { value: 'friends_only', label: 'Friends Only', description: 'Only friends can view your profile', icon: <Users className="w-5 h-5" /> },
+                  { value: 'private', label: 'Private', description: 'Only you can view your profile', icon: <Lock className="w-5 h-5" /> },
                 ].map((option) => (
                   <button
                     key={option.value}
@@ -371,11 +371,16 @@ export default function SettingsPage() {
                     }`}
                   >
                     <div className="flex items-start justify-between">
-                      <div>
-                        <p className="font-semibold text-gray-900">
-                          {option.icon} {option.label}
-                        </p>
-                        <p className="text-sm text-gray-600">{option.description}</p>
+                      <div className="flex items-center gap-3">
+                        <div className="text-gray-600">
+                          {option.icon}
+                        </div>
+                        <div>
+                          <p className="font-semibold text-gray-900">
+                            {option.label}
+                          </p>
+                          <p className="text-sm text-gray-600">{option.description}</p>
+                        </div>
                       </div>
                       {privacyLevel === option.value && (
                         <div className="w-5 h-5 rounded-full border-2 border-amber-700 flex items-center justify-center">

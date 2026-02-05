@@ -164,7 +164,9 @@ export default function SearchPage() {
           </div>
         ) : !searched ? (
           <div className="text-center py-12">
-            <div className="text-6xl mb-4">🔍</div>
+            <div className="w-20 h-20 mx-auto mb-4 flex items-center justify-center bg-amber-100 rounded-full">
+              <MagnifyingGlassIcon className="w-10 h-10 text-amber-700" />
+            </div>
             <h2 className="text-xl font-bold text-gray-900 mb-2">Search CoffeeConnect</h2>
             <p className="text-gray-600">Find friends, posts, and coffee shops</p>
           </div>

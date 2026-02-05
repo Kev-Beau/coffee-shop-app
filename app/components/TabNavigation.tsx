@@ -1,10 +1,12 @@
 'use client';
 
+import { ReactNode } from 'react';
+
 interface TabNavigationProps {
   tabs: Array<{
     id: string;
     label: string;
-    icon?: string;
+    icon?: string | ReactNode;
     count?: number;
   }>;
   activeTab: string;

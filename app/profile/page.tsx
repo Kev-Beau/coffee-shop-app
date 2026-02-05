@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
-import { Coffee, MapPin as MapPinLucide } from 'lucide-react';
+import { Coffee, MapPin as MapPinLucide, Heart, FileEdit } from 'lucide-react';
 import { PencilIcon, Squares2X2Icon, BookmarkIcon, MapPinIcon, UserGroupIcon } from '@heroicons/react/24/outline';
 import { db } from '@/lib/supabase';
 import { usePullToRefresh } from '../hooks/usePullToRefresh';
@@ -290,7 +290,7 @@ export default function ProfilePage() {
             <>
               {posts.length === 0 ? (
                 <div className="col-span-3 bg-white rounded-3xl shadow-lg p-8 text-center">
-                  <div className="text-6xl mb-4">📝</div>
+                  <FileEdit className="w-16 h-16 mx-auto mb-4 text-gray-300" />
                   <h2 className="text-xl font-bold text-gray-900 mb-2">No Posts Yet</h2>
                   <p className="text-gray-600 mb-6">Start logging your coffee adventures!</p>
                   <a
@@ -362,7 +362,7 @@ export default function ProfilePage() {
             <>
               {favorites.length === 0 ? (
                 <div className="col-span-3 bg-white rounded-3xl shadow-lg p-8 text-center">
-                  <div className="text-6xl mb-4">❤️</div>
+                  <Heart className="w-16 h-16 mx-auto mb-4 text-red-300" />
                   <h2 className="text-xl font-bold text-gray-900 mb-2">No Favorites Yet</h2>
                   <p className="text-gray-600">Save coffee shops you love!</p>
                 </div>

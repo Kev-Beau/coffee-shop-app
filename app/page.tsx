@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
-import { MapPin } from 'lucide-react';
+import { MapPin, Star, Users } from 'lucide-react';
 
 export default function Home() {
   const router = useRouter();
@@ -66,7 +66,9 @@ export default function Home() {
           </div>
 
           <div className="bg-white p-8 rounded-2xl shadow-md hover:shadow-xl transition">
-            <div className="text-4xl mb-4">⭐</div>
+            <div className="w-12 h-12 mb-4 flex items-center justify-center">
+              <Star className="w-12 h-12 text-amber-700" />
+            </div>
             <h3 className="text-xl font-bold text-gray-900 mb-2">Share Reviews</h3>
             <p className="text-gray-600">
               Rate and review shops to help friends find the best spots
@@ -74,7 +76,9 @@ export default function Home() {
           </div>
 
           <div className="bg-white p-8 rounded-2xl shadow-md hover:shadow-xl transition">
-            <div className="text-4xl mb-4">👥</div>
+            <div className="w-12 h-12 mb-4 flex items-center justify-center">
+              <Users className="w-12 h-12 text-amber-700" />
+            </div>
             <h3 className="text-xl font-bold text-gray-900 mb-2">Connect</h3>
             <p className="text-gray-600">
               See where your friends are going and plan coffee meetups

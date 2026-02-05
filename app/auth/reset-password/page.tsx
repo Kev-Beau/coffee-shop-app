@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
-import { Coffee } from 'lucide-react';
+import { Coffee, Mail } from 'lucide-react';
 
 export default function ResetPasswordPage() {
   const [email, setEmail] = useState('');
@@ -40,7 +40,7 @@ export default function ResetPasswordPage() {
       <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50 flex items-center justify-center px-4">
         <div className="max-w-md w-full">
           <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
-            <div className="text-5xl mb-4">📧</div>
+            <Mail className="w-16 h-16 mx-auto mb-4 text-amber-700" />
             <h1 className="text-2xl font-bold text-gray-900 mb-2">Check your email</h1>
             <p className="text-gray-600 mb-6">
               We sent a password reset link to <strong>{email}</strong>
