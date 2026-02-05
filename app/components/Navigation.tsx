@@ -163,6 +163,14 @@ export default function Navigation() {
               </Link>
             ))}
 
+            <Link
+              href="/search"
+              className="block px-3 py-2 rounded-lg text-gray-700 hover:bg-amber-50 hover:text-amber-700 transition"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Search
+            </Link>
+
             {user ? (
               <>
                 <Link

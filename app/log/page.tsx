@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
-import { MagnifyingGlassIcon, ClockIcon } from '@heroicons/react/24/outline';
+import { ClockIcon } from '@heroicons/react/24/outline';
 import DrinkLogModal from '../components/DrinkLogModal';
 
 const supabase = createClient(
@@ -108,16 +108,7 @@ export default function LogPage() {
         {/* Header */}
         <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
           <div className="max-w-2xl mx-auto px-4 py-4">
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">Quick Log</h1>
-
-            {/* Search Button */}
-            <button
-              onClick={() => router.push('/shops')}
-              className="w-full flex items-center gap-3 px-4 py-3 bg-gray-100 rounded-xl text-gray-600 hover:bg-gray-200 transition"
-            >
-              <MagnifyingGlassIcon className="w-5 h-5" />
-              <span>Search for a coffee shop...</span>
-            </button>
+            <h1 className="text-2xl font-bold text-gray-900">Quick Log</h1>
           </div>
         </div>
 
