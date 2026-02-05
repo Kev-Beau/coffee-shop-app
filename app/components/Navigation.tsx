@@ -92,13 +92,6 @@ export default function Navigation() {
               </Link>
             ))}
 
-            <Link
-              href="/search"
-              className="text-gray-600 hover:text-amber-700 transition font-medium"
-            >
-              <MagnifyingGlassIcon className="w-5 h-5" />
-            </Link>
-
             {user ? (
               <>
                 <Link
@@ -162,14 +155,6 @@ export default function Navigation() {
                 </span>
               </Link>
             ))}
-
-            <Link
-              href="/search"
-              className="block px-3 py-2 rounded-lg text-gray-700 hover:bg-amber-50 hover:text-amber-700 transition"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Search
-            </Link>
 
             {user ? (
               <>

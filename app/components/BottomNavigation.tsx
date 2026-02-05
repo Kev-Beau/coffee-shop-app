@@ -16,7 +16,7 @@ export default function BottomNavigation() {
 
   const navItems = [
     { href: '/feed', icon: HomeIcon, solidIcon: HomeIconSolid, label: 'Feed' },
-    { href: '/shops', icon: MagnifyingGlassIcon, solidIcon: MagnifyingGlassIconSolid, label: 'Shops' },
+    { href: '/search', icon: MagnifyingGlassIcon, solidIcon: MagnifyingGlassIconSolid, label: 'Search' },
     { href: '/log', icon: PlusIcon, solidIcon: PlusIcon, label: 'Log', special: true },
     { href: '/friends', icon: UserGroupIcon, solidIcon: UserGroupIconSolid, label: 'Friends' },
     { href: '/profile', icon: UserIcon, solidIcon: UserIconSolid, label: 'Profile' },

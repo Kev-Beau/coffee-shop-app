@@ -132,7 +132,7 @@ export default function SearchPage() {
           {/* Tabs */}
           <div className="flex gap-2 mt-4">
             {[
-              { id: 'users' as SearchTab, icon: UserIcon, label: 'Users' },
+              { id: 'users' as SearchTab, icon: UserIcon, label: 'Friends' },
               { id: 'posts' as SearchTab, icon: DocumentTextIcon, label: 'Posts' },
               { id: 'shops' as SearchTab, icon: MapPinIcon, label: 'Shops' },
             ].map((tab) => (
