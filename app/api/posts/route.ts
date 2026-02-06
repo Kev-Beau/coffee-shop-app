@@ -139,12 +139,49 @@ export async function GET(request: NextRequest) {
           .in('post_id', postIds)
       : { data: [] };
 
-    // Add like information to posts
+    // Get comments with user info (top-level only, limit to 3 per post)
+    const { data: comments } = postIds.length > 0
+      ? await supabase
+          .from('comments')
+          .select(`
+            *,
+            profiles (
+              id,
+              username,
+              display_name,
+              avatar_url
+            )
+          `)
+          .in('post_id', postIds)
+          .is('parent_id', null)
+          .order('created_at', { ascending: false })
+      : { data: [] };
+
+    // Group comments by post and limit to 3 per post
+    const commentsByPost: Record<string, any[]> = {};
+    comments?.forEach((comment: any) => {
+      if (!commentsByPost[comment.post_id]) {
+        commentsByPost[comment.post_id] = [];
+      }
+      if (commentsByPost[comment.post_id].length < 3) {
+        commentsByPost[comment.post_id].push(comment);
+      }
+    });
+
+    // Count total comments per post
+    const commentCounts: Record<string, number> = {};
+    comments?.forEach((c: any) => {
+      commentCounts[c.post_id] = (commentCounts[c.post_id] || 0) + 1;
+    });
+
+    // Add like and comment information to posts
     const postsWithLikes = filteredPosts?.map((post: any) => {
       const postLikes = likes?.filter((l: any) => l.post_id === post.id) || [];
       return {
         ...post,
         like_count: postLikes.length,
+        comment_count: commentCounts[post.id] || 0,
+        comments_preview: commentsByPost[post.id] || [],
         user_has_liked: user ? postLikes.some((l: any) => l.user_id === user.id) : false,
       };
     });

@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
 import { ArrowLeftIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { db } from '@/lib/supabase';
-import { Coffee, Users, Globe, Lock } from 'lucide-react';
+import { Coffee, Users, Globe, Lock, Palette } from 'lucide-react';
+import ThemeSwitcher from '@/app/components/ThemeSwitcher';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -168,9 +169,9 @@ export default function SettingsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-primary-lighter to-primary-light flex items-center justify-center">
         <div className="text-center">
-          <div className="w-12 h-12 border-4 border-amber-700 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
           <p className="text-gray-600">Loading settings...</p>
         </div>
       </div>
@@ -178,7 +179,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50 pb-20">
+    <div className="min-h-screen bg-gradient-to-b from-primary-lighter to-primary-light pb-20">
       {/* Header */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-2xl mx-auto px-4 py-4 flex items-center gap-4">
@@ -220,7 +221,7 @@ export default function SettingsPage() {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="coffee-lover"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none transition"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition"
               />
               <p className="mt-1 text-sm text-gray-500">
                 Your unique username (3+ characters, lowercase letters, numbers, hyphens)
@@ -237,7 +238,7 @@ export default function SettingsPage() {
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
                 placeholder="Coffee Lover"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none transition"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition"
               />
             </div>
 
@@ -252,7 +253,7 @@ export default function SettingsPage() {
                 placeholder="Tell others about yourself..."
                 rows={3}
                 maxLength={300}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none transition resize-none"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition resize-none"
               />
               <p className="mt-1 text-sm text-gray-500">{bio.length}/300</p>
             </div>
@@ -260,7 +261,7 @@ export default function SettingsPage() {
             {/* Coffee Preferences */}
             <div className="mt-6 pt-6 border-t border-gray-200">
               <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <Coffee className="w-5 h-5 text-amber-700" />
+                <Coffee className="w-5 h-5 text-primary" />
                 Coffee Preferences
               </h3>
 
@@ -275,8 +276,8 @@ export default function SettingsPage() {
                       onClick={() => toggleFavoriteDrink(drink)}
                       className={`px-3 py-2 rounded-lg border-2 text-sm font-medium transition ${
                         favoriteDrinks.includes(drink)
-                          ? 'border-amber-700 bg-amber-700 text-white'
-                          : 'border-gray-300 text-gray-700 hover:border-amber-500'
+                          ? 'border-primary bg-primary text-white'
+                          : 'border-gray-300 text-gray-700 hover:border-primary'
                       }`}
                     >
                       {drink}
@@ -296,8 +297,8 @@ export default function SettingsPage() {
                       onClick={() => setPreferredRoast(roast)}
                       className={`py-3 rounded-lg border-2 font-medium transition ${
                         preferredRoast === roast
-                          ? 'border-amber-700 bg-amber-700 text-white'
-                          : 'border-gray-300 text-gray-700 hover:border-amber-500'
+                          ? 'border-primary bg-primary text-white'
+                          : 'border-gray-300 text-gray-700 hover:border-primary'
                       }`}
                     >
                       {roast}
@@ -317,8 +318,8 @@ export default function SettingsPage() {
                       onClick={() => setBrewingMethod(method)}
                       className={`py-3 rounded-lg border-2 font-medium transition ${
                         brewingMethod === method
-                          ? 'border-amber-700 bg-amber-700 text-white'
-                          : 'border-gray-300 text-gray-700 hover:border-amber-500'
+                          ? 'border-primary bg-primary text-white'
+                          : 'border-gray-300 text-gray-700 hover:border-primary'
                       }`}
                     >
                       {method}
@@ -338,8 +339,8 @@ export default function SettingsPage() {
                       onClick={() => setCoffeeStrength(strength)}
                       className={`py-3 rounded-lg border-2 font-medium transition ${
                         coffeeStrength === strength
-                          ? 'border-amber-700 bg-amber-700 text-white'
-                          : 'border-gray-300 text-gray-700 hover:border-amber-500'
+                          ? 'border-primary bg-primary text-white'
+                          : 'border-gray-300 text-gray-700 hover:border-primary'
                       }`}
                     >
                       {strength}
@@ -366,8 +367,8 @@ export default function SettingsPage() {
                     onClick={() => setPrivacyLevel(option.value as any)}
                     className={`w-full p-4 rounded-lg border-2 text-left transition ${
                       privacyLevel === option.value
-                        ? 'border-amber-700 bg-amber-50'
-                        : 'border-gray-200 hover:border-amber-300'
+                        ? 'border-primary bg-primary-lighter'
+                        : 'border-gray-200 hover:border-primary'
                     }`}
                   >
                     <div className="flex items-start justify-between">
@@ -383,8 +384,8 @@ export default function SettingsPage() {
                         </div>
                       </div>
                       {privacyLevel === option.value && (
-                        <div className="w-5 h-5 rounded-full border-2 border-amber-700 flex items-center justify-center">
-                          <div className="w-3 h-3 rounded-full bg-amber-700" />
+                        <div className="w-5 h-5 rounded-full border-2 border-primary flex items-center justify-center">
+                          <div className="w-3 h-3 rounded-full bg-primary" />
                         </div>
                       )}
                     </div>
@@ -398,7 +399,7 @@ export default function SettingsPage() {
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className="w-full bg-amber-700 text-white py-3 rounded-lg font-semibold hover:bg-amber-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary-dark transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {saving ? 'Saving...' : 'Save Changes'}
               </button>
@@ -428,6 +429,24 @@ export default function SettingsPage() {
                 }) : 'N/A'}
               </span>
             </div>
+          </div>
+        </div>
+
+        {/* Appearance */}
+        <div className="bg-white rounded-2xl shadow-md p-6">
+          <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <Palette className="w-5 h-5 text-primary" />
+            Appearance
+          </h2>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Theme
+            </label>
+            <p className="text-sm text-gray-500 mb-3">
+              Choose your preferred color theme
+            </p>
+            <ThemeSwitcher />
           </div>
         </div>
 

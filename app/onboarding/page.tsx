@@ -44,26 +44,38 @@ export default function OnboardingPage() {
       setUserId(session.user.id);
 
       // Check if already onboarded
-      const { data: preferences } = await db.getDrinkPreferences(session.user.id);
-      if (preferences) {
-        router.push('/feed');
-        return;
+      try {
+        const preferences = await db.getDrinkPreferences(session.user.id);
+        if (preferences) {
+          router.push('/feed');
+          return;
+        }
+      } catch (error) {
+        console.error('Error checking preferences:', error);
+        // Continue to onboarding if there's an error
       }
 
       // Load existing profile data
-      const profile = await db.getProfile(session.user.id);
-      if (profile) {
-        setFormData(prev => ({
-          ...prev,
-          privacy_level: profile.privacy_level,
-          display_name: profile.display_name || '',
-          bio: profile.bio || '',
-        }));
+      try {
+        const profile = await db.getProfile(session.user.id);
+        if (profile) {
+          setFormData(prev => ({
+            ...prev,
+            privacy_level: profile.privacy_level,
+            display_name: profile.display_name || '',
+            bio: profile.bio || '',
+          }));
+        }
+      } catch (error) {
+        console.error('Error loading profile:', error);
+        // Continue with default values
       }
+
+      setLoading(false);
     };
 
     checkAuth();
-  }, [router]);
+  }, []);
 
   const handleNext = async () => {
     if (step < 5) {
@@ -111,7 +123,7 @@ export default function OnboardingPage() {
   const progress = (step / totalSteps) * 100;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50">
+    <div className="min-h-screen bg-gradient-to-b from-primary-lighter to-primary-light">
       {/* Progress Bar */}
       <div className="sticky top-0 z-50 bg-white shadow-sm">
         <div className="max-w-2xl mx-auto px-4 py-4">
@@ -125,7 +137,7 @@ export default function OnboardingPage() {
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
             <div
-              className="bg-amber-700 h-2 rounded-full transition-all duration-300"
+              className="bg-primary h-2 rounded-full transition-all duration-300"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -181,10 +193,10 @@ function Step1({ onNext }: { onNext: () => void }) {
   return (
     <div className="text-center">
       <div className="w-20 h-20 mx-auto mb-6 flex items-center justify-center">
-        <Coffee className="w-20 h-20 text-amber-700" />
+        <Coffee className="w-20 h-20 text-primary" />
       </div>
       <h1 className="text-4xl font-bold text-gray-900 mb-4">
-        Welcome to CoffeeConnect!
+        Welcome to Beany!
       </h1>
       <p className="text-xl text-gray-600 mb-8">
         Let's set up your account in just a few steps
@@ -195,25 +207,25 @@ function Step1({ onNext }: { onNext: () => void }) {
         <ul className="space-y-3">
           <li className="flex items-start gap-3">
             <div className="w-8 h-8 flex-shrink-0 flex items-center justify-center">
-              <MapPin className="w-8 h-8 text-amber-700" />
+              <MapPin className="w-8 h-8 text-primary" />
             </div>
             <span className="text-gray-700">Discover and save local coffee shops</span>
           </li>
           <li className="flex items-start gap-3">
             <div className="w-8 h-8 flex-shrink-0 flex items-center justify-center">
-              <Camera className="w-8 h-8 text-amber-700" />
+              <Camera className="w-8 h-8 text-primary" />
             </div>
             <span className="text-gray-700">Share photos and reviews of your drinks</span>
           </li>
           <li className="flex items-start gap-3">
             <div className="w-8 h-8 flex-shrink-0 flex items-center justify-center">
-              <Users className="w-8 h-8 text-amber-700" />
+              <Users className="w-8 h-8 text-primary" />
             </div>
             <span className="text-gray-700">Connect with friends and see their recommendations</span>
           </li>
           <li className="flex items-start gap-3">
             <div className="w-8 h-8 flex-shrink-0 flex items-center justify-center">
-              <Search className="w-8 h-8 text-amber-700" />
+              <Search className="w-8 h-8 text-primary" />
             </div>
             <span className="text-gray-700">Find your perfect cup based on your preferences</span>
           </li>
@@ -222,7 +234,7 @@ function Step1({ onNext }: { onNext: () => void }) {
 
       <button
         onClick={onNext}
-        className="bg-amber-700 text-white px-8 py-4 rounded-full font-semibold hover:bg-amber-800 transition shadow-lg"
+        className="bg-primary text-white px-8 py-4 rounded-full font-semibold hover:bg-primary-dark transition shadow-lg"
       >
         Let's Get Started →
       </button>
@@ -261,12 +273,12 @@ function Step2({
                 onClick={() => onChange({ ...data, temperature: option })}
                 className={`p-4 rounded-xl border-2 transition capitalize ${
                   data.temperature === option
-                    ? 'border-amber-700 bg-amber-50 text-amber-700'
-                    : 'border-gray-200 hover:border-amber-300'
+                    ? 'border-primary bg-primary-lighter text-primary'
+                    : 'border-gray-200 hover:border-primary'
                 }`}
               >
                 <div className="w-12 h-12 mx-auto mb-1 flex items-center justify-center">
-                  {option === 'hot' ? <Flame className="w-8 h-8 text-orange-500" /> : option === 'iced' ? <Snowflake className="w-8 h-8 text-blue-500" /> : <Thermometer className="w-8 h-8 text-amber-700" />}
+                  {option === 'hot' ? <Flame className="w-8 h-8 text-orange-500" /> : option === 'iced' ? <Snowflake className="w-8 h-8 text-blue-500" /> : <Thermometer className="w-8 h-8 text-primary" />}
                 </div>
                 <div className="font-medium">{option}</div>
               </button>
@@ -287,12 +299,12 @@ function Step2({
                 onClick={() => onChange({ ...data, sweetness: option })}
                 className={`p-4 rounded-xl border-2 transition capitalize ${
                   data.sweetness === option
-                    ? 'border-amber-700 bg-amber-50 text-amber-700'
-                    : 'border-gray-200 hover:border-amber-300'
+                    ? 'border-primary bg-primary-lighter text-primary'
+                    : 'border-gray-200 hover:border-primary'
                 }`}
               >
                 <div className="w-12 h-12 mx-auto mb-1 flex items-center justify-center">
-                  {option === 'sweet' ? <Candy className="w-8 h-8 text-amber-700" /> : option === 'unsweetened' ? <Ban className="w-8 h-8 text-gray-600" /> : <RefreshCw className="w-8 h-8 text-amber-700" />}
+                  {option === 'sweet' ? <Candy className="w-8 h-8 text-primary" /> : option === 'unsweetened' ? <Ban className="w-8 h-8 text-gray-600" /> : <RefreshCw className="w-8 h-8 text-primary" />}
                 </div>
                 <div className="font-medium">{option}</div>
               </button>
@@ -313,12 +325,12 @@ function Step2({
                 onClick={() => onChange({ ...data, strength: option })}
                 className={`p-4 rounded-xl border-2 transition capitalize ${
                   data.strength === option
-                    ? 'border-amber-700 bg-amber-50 text-amber-700'
-                    : 'border-gray-200 hover:border-amber-300'
+                    ? 'border-primary bg-primary-lighter text-primary'
+                    : 'border-gray-200 hover:border-primary'
                 }`}
               >
                 <div className="w-12 h-12 mx-auto mb-1 flex items-center justify-center">
-                  {option === 'strong' ? <Dumbbell className="w-8 h-8 text-amber-700" /> : option === 'light' ? <Cloud className="w-8 h-8 text-gray-400" /> : <Scale className="w-8 h-8 text-amber-700" />}
+                  {option === 'strong' ? <Dumbbell className="w-8 h-8 text-primary" /> : option === 'light' ? <Cloud className="w-8 h-8 text-gray-400" /> : <Scale className="w-8 h-8 text-primary" />}
                 </div>
                 <div className="font-medium">{option}</div>
               </button>
@@ -339,12 +351,12 @@ function Step2({
                 onClick={() => onChange({ ...data, milk: option })}
                 className={`p-4 rounded-xl border-2 transition capitalize ${
                   data.milk === option
-                    ? 'border-amber-700 bg-amber-50 text-amber-700'
-                    : 'border-gray-200 hover:border-amber-300'
+                    ? 'border-primary bg-primary-lighter text-primary'
+                    : 'border-gray-200 hover:border-primary'
                 }`}
               >
                 <div className="w-12 h-12 mx-auto mb-1 flex items-center justify-center">
-                  {option === 'black' ? <Coffee className="w-8 h-8 text-amber-700" /> : option === 'cream' ? <CircleDot className="w-8 h-8 text-amber-700" /> : <RefreshCw className="w-8 h-8 text-amber-700" />}
+                  {option === 'black' ? <Coffee className="w-8 h-8 text-primary" /> : option === 'cream' ? <CircleDot className="w-8 h-8 text-primary" /> : <RefreshCw className="w-8 h-8 text-primary" />}
                 </div>
                 <div className="font-medium">{option}</div>
               </button>
@@ -362,7 +374,7 @@ function Step2({
         </button>
         <button
           onClick={onNext}
-          className="bg-amber-700 text-white px-8 py-3 rounded-full font-semibold hover:bg-amber-800 transition"
+          className="bg-primary text-white px-8 py-3 rounded-full font-semibold hover:bg-primary-dark transition"
         >
           Continue →
         </button>
@@ -409,7 +421,7 @@ function Step3({
                 <p className="text-gray-600">{option.description}</p>
               </div>
               {data.privacy_level === option.value && (
-                <div className="text-amber-700">
+                <div className="text-primary">
                   <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
@@ -429,7 +441,7 @@ function Step3({
         </button>
         <button
           onClick={onNext}
-          className="bg-amber-700 text-white px-8 py-3 rounded-full font-semibold hover:bg-amber-800 transition"
+          className="bg-primary text-white px-8 py-3 rounded-full font-semibold hover:bg-primary-dark transition"
         >
           Continue →
         </button>
@@ -466,10 +478,10 @@ function Step4({
             value={data.display_name}
             onChange={(e) => onChange({ ...data, display_name: e.target.value })}
             placeholder="Coffee Lover"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none transition"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition"
           />
           <p className="mt-1 text-sm text-gray-500">
-            This is how others will see you on CoffeeConnect
+            This is how others will see you on Beany
           </p>
         </div>
 
@@ -484,15 +496,15 @@ function Step4({
             placeholder="I love exploring new coffee shops and trying different roasts..."
             rows={4}
             maxLength={300}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none transition resize-none"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition resize-none"
           />
           <p className="mt-1 text-sm text-gray-500">
             {data.bio.length}/300 characters
           </p>
         </div>
 
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-          <p className="text-sm text-amber-800 flex items-center gap-2">
+        <div className="bg-primary-lighter border border-amber-200 rounded-lg p-4">
+          <p className="text-sm text-primary-dark flex items-center gap-2">
             <Lightbulb className="w-4 h-4" />
             <span>You can always update your profile later and add a profile picture in Settings</span>
           </p>
@@ -508,7 +520,7 @@ function Step4({
         </button>
         <button
           onClick={onNext}
-          className="bg-amber-700 text-white px-8 py-3 rounded-full font-semibold hover:bg-amber-800 transition"
+          className="bg-primary text-white px-8 py-3 rounded-full font-semibold hover:bg-primary-dark transition"
         >
           Continue →
         </button>
@@ -530,7 +542,7 @@ function Step5({
   return (
     <div className="text-center">
       <div className="w-20 h-20 mx-auto mb-6 flex items-center justify-center">
-        <svg className="w-20 h-20 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-20 h-20 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
       </div>
@@ -543,8 +555,8 @@ function Step5({
 
       <div className="bg-white rounded-2xl shadow-lg p-8 mb-8 text-left space-y-6">
         <div className="flex items-start">
-          <div className="bg-amber-100 rounded-full p-3 mr-4">
-            <Home className="w-8 h-8 text-amber-700" />
+          <div className="bg-primary-light rounded-full p-3 mr-4">
+            <Home className="w-8 h-8 text-primary" />
           </div>
           <div>
             <h3 className="text-lg font-bold text-gray-900">Explore Coffee Shops</h3>
@@ -553,8 +565,8 @@ function Step5({
         </div>
 
         <div className="flex items-start">
-          <div className="bg-amber-100 rounded-full p-3 mr-4">
-            <FileEdit className="w-8 h-8 text-amber-700" />
+          <div className="bg-primary-light rounded-full p-3 mr-4">
+            <FileEdit className="w-8 h-8 text-primary" />
           </div>
           <div>
             <h3 className="text-lg font-bold text-gray-900">Log Your Drinks</h3>
@@ -563,8 +575,8 @@ function Step5({
         </div>
 
         <div className="flex items-start">
-          <div className="bg-amber-100 rounded-full p-3 mr-4">
-            <Users className="w-8 h-8 text-amber-700" />
+          <div className="bg-primary-light rounded-full p-3 mr-4">
+            <Users className="w-8 h-8 text-primary" />
           </div>
           <div>
             <h3 className="text-lg font-bold text-gray-900">Find Friends</h3>
@@ -573,8 +585,8 @@ function Step5({
         </div>
 
         <div className="flex items-start">
-          <div className="bg-amber-100 rounded-full p-3 mr-4">
-            <Settings className="w-8 h-8 text-amber-700" />
+          <div className="bg-primary-light rounded-full p-3 mr-4">
+            <Settings className="w-8 h-8 text-primary" />
           </div>
           <div>
             <h3 className="text-lg font-bold text-gray-900">Customize Settings</h3>
@@ -594,7 +606,7 @@ function Step5({
         <button
           onClick={onComplete}
           disabled={loading}
-          className="bg-amber-700 text-white px-8 py-4 rounded-full font-semibold hover:bg-amber-800 transition shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+          className="bg-primary text-white px-8 py-4 rounded-full font-semibold hover:bg-primary-dark transition shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? 'Setting up...' : 'Start Exploring →'}
         </button>

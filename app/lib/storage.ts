@@ -1,6 +1,6 @@
 // LocalStorage keys
-const VISITS_KEY = 'coffeeconnect_visits';
-const FAVORITES_KEY = 'coffeeconnect_favorites';
+const VISITS_KEY = 'beany_visits';
+const FAVORITES_KEY = 'beany_favorites';
 
 // Types
 export interface Visit {

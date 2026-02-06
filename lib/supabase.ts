@@ -165,11 +165,12 @@ export const db = {
           id,
           username,
           display_name,
-          avatar_url
+          avatar_url,
+          privacy_level
         )
       `)
       .eq('id', postId)
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
     return data;
@@ -419,6 +420,113 @@ export const db = {
     return data;
   },
 
+  // Comments
+  async createComment(comment: {
+    user_id: string;
+    post_id: string;
+    content: string;
+    parent_id?: string;
+  }) {
+    const { data, error } = await supabase!
+      .from('comments')
+      .insert(comment)
+      .select(`
+        *,
+        profiles (
+          id,
+          username,
+          display_name,
+          avatar_url
+        )
+      `)
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  async getComments(postId: string, parentId?: string) {
+    let query = supabase!
+      .from('comments')
+      .select(`
+        *,
+        profiles (
+          id,
+          username,
+          display_name,
+          avatar_url
+        )
+      `)
+      .eq('post_id', postId)
+      .is('parent_id', null)
+      .order('created_at', { ascending: true });
+
+    const { data, error } = await query;
+
+    if (error) throw error;
+
+    // Get replies for each comment
+    const commentsWithReplies = await Promise.all(
+      (data || []).map(async (comment) => {
+        const { data: replies } = await supabase!
+          .from('comments')
+          .select(`
+            *,
+            profiles (
+              id,
+              username,
+              display_name,
+              avatar_url
+            )
+          `)
+          .eq('parent_id', comment.id)
+          .order('created_at', { ascending: true });
+
+        return {
+          ...comment,
+          replies: replies || [],
+        };
+      })
+    );
+
+    return commentsWithReplies;
+  },
+
+  async updateComment(commentId: string, userId: string, updates: { content: string }) {
+    const { data, error } = await supabase!
+      .from('comments')
+      .update({ ...updates, updated_at: new Date().toISOString() })
+      .eq('id', commentId)
+      .eq('user_id', userId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  async deleteComment(commentId: string, userId: string) {
+    const { data, error } = await supabase!
+      .from('comments')
+      .delete()
+      .eq('id', commentId)
+      .eq('user_id', userId)
+      .select();
+
+    if (error) throw error;
+    return data;
+  },
+
+  async getCommentCount(postId: string) {
+    const { count, error } = await supabase!
+      .from('comments')
+      .select('*', { count: 'exact', head: true })
+      .eq('post_id', postId);
+
+    if (error) throw error;
+    return count || 0;
+  },
+
   // Real-time subscriptions
   subscribeToPosts(userId: string, callback: (payload: any) => void) {
     return supabase!
@@ -459,6 +567,85 @@ export const db = {
         callback
       )
       .subscribe();
+  },
+
+  // Notifications
+  async createNotification(
+    userId: string,
+    type: 'friend_request' | 'friend_accepted' | 'comment' | 'like',
+    title: string,
+    message: string,
+    actorId?: string,
+    postId?: string,
+    friendshipId?: string
+  ) {
+    const { data, error } = await supabase!
+      .rpc('create_notification', {
+        p_user_id: userId,
+        p_type: type,
+        p_title: title,
+        p_message: message,
+        p_actor_id: actorId || null,
+        p_post_id: postId || null,
+        p_friendship_id: friendshipId || null,
+      });
+
+    if (error) throw error;
+    return data;
+  },
+
+  async getNotifications(userId: string, unreadOnly = false, limit = 20) {
+    let query = supabase!
+      .from('notifications')
+      .select(`
+        *,
+        actor:actor_id(id, username, display_name, avatar_url),
+        post:post_id(id, drink_name, photo_url)
+      `)
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+      .limit(limit);
+
+    if (unreadOnly) {
+      query = query.eq('read', false);
+    }
+
+    const { data, error } = await query;
+
+    if (error) throw error;
+    return data;
+  },
+
+  async markNotificationAsRead(notificationId: string) {
+    const { data, error } = await supabase!
+      .from('notifications')
+      .update({ read: true })
+      .eq('id', notificationId);
+
+    if (error) throw error;
+    return data;
+  },
+
+  async markAllNotificationsAsRead(userId: string) {
+    const { data, error } = await supabase!
+      .from('notifications')
+      .update({ read: true })
+      .eq('user_id', userId)
+      .eq('read', false);
+
+    if (error) throw error;
+    return data;
+  },
+
+  async getUnreadCount(userId: string) {
+    const { data, error } = await supabase!
+      .from('notifications')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', userId)
+      .eq('read', false);
+
+    if (error) throw error;
+    return data || 0;
   },
 };
 

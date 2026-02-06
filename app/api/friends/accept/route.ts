@@ -1,15 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { db } from '@/lib/supabase';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+import { createSupabaseClient } from '../_utils';
 
 // POST /api/friends/accept - Accept a friend request
 export async function POST(request: NextRequest) {
   try {
+    const supabase = createSupabaseClient(request);
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {
@@ -28,6 +25,19 @@ export async function POST(request: NextRequest) {
 
     // Accept friend request
     const friendship = await db.acceptFriendRequest(friendshipId, user.id);
+
+    // Create notification for the requester (initiator)
+    if (friendship && friendship.initiator_id !== user.id) {
+      await db.createNotification(
+        friendship.initiator_id,
+        'friend_accepted',
+        'Friend Request Accepted!',
+        `${user.user_metadata?.full_name || user.user_metadata?.username || 'Someone'} accepted your friend request!`,
+        user.id,
+        undefined,
+        friendship.id
+      );
+    }
 
     return NextResponse.json({ data: friendship });
   } catch (error: any) {

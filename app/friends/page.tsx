@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
 import { MagnifyingGlassIcon, UserPlusIcon, UserMinusIcon, CheckIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { Coffee } from 'lucide-react';
@@ -11,8 +11,9 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-export default function FriendsPage() {
+function FriendsPageContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [user, setUser] = useState<any>(null);
   const [friends, setFriends] = useState<any[]>([]);
   const [incomingRequests, setIncomingRequests] = useState<any[]>([]);
@@ -21,6 +22,8 @@ export default function FriendsPage() {
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<'friends' | 'requests' | 'search'>('friends');
+  const [friendToRemove, setFriendToRemove] = useState<any>(null);
+  const [showRemoveConfirm, setShowRemoveConfirm] = useState(false);
 
   // Helper to get auth headers
   const getAuthHeaders = async () => {
@@ -31,6 +34,14 @@ export default function FriendsPage() {
     }
     return headers;
   };
+
+  useEffect(() => {
+    // Check URL for tab parameter
+    const tabParam = searchParams.get('tab');
+    if (tabParam === 'requests' || tabParam === 'search' || tabParam === 'friends') {
+      setTab(tabParam);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     // Check authentication
@@ -101,15 +112,18 @@ export default function FriendsPage() {
       });
 
       if (response.ok) {
-        // Remove from search results and add to outgoing
+        // Add to outgoing requests and update search results
         const requestedUser = searchResults.find((u: any) => u.id === receiverId);
         if (requestedUser) {
-          setSearchResults(searchResults.filter((u: any) => u.id !== receiverId));
           setOutgoingRequests([...outgoingRequests, {
             id: Date.now(),
             status: 'pending',
             friend_profile: requestedUser,
           }]);
+          // Update the user's status in search results
+          setSearchResults(searchResults.map((u: any) =>
+            u.id === receiverId ? { ...u, friendshipStatus: 'outgoing' } : u
+          ));
         }
       }
     } catch (error) {
@@ -151,17 +165,30 @@ export default function FriendsPage() {
 
       if (response.ok) {
         setFriends(friends.filter((f: any) => f.id !== friendshipId));
+        setIncomingRequests(incomingRequests.filter((r: any) => r.id !== friendshipId));
+        setShowRemoveConfirm(false);
+        setFriendToRemove(null);
       }
     } catch (error) {
       console.error('Error removing friend:', error);
     }
   };
 
+  const initiateRemoveFriend = (friendship: any) => {
+    setFriendToRemove(friendship);
+    setShowRemoveConfirm(true);
+  };
+
+  const cancelRemoveFriend = () => {
+    setShowRemoveConfirm(false);
+    setFriendToRemove(null);
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-primary-lighter to-primary-light flex items-center justify-center">
         <div className="text-center">
-          <div className="w-12 h-12 border-4 border-amber-700 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
           <p className="text-gray-600">Loading friends...</p>
         </div>
       </div>
@@ -169,7 +196,7 @@ export default function FriendsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50 pb-20">
+    <div className="min-h-screen bg-gradient-to-b from-primary-lighter to-primary-light pb-20">
       {/* Header */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-2xl mx-auto px-4 py-4">
@@ -181,7 +208,7 @@ export default function FriendsPage() {
               onClick={() => setTab('friends')}
               className={`pb-3 px-2 font-medium ${
                 tab === 'friends'
-                  ? 'text-amber-700 border-b-2 border-amber-700'
+                  ? 'text-primary border-b-2 border-primary'
                   : 'text-gray-500 hover:text-gray-700'
               }`}
             >
@@ -191,7 +218,7 @@ export default function FriendsPage() {
               onClick={() => setTab('requests')}
               className={`pb-3 px-2 font-medium ${
                 tab === 'requests'
-                  ? 'text-amber-700 border-b-2 border-amber-700'
+                  ? 'text-primary border-b-2 border-primary'
                   : 'text-gray-500 hover:text-gray-700'
               }`}
             >
@@ -201,7 +228,7 @@ export default function FriendsPage() {
               onClick={() => setTab('search')}
               className={`pb-3 px-2 font-medium ${
                 tab === 'search'
-                  ? 'text-amber-700 border-b-2 border-amber-700'
+                  ? 'text-primary border-b-2 border-primary'
                   : 'text-gray-500 hover:text-gray-700'
               }`}
             >
@@ -226,7 +253,7 @@ export default function FriendsPage() {
                 <p className="text-gray-600 mb-6">Find people to connect with!</p>
                 <button
                   onClick={() => setTab('search')}
-                  className="bg-amber-700 text-white px-6 py-3 rounded-lg font-semibold hover:bg-amber-800 transition"
+                  className="bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary-dark transition"
                 >
                   Find Friends
                 </button>
@@ -240,11 +267,11 @@ export default function FriendsPage() {
                     className="bg-white rounded-2xl shadow-md p-4 flex items-center justify-between"
                   >
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center overflow-hidden">
+                      <div className="w-12 h-12 rounded-full bg-primary-light flex items-center justify-center overflow-hidden">
                         {profile?.avatar_url ? (
                           <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
                         ) : (
-                          <Coffee className="w-5 h-5 text-amber-700" />
+                          <Coffee className="w-5 h-5 text-primary" />
                         )}
                       </div>
                       <div>
@@ -255,7 +282,7 @@ export default function FriendsPage() {
                       </div>
                     </div>
                     <button
-                      onClick={() => handleRemoveFriend(friendship.id)}
+                      onClick={() => initiateRemoveFriend(friendship)}
                       className="text-gray-400 hover:text-red-500 transition"
                       title="Remove friend"
                     >
@@ -298,11 +325,11 @@ export default function FriendsPage() {
                             className="bg-white rounded-2xl shadow-md p-4 flex items-center justify-between"
                           >
                             <div className="flex items-center gap-4">
-                              <div className="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center overflow-hidden">
+                              <div className="w-12 h-12 rounded-full bg-primary-light flex items-center justify-center overflow-hidden">
                                 {profile?.avatar_url ? (
                                   <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
                                 ) : (
-                                  <Coffee className="w-5 h-5 text-amber-700" />
+                                  <Coffee className="w-5 h-5 text-primary" />
                                 )}
                               </div>
                               <div>
@@ -347,11 +374,11 @@ export default function FriendsPage() {
                             className="bg-white rounded-2xl shadow-md p-4 flex items-center justify-between opacity-60"
                           >
                             <div className="flex items-center gap-4">
-                              <div className="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center overflow-hidden">
+                              <div className="w-12 h-12 rounded-full bg-primary-light flex items-center justify-center overflow-hidden">
                                 {profile?.avatar_url ? (
                                   <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
                                 ) : (
-                                  <Coffee className="w-5 h-5 text-amber-700" />
+                                  <Coffee className="w-5 h-5 text-primary" />
                                 )}
                               </div>
                               <div>
@@ -383,11 +410,11 @@ export default function FriendsPage() {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                   placeholder="Search by username..."
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none"
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
                 />
                 <button
                   onClick={handleSearch}
-                  className="px-4 py-2 bg-amber-700 text-white rounded-lg hover:bg-amber-800 transition"
+                  className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition"
                 >
                   <MagnifyingGlassIcon className="w-5 h-5" />
                 </button>
@@ -408,11 +435,11 @@ export default function FriendsPage() {
                       className="bg-white rounded-2xl shadow-md p-4 flex items-center justify-between"
                     >
                       <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center overflow-hidden">
+                        <div className="w-12 h-12 rounded-full bg-primary-light flex items-center justify-center overflow-hidden">
                           {user.avatar_url ? (
                             <img src={user.avatar_url} alt="" className="w-full h-full object-cover" />
                           ) : (
-                            <Coffee className="w-5 h-5 text-amber-700" />
+                            <Coffee className="w-5 h-5 text-primary" />
                           )}
                         </div>
                         <div>
@@ -424,8 +451,14 @@ export default function FriendsPage() {
                       </div>
                       {isFriend ? (
                         <span className="text-sm text-gray-500">Already friends</span>
-                      ) : hasPendingRequest ? (
-                        <span className="text-sm text-amber-700">Request sent</span>
+                      ) : hasPendingRequest || user.friendshipStatus === 'outgoing' ? (
+                        <button
+                          disabled
+                          className="px-4 py-2 bg-gray-100 text-gray-500 rounded-lg text-sm font-medium cursor-not-allowed"
+                        >
+                          <UserPlusIcon className="w-4 h-4 inline mr-1" />
+                          Pending
+                        </button>
                       ) : user.friendshipStatus === 'incoming' ? (
                         <button
                           onClick={() => {
@@ -439,7 +472,7 @@ export default function FriendsPage() {
                       ) : (
                         <button
                           onClick={() => handleSendRequest(user.id)}
-                          className="px-4 py-2 bg-amber-700 text-white rounded-lg hover:bg-amber-800 transition text-sm font-medium"
+                          className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition text-sm font-medium"
                         >
                           <UserPlusIcon className="w-4 h-4 inline mr-1" />
                           Add Friend
@@ -453,6 +486,47 @@ export default function FriendsPage() {
           </div>
         )}
       </div>
+
+      {/* Confirmation Modal */}
+      {showRemoveConfirm && friendToRemove && (
+        <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 animate-slide-up">
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Remove Friend?</h3>
+            <p className="text-gray-600 mb-6">
+              Are you sure you want to remove <strong>{friendToRemove.friend_profile?.display_name || friendToRemove.friend_profile?.username}</strong> as a friend?
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={cancelRemoveFriend}
+                className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleRemoveFriend(friendToRemove.id)}
+                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition"
+              >
+                Remove
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
+  );
+}
+
+export default function FriendsPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-b from-primary-lighter to-primary-light flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-gray-600">Loading friends...</p>
+        </div>
+      </div>
+    }>
+      <FriendsPageContent />
+    </Suspense>
   );
 }

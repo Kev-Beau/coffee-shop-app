@@ -154,7 +154,7 @@ export default function QuickLogModal({ isOpen, onClose }: QuickLogModalProps) {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search for any coffee shop..."
-                  className="w-full pl-12 pr-10 py-4 text-base bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 text-gray-900 placeholder-gray-400"
+                  className="w-full pl-12 pr-10 py-4 text-base bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary text-gray-900 placeholder-gray-400"
                 />
                 {searchQuery && (
                   <button
@@ -175,7 +175,7 @@ export default function QuickLogModal({ isOpen, onClose }: QuickLogModalProps) {
               <div className="p-4 pt-2">
                 {searchLoading ? (
                   <div className="text-center py-8">
-                    <div className="w-10 h-10 border-4 border-amber-700 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+                    <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-3" />
                     <p className="text-gray-600 text-sm">Searching...</p>
                   </div>
                 ) : searchResults.length > 0 ? (
@@ -186,7 +186,7 @@ export default function QuickLogModal({ isOpen, onClose }: QuickLogModalProps) {
                         <button
                           key={shop.place_id}
                           onClick={() => handleShopSelect(shop)}
-                          className="w-full bg-amber-50 hover:bg-amber-100 rounded-xl p-4 text-left transition overflow-hidden"
+                          className="w-full bg-primary-lighter hover:bg-primary-light rounded-xl p-4 text-left transition overflow-hidden"
                         >
                           <div className="flex items-start justify-between gap-3">
                             <div className="flex-1 min-w-0">
@@ -195,7 +195,7 @@ export default function QuickLogModal({ isOpen, onClose }: QuickLogModalProps) {
                             </div>
                             {shop.rating && (
                               <div className="flex items-center gap-1 ml-2">
-                                <span className="text-amber-700">★</span>
+                                <span className="text-primary">★</span>
                                 <span className="text-sm text-gray-700">{shop.rating}</span>
                               </div>
                             )}
@@ -219,7 +219,7 @@ export default function QuickLogModal({ isOpen, onClose }: QuickLogModalProps) {
               <div className="p-4 pt-2">
                 {loading ? (
                   <div className="text-center py-8">
-                    <div className="w-10 h-10 border-4 border-amber-700 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+                    <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-3" />
                     <p className="text-gray-600 text-sm">Loading recent shops...</p>
                   </div>
                 ) : recentShops.length > 0 ? (
@@ -230,7 +230,7 @@ export default function QuickLogModal({ isOpen, onClose }: QuickLogModalProps) {
                         <button
                           key={shop.place_id}
                           onClick={() => handleShopSelect(shop)}
-                          className="w-full bg-amber-50 hover:bg-amber-100 rounded-xl p-4 text-left transition"
+                          className="w-full bg-primary-lighter hover:bg-primary-light rounded-xl p-4 text-left transition"
                         >
                           <p className="font-semibold text-gray-900 text-base">{shop.place_name}</p>
                           <p className="text-sm text-gray-600 truncate">{shop.address}</p>

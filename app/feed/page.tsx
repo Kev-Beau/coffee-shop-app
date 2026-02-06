@@ -22,7 +22,7 @@ export default function FeedPage() {
   // Show setup message if Supabase not configured
   if (!isSupabaseConfigured) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-b from-primary-lighter to-primary-light flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-8 text-center">
           <AlertTriangle className="w-16 h-16 mx-auto mb-4 text-amber-500" />
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Setup Required</h1>
@@ -33,7 +33,7 @@ export default function FeedPage() {
             href="https://supabase.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-block bg-amber-700 text-white px-6 py-3 rounded-lg font-semibold hover:bg-amber-800 transition"
+            className="inline-block bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary-dark transition"
           >
             Set Up Supabase
           </a>
@@ -197,9 +197,9 @@ export default function FeedPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-primary-lighter to-primary-light flex items-center justify-center">
         <div className="text-center">
-          <div className="w-12 h-12 border-4 border-amber-700 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
           <p className="text-gray-600">Loading feed...</p>
         </div>
       </div>
@@ -208,14 +208,14 @@ export default function FeedPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-b from-primary-lighter to-primary-light flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-8 text-center">
           <AlertTriangle className="w-16 h-16 mx-auto mb-4 text-amber-500" />
           <h2 className="text-xl font-bold text-gray-900 mb-2">Error Loading Feed</h2>
           <p className="text-gray-600 mb-4">{error}</p>
           <button
             onClick={() => window.location.reload()}
-            className="px-6 py-3 bg-amber-700 text-white rounded-lg font-semibold hover:bg-amber-800 transition"
+            className="px-6 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-primary-dark transition"
           >
             Reload Page
           </button>
@@ -225,12 +225,12 @@ export default function FeedPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50 pb-20">
+    <div className="min-h-screen bg-gradient-to-b from-primary-lighter to-primary-light pb-20">
       {/* Pull to Refresh Indicator */}
       <div className="flex justify-center pt-2" style={{ height: pullDistance > 0 ? pullDistance : 0, overflow: 'hidden' }}>
         {pullDistance > 40 && (
-          <div className="flex items-center gap-2 text-amber-700">
-            <div className="w-5 h-5 border-2 border-amber-700 border-t-transparent rounded-full animate-spin" />
+          <div className="flex items-center gap-2 text-primary">
+            <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
             <span className="text-sm font-medium">Refreshing...</span>
           </div>
         )}
@@ -253,13 +253,13 @@ export default function FeedPage() {
       <div className="max-w-2xl mx-auto px-4 pb-6">
         {loading ? (
           <div className="text-center py-12">
-            <div className="w-12 h-12 border-4 border-amber-700 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
             <p className="text-gray-600">Loading posts...</p>
           </div>
         ) : posts.length === 0 ? (
           <div className="text-center py-16">
-            <div className="w-20 h-20 mx-auto mb-4 flex items-center justify-center bg-amber-100 rounded-full">
-              {feedType === 'friends' ? <Users className="w-10 h-10 text-amber-700" /> : <Globe className="w-10 h-10 text-amber-700" />}
+            <div className="w-20 h-20 mx-auto mb-4 flex items-center justify-center bg-primary-light rounded-full">
+              {feedType === 'friends' ? <Users className="w-10 h-10 text-primary" /> : <Globe className="w-10 h-10 text-primary" />}
             </div>
             <h2 className="text-xl font-bold text-gray-900 mb-2">
               {feedType === 'friends' ? 'No Friends Posts Yet' : 'No Posts Yet'}
@@ -272,14 +272,14 @@ export default function FeedPage() {
             {feedType === 'friends' ? (
               <a
                 href="/friends"
-                className="inline-block bg-amber-700 text-white px-6 py-3 rounded-lg font-semibold hover:bg-amber-800 transition"
+                className="inline-block bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary-dark transition"
               >
                 Find Friends
               </a>
             ) : (
               <a
                 href="/shops"
-                className="inline-block bg-amber-700 text-white px-6 py-3 rounded-lg font-semibold hover:bg-amber-800 transition"
+                className="inline-block bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary-dark transition"
               >
                 Explore Shops
               </a>
@@ -294,7 +294,7 @@ export default function FeedPage() {
               <button
                 onClick={handleRefresh}
                 disabled={refreshing}
-                className="text-sm text-amber-700 hover:text-amber-800 font-medium disabled:opacity-50"
+                className="text-sm text-primary hover:text-primary-dark font-medium disabled:opacity-50"
               >
                 {refreshing ? 'Refreshing...' : 'Refresh'}
               </button>
@@ -308,6 +308,7 @@ export default function FeedPage() {
                   currentUserId={user?.id}
                   onLike={handleLike}
                   onUnlike={handleUnlike}
+                  commentCount={post.comment_count}
                 />
               ))}
             </div>

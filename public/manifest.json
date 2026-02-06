@@ -1,19 +1,19 @@
 {
-  "name": "CoffeeConnect",
-  "short_name": "CoffeeConnect",
+  "name": "Beany",
+  "short_name": "Beany",
   "description": "Find and share the best local coffee shops with friends",
   "start_url": "/?source=pwa",
   "display": "standalone",
   "display_override": ["standalone", "fullscreen"],
-  "background_color": "#fffbeb",
-  "theme_color": "#92400e",
+  "background_color": "#F2E8D5",
+  "theme_color": "#6F4E37",
   "orientation": "portrait",
   "scope": "/",
   "icons": [
     {
-      "src": "/icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
+      "src": "/icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
       "purpose": "any maskable"
     }
   ]

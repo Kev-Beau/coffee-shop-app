@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navigation from "./components/Navigation";
 import BottomNavigation from "./components/BottomNavigation";
+import { ThemeProvider } from "./theme/config";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,14 +16,14 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CoffeeConnect - Discover Great Coffee Shops",
+  title: "Beany - Discover Great Coffee Shops",
   description: "Find and share the best local coffee shops with friends. Discover new spots, read reviews, and connect over coffee.",
   manifest: "/manifest.json",
-  themeColor: "#fef3c7",
+  themeColor: "#F2E8D5",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "CoffeeConnect",
+    title: "Beany",
   },
   viewport: {
     width: "device-width",
@@ -35,7 +36,7 @@ export const metadata: Metadata = {
     "mobile-web-app-capable": "yes",
     "apple-mobile-web-app-capable": "yes",
     "apple-mobile-web-app-status-bar-style": "default",
-    "apple-mobile-web-app-title": "CoffeeConnect",
+    "apple-mobile-web-app-title": "Beany",
   },
 };
 
@@ -47,17 +48,19 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="icon" href="/icon.svg" />
-        <link rel="apple-touch-icon" href="/icon.svg" />
+        <link rel="icon" href="/icon.png" />
+        <link rel="apple-touch-icon" href="/icon.png" />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
-        <meta name="theme-color" content="#92400e" />
+        <meta name="theme-color" content="#6F4E37" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Navigation />
-        {children}
-        <BottomNavigation />
+        <ThemeProvider>
+          <Navigation />
+          {children}
+          <BottomNavigation />
+        </ThemeProvider>
       </body>
     </html>
   );

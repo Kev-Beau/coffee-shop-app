@@ -10,7 +10,7 @@ export default function LogPage() {
 
   return (
     <>
-      <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50 pb-20">
+      <div className="min-h-screen bg-gradient-to-b from-primary-lighter to-primary-light pb-20">
         {/* This page just shows the modal */}
       </div>
 

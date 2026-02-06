@@ -35,13 +35,13 @@ export default function BottomNavigation() {
               href={item.href}
               className={`flex flex-col items-center justify-center flex-1 ${
                 item.special
-                  ? 'text-amber-700 hover:text-amber-800'
+                  ? 'text-primary hover:text-primary-dark'
                   : isActive
-                  ? 'text-amber-700'
+                  ? 'text-primary'
                   : 'text-gray-500 hover:text-gray-700'
               } transition`}
             >
-              <div className={item.special ? 'bg-amber-700 text-white rounded-full p-4 -mt-6 shadow-lg' : ''}>
+              <div className={item.special ? 'bg-primary text-white rounded-full p-4 -mt-6 shadow-lg' : ''}>
                 <Icon className={`${item.special ? 'w-8 h-8' : 'w-6 h-6'}`} />
               </div>
               {!item.special && (

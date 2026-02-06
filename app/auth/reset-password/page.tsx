@@ -37,10 +37,10 @@ export default function ResetPasswordPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-gradient-to-b from-primary-lighter to-primary-light flex items-center justify-center px-4">
         <div className="max-w-md w-full">
           <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
-            <Mail className="w-16 h-16 mx-auto mb-4 text-amber-700" />
+            <Mail className="w-16 h-16 mx-auto mb-4 text-primary" />
             <h1 className="text-2xl font-bold text-gray-900 mb-2">Check your email</h1>
             <p className="text-gray-600 mb-6">
               We sent a password reset link to <strong>{email}</strong>
@@ -50,7 +50,7 @@ export default function ResetPasswordPage() {
             </p>
             <Link
               href="/auth/signin"
-              className="inline-block bg-amber-700 text-white px-6 py-3 rounded-lg font-semibold hover:bg-amber-800 transition"
+              className="inline-block bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary-dark transition"
             >
               Back to Sign In
             </Link>
@@ -61,14 +61,14 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gradient-to-b from-primary-lighter to-primary-light flex items-center justify-center px-4">
       <div className="max-w-md w-full">
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-            <Coffee className="w-16 h-16 text-amber-700" />
+            <Coffee className="w-16 h-16 text-primary" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900">CoffeeConnect</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Beany</h1>
           <p className="text-gray-600 mt-2">Reset your password</p>
         </div>
 
@@ -97,7 +97,7 @@ export default function ResetPasswordPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none transition"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition"
                 placeholder="you@example.com"
               />
             </div>
@@ -106,7 +106,7 @@ export default function ResetPasswordPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-amber-700 text-white py-3 rounded-lg font-semibold hover:bg-amber-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary-dark transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Sending...' : 'Send Reset Link'}
             </button>
@@ -116,7 +116,7 @@ export default function ResetPasswordPage() {
           <div className="mt-6 text-center">
             <Link
               href="/auth/signin"
-              className="text-amber-700 hover:text-amber-800 font-semibold"
+              className="text-primary hover:text-primary-dark font-semibold"
             >
               ← Back to Sign In
             </Link>

@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { Coffee } from 'lucide-react';
 import { Bars3Icon, XMarkIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import NotificationBell from './NotificationBell';
 
 interface NavItem {
   label: string;
@@ -63,9 +64,9 @@ export default function Navigation() {
   if (loading) {
     return (
       <nav className="sticky top-0 z-50 flex items-center justify-between p-6 bg-white shadow-md">
-        <div className="text-2xl font-bold text-amber-800 flex items-center gap-2">
+        <div className="text-2xl font-bold text-primary-dark flex items-center gap-2">
           <Coffee className="w-6 h-6" />
-          CoffeeConnect
+          Beany
         </div>
       </nav>
     );
@@ -78,19 +79,20 @@ export default function Navigation() {
           {/* Logo */}
           <Link
             href="/"
-            className="flex items-center gap-2 text-xl font-bold text-amber-800 hover:text-amber-900 transition"
+            className="flex items-center gap-2 text-xl font-bold text-primary-dark hover:text-primary-dark transition"
           >
             <Coffee className="w-5 h-5" />
-            CoffeeConnect
+            Beany
           </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-6">
+            {user && <NotificationBell />}
             {currentNav.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className="text-gray-600 hover:text-amber-700 transition font-medium flex items-center gap-1"
+                className="text-gray-600 hover:text-primary transition font-medium flex items-center gap-1"
               >
                 {item.icon && <span className="text-lg">{item.icon}</span>}
                 <span>{item.label}</span>
@@ -101,19 +103,19 @@ export default function Navigation() {
               <>
                 <Link
                   href="/profile"
-                  className="text-gray-600 hover:text-amber-700 transition font-medium"
+                  className="text-gray-600 hover:text-primary transition font-medium"
                 >
                   Profile
                 </Link>
                 <Link
                   href="/settings"
-                  className="text-gray-600 hover:text-amber-700 transition font-medium"
+                  className="text-gray-600 hover:text-primary transition font-medium"
                 >
                   Settings
                 </Link>
                 <button
                   onClick={handleSignOut}
-                  className="text-gray-600 hover:text-amber-700 transition font-medium"
+                  className="text-gray-600 hover:text-primary transition font-medium"
                 >
                   Sign Out
                 </button>
@@ -121,7 +123,7 @@ export default function Navigation() {
             ) : (
               <Link
                 href="/auth/signin"
-                className="bg-amber-700 text-white px-4 py-2 rounded-lg font-medium hover:bg-amber-800 transition text-sm"
+                className="bg-primary text-white px-4 py-2 rounded-lg font-medium hover:bg-primary-dark transition text-sm"
               >
                 Sign In
               </Link>
@@ -151,7 +153,7 @@ export default function Navigation() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="block px-3 py-2 rounded-lg text-gray-700 hover:bg-amber-50 hover:text-amber-700 transition"
+                className="block px-3 py-2 rounded-lg text-gray-700 hover:bg-primary-lighter hover:text-primary transition"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 <span className="flex items-center gap-2 justify-end">
@@ -165,14 +167,14 @@ export default function Navigation() {
               <>
                 <Link
                   href="/settings"
-                  className="block px-3 py-2 rounded-lg text-gray-700 hover:bg-amber-50 hover:text-amber-700 transition"
+                  className="block px-3 py-2 rounded-lg text-gray-700 hover:bg-primary-lighter hover:text-primary transition"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Settings
                 </Link>
                 <button
                   onClick={handleSignOut}
-                  className="w-full text-right px-3 py-2 rounded-lg text-gray-700 hover:bg-amber-50 hover:text-amber-700 transition"
+                  className="w-full text-right px-3 py-2 rounded-lg text-gray-700 hover:bg-primary-lighter hover:text-primary transition"
                 >
                   Sign Out
                 </button>
@@ -180,7 +182,7 @@ export default function Navigation() {
             ) : (
               <Link
                 href="/auth/signin"
-                className="inline-block px-3 py-2 rounded-lg bg-amber-700 text-white font-medium hover:bg-amber-800 transition"
+                className="inline-block px-3 py-2 rounded-lg bg-primary text-white font-medium hover:bg-primary-dark transition"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Sign In

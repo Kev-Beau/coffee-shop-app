@@ -3,8 +3,8 @@
  * Clears all old localStorage data from the single-user version of CoffeeConnect
  */
 
-const MIGRATION_KEY = 'coffeeconnect_migration_complete';
-const CLEARED_KEY = 'coffeeconnect_localstorage_cleared';
+const MIGRATION_KEY = 'beany_migration_complete';
+const CLEARED_KEY = 'beany_localstorage_cleared';
 
 const LOCAL_STORAGE_KEYS_TO_CLEAR = [
   'visits',

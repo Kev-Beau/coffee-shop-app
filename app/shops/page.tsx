@@ -264,7 +264,7 @@ export default function ShopsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50 pb-20">
+    <div className="min-h-screen bg-gradient-to-b from-primary-lighter to-primary-light pb-20">
       {/* Search & Controls */}
       <main className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-12">
         <div className="bg-white rounded-xl md:rounded-2xl shadow-lg p-4 md:p-6 mb-6 md:mb-8">
@@ -277,7 +277,7 @@ export default function ShopsPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search city or zipcode..."
-                className="w-full px-3 py-2 md:px-4 md:py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 text-gray-900 placeholder-gray-400 text-sm md:text-base"
+                className="w-full px-3 py-2 md:px-4 md:py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-gray-900 placeholder-gray-400 text-sm md:text-base"
               />
             </form>
 
@@ -285,7 +285,7 @@ export default function ShopsPage() {
             <select
               value={sortBy}
               onChange={(e) => handleSortChange(e.target.value as SortType)}
-              className="px-3 py-2 md:px-4 md:py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 text-gray-900 bg-white whitespace-nowrap text-sm md:text-base"
+              className="px-3 py-2 md:px-4 md:py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-gray-900 bg-white whitespace-nowrap text-sm md:text-base"
             >
               <option value="rating-desc">Top Rated</option>
               <option value="rating-asc">Lowest Rated</option>
@@ -316,7 +316,7 @@ export default function ShopsPage() {
                   onClick={() => handleFilterClick(filterKey as FilterType)}
                   className={`px-2 md:px-3 py-1 md:py-1.5 rounded-full text-xs md:text-sm font-medium transition flex items-center gap-1 ${
                     isActive
-                      ? 'bg-amber-700 text-white'
+                      ? 'bg-primary text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
@@ -338,7 +338,7 @@ export default function ShopsPage() {
                 onClick={() => handlePriceFilter(price)}
                 className={`px-2 md:px-3 py-1 md:py-1.5 rounded-full text-xs md:text-sm font-medium transition ${
                   priceFilters.has(price)
-                    ? 'bg-amber-700 text-white'
+                    ? 'bg-primary text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
@@ -352,7 +352,7 @@ export default function ShopsPage() {
                   setPriceFilters(new Set());
                   applyFilterAndSort(activeFilter, sortBy, shops, favorites, new Set());
                 }}
-                className="px-2 md:px-3 py-1 md:py-1.5 text-xs md:text-sm text-amber-700 hover:text-amber-800 underline"
+                className="px-2 md:px-3 py-1 md:py-1.5 text-xs md:text-sm text-primary hover:text-primary-dark underline"
               >
                 Clear
               </button>
@@ -362,12 +362,12 @@ export default function ShopsPage() {
 
         {/* Error Message */}
         {error && (
-          <div className="mb-4 md:mb-6 p-3 md:p-4 bg-amber-100 border border-amber-300 rounded-lg md:rounded-xl text-amber-800 text-sm md:text-base">
+          <div className="mb-4 md:mb-6 p-3 md:p-4 bg-primary-light border border-amber-300 rounded-lg md:rounded-xl text-primary-dark text-sm md:text-base">
             <p className="mb-2 flex items-center gap-2"><AlertTriangle className="w-4 h-4" /> <span>{error}</span></p>
             {!locationRetried && (
               <button
                 onClick={retryLocation}
-                className="bg-amber-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-amber-800 transition flex items-center gap-2"
+                className="bg-primary text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-primary-dark transition flex items-center gap-2"
               >
                 <MapPin className="w-4 h-4" />
                 Try Location Again
@@ -380,7 +380,7 @@ export default function ShopsPage() {
         {loading && (
           <div className="text-center py-8 md:py-12">
             <div className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-3 md:mb-4 flex items-center justify-center">
-              <Coffee className="w-12 h-12 md:w-16 md:h-16 text-amber-700" />
+              <Coffee className="w-12 h-12 md:w-16 md:h-16 text-primary" />
             </div>
             <p className="text-gray-600 text-sm md:text-base">Finding coffee shops near you...</p>
           </div>
@@ -427,7 +427,7 @@ export default function ShopsPage() {
 
                   {/* Shop Icon */}
                   <div className="w-12 h-12 md:w-16 md:h-16 mb-3 md:mb-4 group-hover:scale-110 transition flex items-center justify-center">
-                    <Coffee className="w-12 h-12 md:w-16 md:h-16 text-amber-700" />
+                    <Coffee className="w-12 h-12 md:w-16 md:h-16 text-primary" />
                   </div>
 
                   {/* Shop Name */}
@@ -439,7 +439,7 @@ export default function ShopsPage() {
                   {shop.rating > 0 && (
                     <div className="flex items-center gap-1.5 md:gap-2 mb-2 md:mb-3">
                       <Star className="w-4 h-4 md:w-5 md:h-5 text-amber-500 fill-current" />
-                      <span className="text-amber-600 font-bold text-sm md:text-base">{shop.rating}</span>
+                      <span className="text-accent font-bold text-sm md:text-base">{shop.rating}</span>
                       <span className="text-gray-500 text-xs md:text-sm">
                         ({shop.review_count} reviews)
                       </span>

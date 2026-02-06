@@ -2,10 +2,49 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { db } from '@/lib/supabase';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+function createSupabaseClient(request: NextRequest) {
+  const authHeader = request.headers.get('authorization');
+
+  // If Authorization header is present, use it
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const accessToken = authHeader.substring(7);
+    return createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        global: {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      }
+    );
+  }
+
+  // Otherwise, fall back to cookies
+  const cookieHeader = request.headers.get('cookie') || '';
+  const cookies: Record<string, string> = {};
+  cookieHeader.split(';').forEach((cookie) => {
+    const [name, value] = cookie.trim().split('=');
+    if (name && value) {
+      cookies[name] = value;
+    }
+  });
+
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      auth: {
+        storage: {
+          getItem: (key: string) => cookies[key] || null,
+          setItem: () => {},
+          removeItem: () => {},
+        },
+      },
+    }
+  );
+}
 
 // GET /api/posts/[id] - Get a single post
 export async function GET(
@@ -13,43 +52,58 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await params;
+    const resolvedParams = await params;
+    const { id } = resolvedParams;
+    const supabase = createSupabaseClient(request);
     const { data: { user } } = await supabase.auth.getUser();
-    const post = await db.getPostById(id);
+
+    console.log('Fetching post:', id, 'User:', user?.id);
+
+    // Fetch post directly with the authenticated client
+    const { data: post, error: postError } = await supabase
+      .from('posts')
+      .select(`
+        *,
+        profiles (
+          id,
+          username,
+          display_name,
+          avatar_url,
+          privacy_level
+        )
+      `)
+      .eq('id', id)
+      .maybeSingle();
+
+    console.log('Post result:', post ? 'Found' : 'Not found', 'Error:', postError);
+
+    if (postError) {
+      console.log('Post error:', postError);
+    }
 
     if (!post) {
+      console.log('Post not found, returning 404');
       return NextResponse.json({ error: 'Post not found' }, { status: 404 });
     }
 
-    // Check privacy
-    const isOwnPost = user && post.user_id === user.id;
-    const isPublicPost = (post as any).profiles?.privacy_level === 'public';
-
-    if (!isOwnPost && !isPublicPost && user) {
-      // Check if friends
-      const { data: friendship } = await supabase
-        .from('friendships')
-        .select('*')
-        .or(`and(initiator_id.eq.${user.id},receiver_id.eq.${post.user_id}),and(initiator_id.eq.${post.user_id},receiver_id.eq.${user.id})`)
-        .eq('status', 'accepted')
-        .maybeSingle();
-
-      if (!friendship && (post as any).profiles?.privacy_level === 'private') {
-        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-      }
-    } else if (!user && !isPublicPost) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
     // Get likes
-    const likes = await db.getPostLikes(id);
+    const { data: likes } = await supabase
+      .from('likes')
+      .select('user_id')
+      .eq('post_id', id);
+
+    // Get comment count
+    const { count: commentCount } = await supabase
+      .from('comments')
+      .select('*', { count: 'exact', head: true })
+      .eq('post_id', id);
 
     return NextResponse.json({
       data: {
         ...post,
-        likes,
-        like_count: likes.length,
-        user_has_liked: user ? likes.some((l: any) => l.user_id === user.id) : false,
+        like_count: likes?.length || 0,
+        comment_count: commentCount || 0,
+        user_has_liked: user ? likes?.some((l: any) => l.user_id === user.id) : false,
       },
     });
   } catch (error: any) {
@@ -67,7 +121,9 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await params;
+    const resolvedParams = await params;
+    const { id } = resolvedParams;
+    const supabase = createSupabaseClient(request);
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {
@@ -120,7 +176,9 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await params;
+    const resolvedParams = await params;
+    const { id } = resolvedParams;
+    const supabase = createSupabaseClient(request);
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {

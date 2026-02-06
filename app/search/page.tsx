@@ -107,7 +107,7 @@ export default function SearchPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50 pb-20">
+    <div className="min-h-screen bg-gradient-to-b from-primary-lighter to-primary-light pb-20">
       {/* Header */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-2xl mx-auto px-4 py-4">
@@ -119,7 +119,7 @@ export default function SearchPage() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search users, posts, or shops..."
-              className="w-full pl-10 pr-10 py-3 bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 text-gray-900 placeholder-gray-400"
+              className="w-full pl-10 pr-10 py-3 bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary text-gray-900 placeholder-gray-400"
             />
             {query && (
               <button
@@ -143,7 +143,7 @@ export default function SearchPage() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl font-medium text-sm transition ${
                   activeTab === tab.id
-                    ? 'bg-amber-700 text-white shadow-md'
+                    ? 'bg-primary text-white shadow-md'
                     : 'text-gray-600 hover:bg-gray-100'
                 }`}
               >
@@ -159,15 +159,15 @@ export default function SearchPage() {
       <div className="max-w-2xl mx-auto px-4 py-6">
         {loading ? (
           <div className="text-center py-12">
-            <div className="w-12 h-12 border-4 border-amber-700 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
             <p className="text-gray-600">Searching...</p>
           </div>
         ) : !searched ? (
           <div className="text-center py-12">
-            <div className="w-20 h-20 mx-auto mb-4 flex items-center justify-center bg-amber-100 rounded-full">
-              <MagnifyingGlassIcon className="w-10 h-10 text-amber-700" />
+            <div className="w-20 h-20 mx-auto mb-4 flex items-center justify-center bg-primary-light rounded-full">
+              <MagnifyingGlassIcon className="w-10 h-10 text-primary" />
             </div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">Search CoffeeConnect</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">Search Beany</h2>
             <p className="text-gray-600">Find friends, posts, and coffee shops</p>
           </div>
         ) : results.length === 0 ? (
@@ -191,7 +191,7 @@ export default function SearchPage() {
                     {result.avatar_url ? (
                       <img src={result.avatar_url} alt="" className="w-full h-full object-cover" />
                     ) : (
-                      <Coffee className="w-5 h-5 text-amber-700" />
+                      <Coffee className="w-5 h-5 text-primary" />
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -216,7 +216,7 @@ export default function SearchPage() {
                     {result.profiles?.avatar_url ? (
                       <img src={result.profiles.avatar_url} alt="" className="w-full h-full object-cover" />
                     ) : (
-                      <Coffee className="w-5 h-5 text-amber-700" />
+                      <Coffee className="w-5 h-5 text-primary" />
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -249,7 +249,7 @@ export default function SearchPage() {
                   </div>
                   {result.rating && (
                     <div className="flex items-center gap-1 ml-2">
-                      <span className="text-amber-700">★</span>
+                      <span className="text-primary">★</span>
                       <span className="text-sm text-gray-700">{result.rating}</span>
                     </div>
                   )}

@@ -16,13 +16,25 @@ interface FeedCardProps {
       display_name: string | null;
       avatar_url: string | null;
     };
+    comments_preview?: Array<{
+      id: string;
+      content: string;
+      created_at: string;
+      profiles: {
+        id: string;
+        username: string;
+        display_name: string | null;
+        avatar_url: string | null;
+      };
+    }>;
   };
   currentUserId?: string;
   onLike?: (postId: string) => void;
   onUnlike?: (postId: string) => void;
+  commentCount?: number;
 }
 
-export default function FeedCard({ post, currentUserId, onLike, onUnlike }: FeedCardProps) {
+export default function FeedCard({ post, currentUserId, onLike, onUnlike, commentCount = 0 }: FeedCardProps) {
   const [liking, setLiking] = useState(false);
 
   const handleLike = async () => {
@@ -68,11 +80,11 @@ export default function FeedCard({ post, currentUserId, onLike, onUnlike }: Feed
           href={`/profile/${post.profiles.username}`}
           className="flex items-center gap-3 flex-1"
         >
-          <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center overflow-hidden">
+          <div className="w-10 h-10 rounded-full bg-primary-light flex items-center justify-center overflow-hidden">
             {post.profiles.avatar_url ? (
               <img src={post.profiles.avatar_url} alt="" className="w-full h-full object-cover" />
             ) : (
-              <Coffee className="w-5 h-5 text-amber-700" />
+              <Coffee className="w-5 h-5 text-primary" />
             )}
           </div>
           <div>
@@ -138,13 +150,13 @@ export default function FeedCard({ post, currentUserId, onLike, onUnlike }: Feed
             {post.coffee_notes.slice(0, 3).map((note) => (
               <span
                 key={note}
-                className="px-2 py-1 bg-amber-100 text-amber-800 rounded-full text-xs capitalize"
+                className="px-2 py-1 bg-primary-light text-primary-dark rounded-full text-xs capitalize"
               >
                 {note}
               </span>
             ))}
             {post.coffee_notes.length > 3 && (
-              <span className="px-2 py-1 bg-amber-100 text-amber-800 rounded-full text-xs">
+              <span className="px-2 py-1 bg-primary-light text-primary-dark rounded-full text-xs">
                 +{post.coffee_notes.length - 3}
               </span>
             )}
@@ -171,12 +183,44 @@ export default function FeedCard({ post, currentUserId, onLike, onUnlike }: Feed
 
           <Link
             href={`/posts/${post.id}`}
-            className="flex items-center gap-2 text-gray-700 hover:text-amber-700 transition"
+            className="flex items-center gap-2 text-gray-700 hover:text-primary transition"
           >
             <ChatBubbleLeftIcon className="w-5 h-5" />
-            <span className="text-sm font-medium">Comments</span>
+            <span className="text-sm font-medium">{commentCount > 0 ? commentCount : 'Comments'}</span>
           </Link>
         </div>
+
+        {/* Comments Preview */}
+        {post.comments_preview && post.comments_preview.length > 0 && (
+          <div className="mt-3 pt-3 border-t border-gray-100">
+            {post.comments_preview.map((comment) => (
+              <div key={comment.id} className="flex gap-2 mb-2 last:mb-0">
+                <div className="w-6 h-6 rounded-full bg-primary-light flex items-center justify-center flex-shrink-0 overflow-hidden">
+                  {comment.profiles?.avatar_url ? (
+                    <img src={comment.profiles.avatar_url} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    <Coffee className="w-3 h-3 text-primary" />
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-semibold text-gray-900">
+                    {comment.profiles?.display_name || comment.profiles?.username}
+                  </p>
+                  <p className="text-xs text-gray-700 line-clamp-2">{comment.content}</p>
+                </div>
+              </div>
+            ))}
+
+            {(post.comment_count || 0) > (post.comments_preview?.length || 0) && (
+              <Link
+                href={`/posts/${post.id}`}
+                className="text-xs text-primary font-medium hover:text-primary-dark transition"
+              >
+                View all {(post.comment_count || 0)} comments →
+              </Link>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

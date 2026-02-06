@@ -39,6 +39,18 @@ export interface Post {
   likes?: Like[];
   like_count?: number;
   user_has_liked?: boolean;
+  comment_count?: number;
+  comments_preview?: {
+    id: string;
+    content: string;
+    created_at: string;
+    profiles: {
+      id: string;
+      username: string;
+      display_name: string | null;
+      avatar_url: string | null;
+    };
+  }[];
 }
 
 export interface Visit {
@@ -76,6 +88,29 @@ export interface Like {
   user_id: string;
   post_id: string;
   created_at: string;
+}
+
+export interface Comment {
+  id: string;
+  user_id: string;
+  post_id: string;
+  content: string;
+  parent_id: string | null;
+  created_at: string;
+  updated_at: string;
+  // Joined fields
+  profiles?: {
+    id: string;
+    username: string;
+    display_name: string | null;
+    avatar_url: string | null;
+  };
+  replies?: Comment[];
+}
+
+export interface CommentFormData {
+  content: string;
+  parent_id?: string;
 }
 
 // Auth Types
@@ -262,4 +297,42 @@ export interface UserStatus {
   has_completed_onboarding: boolean;
   profile?: Profile;
   drink_preferences?: DrinkPreferences;
+}
+
+// Stats Types
+export interface ShopStats {
+  shop_id: string;
+  shop_name: string;
+  visit_count: number;
+}
+
+export interface DrinkStats {
+  drink_name: string;
+  post_count: number;
+  avg_rating: number;
+}
+
+export interface PostingFrequency {
+  date: string;
+  post_count: number;
+}
+
+export interface UserStats {
+  total_posts: number;
+  total_visits: number;
+  total_favorites: number;
+  avg_rating: number;
+  most_visited_shops: ShopStats[];
+  favorite_drinks: DrinkStats[];
+  posting_frequency: PostingFrequency[];
+  coffee_preferences: {
+    temperature: string;
+    sweetness: string;
+    strength: string;
+    milk: string;
+    favorite_drinks: string[];
+    preferred_roast: string;
+    brewing_method: string;
+    coffee_strength: string;
+  };
 }

@@ -112,10 +112,10 @@ export default function ShopPage({ params }: ShopPageProps) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-primary-lighter to-primary-light flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 md:w-24 md:h-24 mx-auto mb-3 md:mb-4 flex items-center justify-center">
-            <Coffee className="w-16 h-16 md:w-24 md:h-24 text-amber-700" />
+            <Coffee className="w-16 h-16 md:w-24 md:h-24 text-primary" />
           </div>
           <p className="text-gray-600 text-sm md:text-base">Loading shop details...</p>
         </div>
@@ -125,12 +125,12 @@ export default function ShopPage({ params }: ShopPageProps) {
 
   if (error || !shop) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-primary-lighter to-primary-light flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3 md:mb-4">
             {error || "Shop Not Found"}
           </h1>
-          <Link href="/shops" className="text-amber-700 hover:underline text-sm md:text-base">
+          <Link href="/shops" className="text-primary hover:underline text-sm md:text-base">
             Back to Shops
           </Link>
         </div>
@@ -143,12 +143,12 @@ export default function ShopPage({ params }: ShopPageProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50 pb-20">
+    <div className="min-h-screen bg-gradient-to-b from-primary-lighter to-primary-light pb-20">
       {/* Back Button */}
       <main className="max-w-4xl mx-auto px-4 md:px-6 py-6 md:py-8">
         <Link
           href="/shops"
-          className="inline-flex items-center text-amber-700 hover:underline mb-6"
+          className="inline-flex items-center text-primary hover:underline mb-6"
         >
           ← Back to Shops
         </Link>
@@ -186,7 +186,7 @@ export default function ShopPage({ params }: ShopPageProps) {
                   href={shop.website}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-amber-700 hover:underline text-xs md:text-sm inline-flex items-center gap-1"
+                  className="text-primary hover:underline text-xs md:text-sm inline-flex items-center gap-1"
                 >
                   <Globe className="w-4 h-4" /> Visit Website
                 </a>
@@ -214,7 +214,7 @@ export default function ShopPage({ params }: ShopPageProps) {
           <div className="flex flex-wrap items-center gap-2 md:gap-4 mb-4 md:mb-6">
             <div className="flex items-center gap-1 md:gap-2">
               <Star className="w-5 h-5 md:w-6 md:h-6 text-amber-500 fill-current" />
-              <span className="text-lg md:text-2xl font-bold text-amber-600">
+              <span className="text-lg md:text-2xl font-bold text-accent">
                 {shop.rating}
               </span>
               <span className="text-xs md:text-base text-gray-500">({shop.review_count} reviews)</span>
@@ -236,7 +236,7 @@ export default function ShopPage({ params }: ShopPageProps) {
           <div className="flex flex-col sm:flex-row gap-2 md:gap-3 mb-4 md:mb-6">
             <button
               onClick={handleVisit}
-              className="flex-1 py-2.5 md:py-3 bg-amber-700 text-white rounded-lg md:rounded-xl font-semibold hover:bg-amber-800 transition text-sm md:text-base flex items-center justify-center gap-2"
+              className="flex-1 py-2.5 md:py-3 bg-primary text-white rounded-lg md:rounded-xl font-semibold hover:bg-primary-dark transition text-sm md:text-base flex items-center justify-center gap-2"
             >
               <MapPin className="w-4 h-4 md:w-5 md:h-5" />
               Log Visit
@@ -249,7 +249,7 @@ export default function ShopPage({ params }: ShopPageProps) {
               Log Drink
             </button>
             {visited && visitCount > 0 && (
-              <div className="px-4 md:px-6 py-2.5 md:py-3 bg-amber-100 text-amber-800 rounded-lg md:rounded-xl font-semibold text-sm md:text-base text-center">
+              <div className="px-4 md:px-6 py-2.5 md:py-3 bg-primary-light text-primary-dark rounded-lg md:rounded-xl font-semibold text-sm md:text-base text-center">
                 Visited {visitCount}x
               </div>
             )}
@@ -276,7 +276,7 @@ export default function ShopPage({ params }: ShopPageProps) {
               href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(shop.name + ' ' + shop.address)}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-amber-700 hover:text-amber-800 font-semibold text-sm md:text-base"
+              className="inline-flex items-center gap-2 text-primary hover:text-primary-dark font-semibold text-sm md:text-base"
             >
               <MapIcon className="w-4 h-4 md:w-5 md:h-5" />
               Open in Google Maps
@@ -294,7 +294,7 @@ export default function ShopPage({ params }: ShopPageProps) {
                 <div key={index} className="border-b border-gray-100 pb-4 md:pb-6 last:border-0 last:pb-0">
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-2 md:gap-3">
-                      <div className="w-8 h-8 md:w-10 md:h-10 bg-amber-200 rounded-full flex items-center justify-center text-amber-800 font-bold text-xs md:text-sm flex-shrink-0">
+                      <div className="w-8 h-8 md:w-10 md:h-10 bg-amber-200 rounded-full flex items-center justify-center text-primary-dark font-bold text-xs md:text-sm flex-shrink-0">
                         {review.author_name[0]}
                       </div>
                       <div className="min-w-0">
@@ -302,7 +302,7 @@ export default function ShopPage({ params }: ShopPageProps) {
                         <div className="text-xs md:text-sm text-gray-500">{review.relative_time_description}</div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-1 text-amber-600 font-bold text-sm md:text-base flex-shrink-0">
+                    <div className="flex items-center gap-1 text-accent font-bold text-sm md:text-base flex-shrink-0">
                       <Star className="w-4 h-4 md:w-5 md:h-5 fill-current" />
                       {review.rating}
                     </div>

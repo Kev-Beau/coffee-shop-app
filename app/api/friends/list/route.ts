@@ -1,19 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
 import { db } from '@/lib/supabase';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+import { createSupabaseClient } from '../_utils';
 
 // GET /api/friends/list - Get friends and pending requests
 export async function GET(request: NextRequest) {
   try {
+    const authHeader = request.headers.get('authorization');
+    console.log('[Friends API] Auth header present:', !!authHeader);
+
+    const supabase = createSupabaseClient(request);
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
+    console.log('[Friends API] Auth error:', authError?.message);
+    console.log('[Friends API] User present:', !!user);
+
     if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized', debug: authError?.message }, { status: 401 });
     }
 
     // Get all friendships

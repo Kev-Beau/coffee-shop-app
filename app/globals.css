@@ -3,6 +3,14 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  /* Theme colors - will be dynamically updated */
+  --color-primary: #6F4E37;
+  --color-primary-dark: #4A3728;
+  --color-primary-light: #C4A484;
+  --color-primary-lighter: #F2E8D5;
+  --color-accent: #8B6F47;
+  --color-accent-hover: #6F4E37;
 }
 
 @theme inline {
@@ -12,15 +20,82 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Dynamic theme utility classes */
+.bg-primary {
+  background-color: var(--color-primary);
+}
+
+.text-primary {
+  color: var(--color-primary);
+}
+
+.border-primary {
+  border-color: var(--color-primary);
+}
+
+.hover\:bg-primary:hover {
+  background-color: var(--color-primary);
+}
+
+.hover\:text-primary:hover {
+  color: var(--color-primary);
+}
+
+.hover\:border-primary:hover {
+  border-color: var(--color-primary);
+}
+
+.bg-primary-dark {
+  background-color: var(--color-primary-dark);
+}
+
+.text-primary-dark {
+  color: var(--color-primary-dark);
+}
+
+.hover\:bg-primary-dark:hover {
+  background-color: var(--color-primary-dark);
+}
+
+.hover\:text-primary-dark:hover {
+  color: var(--color-primary-dark);
+}
+
+.bg-primary-light {
+  background-color: var(--color-primary-light);
+}
+
+.bg-primary-lighter {
+  background-color: var(--color-primary-lighter);
+}
+
+.hover\:bg-primary-lighter:hover {
+  background-color: var(--color-primary-lighter);
+}
+
+/* Primary with opacity for backgrounds */
+.bg-primary\/10 {
+  background-color: color-mix(in srgb, var(--color-primary) 10%, transparent);
+}
+
+.text-accent {
+  color: var(--color-accent);
+}
+
+.hover\:text-accent:hover {
+  color: var(--color-accent);
+}
+
+.focus\:ring-primary:focus {
+  --tw-ring-color: var(--color-primary);
+}
+
+.focus\:border-primary:focus {
+  border-color: var(--color-primary);
 }
 
 body {
-  background: #fef3c7;
+  background: var(--color-primary-lighter);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
   /* Safe area support for notched devices */
@@ -44,4 +119,31 @@ body {
 
 .animate-slide-up {
   animation: slide-up 0.3s ease-out;
+}
+
+/* Bounce in animation for checkmark */
+@keyframes bounce-in {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-bounce-in {
+  animation: bounce-in 0.3s ease-out;
+}
+
+/* Hide scrollbar */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }

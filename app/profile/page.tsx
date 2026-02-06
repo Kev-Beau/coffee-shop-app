@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
-import { Coffee, MapPin as MapPinLucide, Heart, FileEdit } from 'lucide-react';
+import { Coffee, MapPin as MapPinLucide, Heart, FileEdit, TrendingUp } from 'lucide-react';
 import { PencilIcon, Squares2X2Icon, BookmarkIcon, MapPinIcon, UserGroupIcon } from '@heroicons/react/24/outline';
 import { db } from '@/lib/supabase';
 import { usePullToRefresh } from '../hooks/usePullToRefresh';
@@ -131,32 +131,38 @@ export default function ProfilePage() {
   const StatCard = ({ icon: Icon, label, value, onClick }: { icon: any, label: string, value: number | string, onClick?: () => void }) => (
     <button
       onClick={onClick}
-      className="flex-1 bg-white rounded-2xl p-3 md:p-4 shadow-sm border border-amber-100 hover:shadow-md transition group"
+      className="flex-1 bg-white rounded-2xl p-3 md:p-4 shadow-sm border border-gray-100 hover:shadow-md transition group"
     >
-      <Icon className="w-5 h-5 md:w-6 md:h-6 text-amber-700 mb-1 md:mb-2 mx-auto" />
-      <p className="text-xl md:text-2xl font-bold text-gray-900">{value}</p>
+      <Icon className="w-5 h-5 md:w-6 md:h-6 text-primary mb-1 md:mb-2 mx-auto" />
+      {value !== "" ? (
+        <p className="text-xl md:text-2xl font-bold text-gray-900">{value}</p>
+      ) : (
+        <div className="h-6 flex items-center justify-center">
+          <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
+        </div>
+      )}
       <p className="text-xs md:text-sm text-gray-600">{label}</p>
     </button>
   );
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-amber-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-primary-lighter via-primary-light to-primary-light flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-amber-800 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-amber-900 font-medium">Loading profile...</p>
+          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-primary font-medium">Loading profile...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-amber-100 pb-20">
+    <div className="min-h-screen bg-gradient-to-br from-primary-lighter via-primary-light to-primary-light pb-20">
       {/* Pull to Refresh Indicator */}
       <div className="flex justify-center pt-2" style={{ height: pullDistance > 0 ? pullDistance : 0, overflow: 'hidden' }}>
         {pullDistance > 40 && (
-          <div className="flex items-center gap-2 text-amber-700">
-            <div className="w-5 h-5 border-2 border-amber-700 border-t-transparent rounded-full animate-spin" />
+          <div className="flex items-center gap-2 text-primary">
+            <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
             <span className="text-sm font-medium">Refreshing...</span>
           </div>
         )}
@@ -170,16 +176,26 @@ export default function ProfilePage() {
           {/* Cover & Profile */}
           <div className="relative">
             {/* Cover gradient */}
-            <div className="h-24 md:h-32 bg-gradient-to-r from-amber-800 via-amber-700 to-orange-800" />
+            <div
+              className="h-24 md:h-32"
+              style={{
+                background: `linear-gradient(90deg, var(--color-primary-dark) 0%, var(--color-primary) 50%, var(--color-primary-dark) 100%)`
+              }}
+            />
 
             {/* Profile Picture */}
             <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 md:left-8 md:translate-x-0">
-              <div className="w-24 h-24 md:w-32 md:h-32 rounded-2xl md:rounded-3xl bg-gradient-to-br from-amber-200 to-amber-300 p-1 shadow-xl">
-                <div className="w-full h-full rounded-xl md:rounded-2xl bg-gradient-to-br from-amber-200 to-amber-300 flex items-center justify-center overflow-hidden">
+              <div
+                className="w-24 h-24 md:w-32 md:h-32 rounded-2xl md:rounded-3xl p-1 shadow-xl"
+                style={{
+                  background: `linear-gradient(135deg, var(--color-primary-light) 0%, var(--color-primary) 100%)`
+                }}
+              >
+                <div className="w-full h-full rounded-xl md:rounded-2xl bg-white flex items-center justify-center overflow-hidden">
                   {profile?.avatar_url ? (
                     <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
                   ) : (
-                    <Coffee className="w-16 h-16 md:w-20 md:h-20 text-amber-700" />
+                    <Coffee className="w-16 h-16 md:w-20 md:h-20 text-primary" />
                   )}
                 </div>
               </div>
@@ -188,7 +204,7 @@ export default function ProfilePage() {
             {/* Edit button on mobile (absolute) */}
             <button
               onClick={() => router.push('/settings')}
-              className="md:hidden absolute top-3 right-3 p-2 bg-white/90 backdrop-blur rounded-xl text-amber-900 shadow"
+              className="md:hidden absolute top-3 right-3 p-2 bg-white/90 backdrop-blur rounded-xl text-primary shadow"
             >
               <PencilIcon className="w-4 h-4" />
             </button>
@@ -216,6 +232,12 @@ export default function ProfilePage() {
                   value={friendsCount}
                   onClick={() => router.push('/friends')}
                 />
+                <StatCard
+                  icon={TrendingUp}
+                  label="Stats"
+                  value=""
+                  onClick={() => router.push('/stats')}
+                />
               </div>
             </div>
           </div>
@@ -223,7 +245,12 @@ export default function ProfilePage() {
 
         {/* Coffee Preferences Card */}
         {profile && (
-          <div className="bg-gradient-to-br from-amber-800 to-amber-900 rounded-3xl shadow-lg p-5 md:p-6 text-white">
+          <div
+            className="rounded-3xl shadow-lg p-5 md:p-6 text-white"
+            style={{
+              background: `linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 100%)`
+            }}
+          >
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
                 <Coffee className="w-6 h-6 text-white" />
@@ -233,25 +260,25 @@ export default function ProfilePage() {
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               <div className="bg-white/10 backdrop-blur rounded-xl p-3">
-                <p className="text-xs text-amber-200 mb-1">Drinks</p>
+                <p className="text-xs text-white/70 mb-1">Drinks</p>
                 <p className="font-semibold text-sm leading-tight">
                   {profile.favorite_drinks?.length ? profile.favorite_drinks.join(', ') : 'Not set'}
                 </p>
               </div>
               <div className="bg-white/10 backdrop-blur rounded-xl p-3">
-                <p className="text-xs text-amber-200 mb-1">Roast</p>
+                <p className="text-xs text-white/70 mb-1">Roast</p>
                 <p className="font-semibold text-sm leading-tight">
                   {profile.preferred_roast || 'Not set'}
                 </p>
               </div>
               <div className="bg-white/10 backdrop-blur rounded-xl p-3">
-                <p className="text-xs text-amber-200 mb-1">Brewing</p>
+                <p className="text-xs text-white/70 mb-1">Brewing</p>
                 <p className="font-semibold text-sm leading-tight">
                   {profile.brewing_method || 'Not set'}
                 </p>
               </div>
               <div className="bg-white/10 backdrop-blur rounded-xl p-3">
-                <p className="text-xs text-amber-200 mb-1">Strength</p>
+                <p className="text-xs text-white/70 mb-1">Strength</p>
                 <p className="font-semibold text-sm leading-tight">
                   {profile.coffee_strength || 'Not set'}
                 </p>
@@ -273,7 +300,7 @@ export default function ProfilePage() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl font-medium text-sm transition ${
                   activeTab === tab.id
-                    ? 'bg-amber-700 text-white shadow-md'
+                    ? 'bg-primary text-white shadow-md'
                     : 'text-gray-600 hover:bg-gray-100'
                 }`}
               >
@@ -295,7 +322,7 @@ export default function ProfilePage() {
                   <p className="text-gray-600 mb-6">Start logging your coffee adventures!</p>
                   <a
                     href="/shops"
-                    className="inline-block bg-amber-700 text-white px-6 py-3 rounded-xl font-semibold hover:bg-amber-800 transition"
+                    className="inline-block bg-primary text-white px-6 py-3 rounded-xl font-semibold hover:bg-primary-dark transition"
                   >
                     Find Coffee Shops
                   </a>
@@ -314,13 +341,13 @@ export default function ProfilePage() {
                         className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-50 p-2">
+                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary-lighter to-primary-light p-2">
                         <div className="text-center">
                           <p className="font-semibold text-gray-900 text-xs line-clamp-2 mb-1">{post.drink_name}</p>
-                          <p className="text-xs text-amber-700">{post.shop_name}</p>
+                          <p className="text-xs text-primary">{post.shop_name}</p>
                           <div className="flex justify-center mt-1 gap-0.5">
                             {[...Array(5)].map((_, i) => (
-                              <span key={i} className={`text-xs ${i < post.rating ? 'text-amber-500' : 'text-gray-300'}`}>
+                              <span key={i} className={`text-xs ${i < post.rating ? 'text-primary' : 'text-gray-300'}`}>
                                 ★
                               </span>
                             ))}
@@ -346,11 +373,11 @@ export default function ProfilePage() {
                 visits.map((visit: any) => (
                   <div
                     key={visit.id}
-                    className="aspect-square bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-3 flex items-center justify-center"
+                    className="aspect-square bg-gradient-to-br from-primary-lighter to-primary-light rounded-2xl p-3 flex items-center justify-center"
                   >
                     <div className="text-center">
                       <p className="font-semibold text-gray-900 text-xs line-clamp-2 mb-1">{visit.place_name}</p>
-                      <p className="text-xs text-amber-700">{formatDate(visit.created_at)}</p>
+                      <p className="text-xs text-primary">{formatDate(visit.created_at)}</p>
                     </div>
                   </div>
                 ))

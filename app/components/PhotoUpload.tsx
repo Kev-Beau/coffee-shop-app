@@ -149,8 +149,8 @@ export default function PhotoUpload({
           onClick={() => fileInputRef.current?.click()}
           className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition ${
             dragActive
-              ? 'border-amber-500 bg-amber-50'
-              : 'border-gray-300 hover:border-amber-400 hover:bg-amber-50'
+              ? 'border-amber-500 bg-primary-lighter'
+              : 'border-gray-300 hover:border-amber-400 hover:bg-primary-lighter'
           }`}
         >
           <div className="space-y-2">
@@ -168,7 +168,7 @@ export default function PhotoUpload({
               />
             </svg>
             <div className="text-sm text-gray-600">
-              <span className="font-medium text-amber-700 hover:text-amber-800">
+              <span className="font-medium text-primary hover:text-primary-dark">
                 Click to upload
               </span>{' '}
               or drag and drop

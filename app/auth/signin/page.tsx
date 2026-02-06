@@ -60,14 +60,14 @@ export default function SignInPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gradient-to-b from-primary-lighter to-primary-light flex items-center justify-center px-4">
       <div className="max-w-md w-full">
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-            <Coffee className="w-16 h-16 text-amber-700" />
+            <Coffee className="w-16 h-16 text-primary" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900">CoffeeConnect</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Beany</h1>
           <p className="text-gray-600 mt-2">Sign in to your account</p>
         </div>
 
@@ -92,7 +92,7 @@ export default function SignInPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none transition text-gray-900 placeholder:text-gray-400"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition text-gray-900 placeholder:text-gray-400"
                 placeholder="you@example.com"
               />
             </div>
@@ -108,7 +108,7 @@ export default function SignInPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none transition text-gray-900 placeholder:text-gray-400"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition text-gray-900 placeholder:text-gray-400"
                 placeholder="••••••••"
               />
             </div>
@@ -117,7 +117,7 @@ export default function SignInPage() {
             <div className="text-right">
               <Link
                 href="/auth/reset-password"
-                className="text-sm text-amber-700 hover:text-amber-800"
+                className="text-sm text-primary hover:text-primary-dark"
               >
                 Forgot password?
               </Link>
@@ -127,7 +127,7 @@ export default function SignInPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-amber-700 text-white py-3 rounded-lg font-semibold hover:bg-amber-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary-dark transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Signing in...' : 'Sign In'}
             </button>
@@ -137,7 +137,7 @@ export default function SignInPage() {
           <div className="mt-6 text-center">
             <p className="text-gray-600">
               Don't have an account?{' '}
-              <Link href="/auth/signup" className="text-amber-700 hover:text-amber-800 font-semibold">
+              <Link href="/auth/signup" className="text-primary hover:text-primary-dark font-semibold">
                 Sign up
               </Link>
             </p>

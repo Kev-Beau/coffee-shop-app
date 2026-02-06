@@ -42,7 +42,7 @@ export default function TagSelector({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white text-left focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none transition flex items-center justify-between"
+        className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white text-left focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition flex items-center justify-between"
       >
         <span className={selectedTags.length === 0 ? 'text-gray-400' : 'text-gray-900'}>
           {selectedTags.length === 0
@@ -79,7 +79,7 @@ export default function TagSelector({
                     onClick={() => toggleTag(tag)}
                     className={`w-full px-3 py-2 rounded-lg text-left transition flex items-center justify-between ${
                       isSelected
-                        ? 'bg-amber-50 text-amber-700'
+                        ? 'bg-primary-lighter text-primary'
                         : 'text-gray-700 hover:bg-gray-50'
                     }`}
                   >
@@ -107,7 +107,7 @@ export default function TagSelector({
           {selectedTags.map((tag) => (
             <span
               key={tag}
-              className="inline-flex items-center gap-1 px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-sm"
+              className="inline-flex items-center gap-1 px-3 py-1 bg-primary-light text-primary-dark rounded-full text-sm"
             >
               <span className="capitalize">{formatTag(tag)}</span>
               <button
