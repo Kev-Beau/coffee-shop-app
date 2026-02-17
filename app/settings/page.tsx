@@ -131,26 +131,39 @@ export default function SettingsPage() {
   };
 
   const handleDeleteAccount = async () => {
-    if (!confirm('Are you sure you want to delete your account? This cannot be undone.')) {
-      return;
-    }
+    // Multiple confirmations to prevent accidental deletion
+    const confirmation1 = confirm('Are you sure you want to delete your account? This action CANNOT be undone.');
+    if (!confirmation1) return;
 
-    if (!confirm('This will permanently delete all your data including posts, friends, and settings. Continue?')) {
+    const confirmation2 = confirm('This will PERMANENTLY delete:\n\n• Your profile and settings\n• All your posts and visits\n• All your friends and friend requests\n• All your comments and likes\n\nYour account cannot be recovered.\n\nContinue?');
+    if (!confirmation2) return;
+
+    const confirmation3 = prompt('Type "DELETE" to confirm account deletion:');
+    if (confirmation3 !== 'DELETE') {
+      alert('Account deletion cancelled.');
       return;
     }
 
     try {
-      // Delete user account (this will cascade delete all data due to RLS policies)
-      const { error } = await supabase.auth.admin.deleteUser(user.id);
+      const response = await fetch('/api/delete-account', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId: user.id }),
+      });
 
-      if (error) throw error;
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to delete account');
+      }
 
-      // Sign out
+      // Sign out and redirect
       await supabase.auth.signOut();
       router.push('/');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error deleting account:', error);
-      showMessage('error', 'Failed to delete account. Please contact support.');
+      showMessage('error', `Failed to delete account: ${error.message}`);
     }
   };
 

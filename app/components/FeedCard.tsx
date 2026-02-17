@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { Coffee } from 'lucide-react';
 import { HeartIcon, ChatBubbleLeftIcon } from '@heroicons/react/24/outline';
@@ -36,6 +36,9 @@ interface FeedCardProps {
 
 export default function FeedCard({ post, currentUserId, onLike, onUnlike, commentCount = 0 }: FeedCardProps) {
   const [liking, setLiking] = useState(false);
+  const [showHeartAnimation, setShowHeartAnimation] = useState(false);
+  const lastTapRef = useRef(0);
+  const heartTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleLike = async () => {
     if (!currentUserId) return;
@@ -45,9 +48,11 @@ export default function FeedCard({ post, currentUserId, onLike, onUnlike, commen
 
     try {
       if (post.user_has_liked) {
-        await onUnlike?.(post.id);
+        // Don't await - let parent's optimistic update handle UI immediately
+        onUnlike?.(post.id);
       } else {
-        await onLike?.(post.id);
+        // Don't await - let parent's optimistic update handle UI immediately
+        onLike?.(post.id);
       }
     } catch (error) {
       console.error('Error toggling like:', error);
@@ -55,6 +60,56 @@ export default function FeedCard({ post, currentUserId, onLike, onUnlike, commen
       setLiking(false);
     }
   };
+
+  const handlePhotoDoubleTap = () => {
+    if (!currentUserId) return;
+
+    const now = Date.now();
+    const timeSinceLastTap = now - lastTapRef.current;
+
+    // Check if this is a double tap (within 300ms)
+    if (timeSinceLastTap < 300 && timeSinceLastTap > 0) {
+      // It's a double tap!
+      lastTapRef.current = 0;
+
+      // Show heart animation
+      setShowHeartAnimation(true);
+
+      // Clear any existing timeout
+      if (heartTimeoutRef.current) {
+        clearTimeout(heartTimeoutRef.current);
+      }
+
+      // Hide animation after 1000ms
+      heartTimeoutRef.current = setTimeout(() => {
+        setShowHeartAnimation(false);
+      }, 1000);
+
+      // Only like if not already liked
+      if (!post.user_has_liked) {
+        handleLike();
+      }
+    } else {
+      // First tap - record the time
+      lastTapRef.current = now;
+
+      // Reset after 300ms if no second tap
+      setTimeout(() => {
+        if (lastTapRef.current === now) {
+          lastTapRef.current = 0;
+        }
+      }, 300);
+    }
+  };
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (heartTimeoutRef.current) {
+        clearTimeout(heartTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -100,21 +155,29 @@ export default function FeedCard({ post, currentUserId, onLike, onUnlike, commen
 
       {/* Photo */}
       {post.photo_url && (
-        <Link href={`/posts/${post.id}`} className="block aspect-square">
-          <img
-            src={post.photo_url}
-            alt={`Photo of ${post.drink_name} at ${post.shop_name}`}
-            className="w-full h-full object-cover"
-          />
-        </Link>
+        <div className="relative aspect-square">
+          {/* Heart Animation Overlay */}
+          {showHeartAnimation && (
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10 animate-bounce-in">
+              <HeartIconSolid className="w-24 h-24 text-white drop-shadow-lg" />
+            </div>
+          )}
+
+          {/* Photo - double tap to like (no link wrapper) */}
+          <div className="w-full h-full" onTouchEnd={handlePhotoDoubleTap}>
+            <img
+              src={post.photo_url}
+              alt={`Photo of ${post.drink_name} at ${post.shop_name}`}
+              className="w-full h-full object-cover"
+            />
+          </div>
+        </div>
       )}
 
       {/* Content */}
-      <div className="p-4">
+      <Link href={`/posts/${post.id}`} className="block p-4">
         {/* Drink Info */}
-        <Link href={`/posts/${post.id}`}>
-          <h3 className="font-bold text-gray-900 mb-1">{post.drink_name}</h3>
-        </Link>
+        <h3 className="font-bold text-gray-900 mb-1">{post.drink_name}</h3>
 
         <div className="flex items-center gap-4 mb-3">
           <StarRating rating={post.rating} readonly size="sm" />
@@ -167,7 +230,10 @@ export default function FeedCard({ post, currentUserId, onLike, onUnlike, commen
         <div className="flex items-center gap-4 pt-3 border-t border-gray-100">
           <button
             type="button"
-            onClick={handleLike}
+            onClick={(e) => {
+              e.preventDefault();
+              handleLike();
+            }}
             disabled={!currentUserId || liking}
             className={`flex items-center gap-2 ${
               post.user_has_liked ? 'text-red-500' : 'text-gray-700'
@@ -221,7 +287,7 @@ export default function FeedCard({ post, currentUserId, onLike, onUnlike, commen
             )}
           </div>
         )}
-      </div>
+      </Link>
     </div>
   );
 }

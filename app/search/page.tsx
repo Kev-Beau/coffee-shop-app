@@ -109,7 +109,7 @@ export default function SearchPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-primary-lighter to-primary-light pb-20">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
+      <div className="bg-white border-b border-gray-200 sticky top-0 z-40">
         <div className="max-w-2xl mx-auto px-4 py-4">
           {/* Search Bar */}
           <div className="relative">
@@ -132,19 +132,19 @@ export default function SearchPage() {
           </div>
 
           {/* Tabs */}
-          <div className="flex gap-2 mt-4">
+          <div className="flex gap-3 mt-4">
             {[
               { id: 'users' as SearchTab, icon: UserIcon, label: 'Friends' },
-              { id: 'posts' as SearchTab, icon: DocumentTextIcon, label: 'Posts' },
+              { id: 'posts' as SearchTab, icon: DocumentTextIcon, label: 'Explore' },
               { id: 'shops' as SearchTab, icon: MapPinIcon, label: 'Shops' },
             ].map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl font-medium text-sm transition ${
+                className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-semibold text-sm border-2 transition ${
                   activeTab === tab.id
-                    ? 'bg-primary text-white shadow-md'
-                    : 'text-gray-600 hover:bg-gray-100'
+                    ? 'border-primary bg-primary text-white shadow-lg'
+                    : 'border-gray-300 text-gray-700 hover:border-primary hover:text-primary hover:bg-primary-lighter'
                 }`}
               >
                 <tab.icon className="w-4 h-4" />
@@ -156,7 +156,7 @@ export default function SearchPage() {
       </div>
 
       {/* Results */}
-      <div className="max-w-2xl mx-auto px-4 py-6">
+      <div className="max-w-2xl mx-auto px-4 py-6 pb-24">
         {loading ? (
           <div className="text-center py-12">
             <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />

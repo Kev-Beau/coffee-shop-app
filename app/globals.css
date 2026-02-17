@@ -105,6 +105,18 @@ body {
   padding-right: env(safe-area-inset-right);
   /* Prevent double-tap zoom on iOS */
   touch-action: manipulation;
+  /* Ensure body doesn't interfere with fixed elements */
+  position: relative;
+  /* Force proper viewport handling on iOS */
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+}
+
+/* Viewport reset class */
+.viewport-reset {
+  position: relative !important;
+  height: auto !important;
+  overflow: visible !important;
 }
 
 /* Slide up animation for modals */
@@ -146,4 +158,234 @@ body {
 
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+/* Fade in animation */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.6s ease-out;
+}
+
+/* Slide up animation */
+@keyframes slide-up-hero {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up-hero 0.8s ease-out;
+}
+
+/* Bounce animation */
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-bounce {
+  animation: bounce 2s infinite;
+}
+
+/* ============================================
+   SCROLL-BASED ANIMATIONS
+   ============================================ */
+
+/* Scale and fade from below */
+@keyframes scale-in-below {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(80px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Slide in from left */
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-100px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Slide in from right */
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(100px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Zoom in with rotation */
+@keyframes zoom-in-rotate {
+  from {
+    opacity: 0;
+    transform: scale(0.5) rotate(-10deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+/* Float up animation */
+@keyframes float-up {
+  from {
+    opacity: 0;
+    transform: translateY(120px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Base scroll reveal class */
+.scroll-reveal {
+  opacity: 0;
+  transition: opacity 0.1s ease-out;
+}
+
+.scroll-reveal.animate-scale-below {
+  animation: scale-in-below 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.scroll-reveal.animate-slide-left {
+  animation: slide-in-left 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.scroll-reveal.animate-slide-right {
+  animation: slide-in-right 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.scroll-reveal.animate-zoom-rotate {
+  animation: zoom-in-rotate 1.1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.scroll-reveal.animate-float-up {
+  animation: float-up 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Staggered animation delays */
+.scroll-reveal.delay-100 {
+  animation-delay: 0.1s;
+}
+
+.scroll-reveal.delay-200 {
+  animation-delay: 0.2s;
+}
+
+.scroll-reveal.delay-300 {
+  animation-delay: 0.3s;
+}
+
+.scroll-reveal.delay-400 {
+  animation-delay: 0.4s;
+}
+
+.scroll-reveal.delay-500 {
+  animation-delay: 0.5s;
+}
+
+.scroll-reveal.delay-600 {
+  animation-delay: 0.6s;
+}
+
+.scroll-reveal.delay-700 {
+  animation-delay: 0.7s;
+}
+
+.scroll-reveal.delay-800 {
+  animation-delay: 0.8s;
+}
+
+.scroll-reveal.visible {
+  opacity: 1;
+}
+
+/* Full height scroll section */
+.scroll-section {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Parallax effect for background elements */
+.parallax-slow {
+  transition: transform 0.1s linear;
+}
+
+.parallax-medium {
+  transition: transform 0.1s linear;
+}
+
+/* Glow effect for emphasis */
+.glow-effect {
+  box-shadow: 0 0 60px rgba(111, 78, 55, 0.3);
+}
+
+.glow-effect-strong {
+  box-shadow: 0 0 100px rgba(111, 78, 55, 0.5);
+}
+
+/* Safe area for bottom navigation */
+.safe-bottom {
+  padding-bottom: calc(env(safe-area-inset-bottom) + 12px);
+}
+
+/* Ensure fixed positioning works correctly */
+nav.fixed {
+  position: fixed !important;
+  transform: translateZ(0);
+  will-change: transform;
+  -webkit-transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+/* Fix iOS Safari viewport issues */
+body {
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+html, body {
+  height: 100%;
+  overflow: visible;
+}
+
+#__next {
+  height: 100%;
+  position: relative;
 }

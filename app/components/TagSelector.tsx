@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 
 interface TagSelectorProps {
   tags: readonly string[] | string[];
@@ -18,6 +19,9 @@ export default function TagSelector({
   placeholder = 'Select tags...',
 }: TagSelectorProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const toggleTag = (tag: string) => {
     if (selectedTags.includes(tag)) {
@@ -31,6 +35,53 @@ export default function TagSelector({
     return tag.charAt(0).toUpperCase() + tag.slice(1);
   };
 
+  // Calculate dropdown position when opening
+  useEffect(() => {
+    if (isOpen && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      const dropdownHeight = 256; // max-h-64 in pixels
+      const windowHeight = window.innerHeight;
+      const spaceBelow = windowHeight - rect.bottom;
+
+      // If not enough space below, show dropdown above the button
+      const shouldShowAbove = spaceBelow < dropdownHeight && rect.top > dropdownHeight;
+
+      setDropdownPosition({
+        top: shouldShowAbove ? rect.top - dropdownHeight - 8 : rect.bottom + 8,
+        left: rect.left,
+        width: rect.width,
+      });
+    }
+  }, [isOpen]);
+
+  // Close dropdown on page scroll (but not dropdown scroll)
+  useEffect(() => {
+    if (!isOpen) return;
+
+    let scrollTimeout: NodeJS.Timeout;
+    const handleScroll = (e: Event) => {
+      // Only close if scrolling the main page, not the dropdown itself
+      const target = e.target as HTMLElement;
+      if (target.closest('.z-\\[150\\]')) {
+        // Scrolling inside dropdown, don't close
+        return;
+      }
+
+      // Debounce to avoid closing on small scroll movements
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        setIsOpen(false);
+      }, 50);
+    };
+
+    window.addEventListener('scroll', handleScroll, true);
+
+    return () => {
+      clearTimeout(scrollTimeout);
+      window.removeEventListener('scroll', handleScroll, true);
+    };
+  }, [isOpen]);
+
   return (
     <div className="relative">
       {label && (
@@ -40,6 +91,7 @@ export default function TagSelector({
       )}
 
       <button
+        ref={buttonRef}
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white text-left focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition flex items-center justify-between"
@@ -59,47 +111,61 @@ export default function TagSelector({
         </svg>
       </button>
 
-      {isOpen && (
-        <>
-          {/* Backdrop */}
-          <div
-            className="fixed inset-0 z-50"
-            onClick={() => setIsOpen(false)}
-          />
+      {isOpen &&
+        createPortal(
+          <>
+            {/* Backdrop */}
+            <div
+              className="fixed inset-0 z-[100]"
+              onClick={() => setIsOpen(false)}
+            />
 
-          {/* Dropdown */}
-          <div className="absolute z-[60] w-full mt-2 bg-white border border-gray-200 rounded-lg shadow-lg max-h-64 overflow-y-auto">
-            <div className="p-2 space-y-1">
-              {tags.map((tag) => {
-                const isSelected = selectedTags.includes(tag);
-                return (
-                  <button
-                    key={tag}
-                    type="button"
-                    onClick={() => toggleTag(tag)}
-                    className={`w-full px-3 py-2 rounded-lg text-left transition flex items-center justify-between ${
-                      isSelected
-                        ? 'bg-primary-lighter text-primary'
-                        : 'text-gray-700 hover:bg-gray-50'
-                    }`}
-                  >
-                    <span className="capitalize">{formatTag(tag)}</span>
-                    {isSelected && (
-                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                        <path
-                          fillRule="evenodd"
-                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    )}
-                  </button>
-                );
-              })}
+            {/* Dropdown - Rendered via Portal outside any stacking contexts */}
+            <div
+              ref={dropdownRef}
+              className="fixed z-[150] bg-white border border-gray-200 rounded-lg shadow-lg max-h-64 overflow-y-auto"
+              style={{
+                top: `${dropdownPosition.top}px`,
+                left: `${dropdownPosition.left}px`,
+                width: `${dropdownPosition.width}px`,
+              }}
+            >
+              <div className="p-2 space-y-1">
+                {tags.map((tag) => {
+                  const isSelected = selectedTags.includes(tag);
+                  return (
+                    <button
+                      key={tag}
+                      type="button"
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        toggleTag(tag);
+                      }}
+                      className={`w-full px-3 py-2 rounded-lg text-left transition flex items-center justify-between ${
+                        isSelected
+                          ? 'bg-primary-lighter text-primary'
+                          : 'text-gray-700 hover:bg-gray-50'
+                      }`}
+                    >
+                      <span className="capitalize">{formatTag(tag)}</span>
+                      {isSelected && (
+                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                          <path
+                            fillRule="evenodd"
+                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        </>
-      )}
+          </>,
+          document.body
+        )
+      }
 
       {/* Selected Tags Display */}
       {selectedTags.length > 0 && (
@@ -112,7 +178,10 @@ export default function TagSelector({
               <span className="capitalize">{formatTag(tag)}</span>
               <button
                 type="button"
-                onClick={() => toggleTag(tag)}
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  toggleTag(tag);
+                }}
                 className="hover:text-amber-900 transition"
               >
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">

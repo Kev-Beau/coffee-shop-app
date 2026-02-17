@@ -10,7 +10,30 @@ const supabase = createClient(
 // POST /api/likes - Like a post
 export async function POST(request: NextRequest) {
   try {
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    // Get user from auth header or cookie
+    let user;
+    let authError;
+    let supabaseClient = supabase;
+
+    const authHeader = request.headers.get('authorization');
+    if (authHeader?.startsWith('Bearer ')) {
+      // Use the provided access token and create a client with it for RLS
+      const token = authHeader.substring(7);
+      const { createClient } = await import('@supabase/supabase-js');
+      supabaseClient = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        { global: { headers: { Authorization: `Bearer ${token}` } } }
+      );
+      const { data: { user: tokenUser }, error: tokenError } = await supabaseClient.auth.getUser();
+      user = tokenUser;
+      authError = tokenError;
+    } else {
+      // Fall back to cookie-based auth
+      const { data: { user: cookieUser }, error: cookieError } = await supabase.auth.getUser();
+      user = cookieUser;
+      authError = cookieError;
+    }
 
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -26,8 +49,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if already liked
-    const existingLike = await db.checkUserLike(postId, user.id);
+    // Check if already liked using the auth'd client
+    const { data: existingLike } = await supabaseClient
+      .from('likes')
+      .select('*')
+      .eq('post_id', postId)
+      .eq('user_id', user.id)
+      .maybeSingle();
 
     if (existingLike) {
       return NextResponse.json(
@@ -36,8 +64,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Like the post
-    await db.likePost(postId, user.id);
+    // Like the post using the auth'd client for RLS
+    const { error: insertError } = await supabaseClient
+      .from('likes')
+      .insert({ post_id: postId, user_id: user.id });
+
+    if (insertError) throw insertError;
 
     return NextResponse.json({ success: true });
   } catch (error: any) {
@@ -52,7 +84,30 @@ export async function POST(request: NextRequest) {
 // DELETE /api/likes - Unlike a post
 export async function DELETE(request: NextRequest) {
   try {
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    // Get user from auth header or cookie
+    let user;
+    let authError;
+    let supabaseClient = supabase;
+
+    const authHeader = request.headers.get('authorization');
+    if (authHeader?.startsWith('Bearer ')) {
+      // Use the provided access token and create a client with it for RLS
+      const token = authHeader.substring(7);
+      const { createClient } = await import('@supabase/supabase-js');
+      supabaseClient = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        { global: { headers: { Authorization: `Bearer ${token}` } } }
+      );
+      const { data: { user: tokenUser }, error: tokenError } = await supabaseClient.auth.getUser();
+      user = tokenUser;
+      authError = tokenError;
+    } else {
+      // Fall back to cookie-based auth
+      const { data: { user: cookieUser }, error: cookieError } = await supabase.auth.getUser();
+      user = cookieUser;
+      authError = cookieError;
+    }
 
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -68,8 +123,14 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    // Unlike the post
-    await db.unlikePost(postId, user.id);
+    // Unlike the post using the auth'd client for RLS
+    const { error: deleteError } = await supabaseClient
+      .from('likes')
+      .delete()
+      .eq('post_id', postId)
+      .eq('user_id', user.id);
+
+    if (deleteError) throw deleteError;
 
     return NextResponse.json({ success: true });
   } catch (error: any) {

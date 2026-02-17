@@ -40,10 +40,25 @@ export default function QuickLogModal({ isOpen, onClose }: QuickLogModalProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [searchLoading, setSearchLoading] = useState(false);
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
 
   useEffect(() => {
     if (isOpen) {
       loadRecentShops();
+      // Get user's location for better search results
+      if ('geolocation' in navigator) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            setUserLocation({
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+            });
+          },
+          (error) => {
+            console.log('Geolocation not available or permission denied:', error);
+          }
+        );
+      }
     }
   }, [isOpen]);
 
@@ -84,7 +99,7 @@ export default function QuickLogModal({ isOpen, onClose }: QuickLogModalProps) {
     const name = 'place_name' in shop ? shop.place_name : shop.name;
     setSelectedShop({ id: shop.place_id, name });
     setShowDrinkModal(true);
-    onClose();
+    // Don't call onClose() here - let the drink modal handle it
   };
 
   const handleSearchShops = async () => {
@@ -92,7 +107,11 @@ export default function QuickLogModal({ isOpen, onClose }: QuickLogModalProps) {
 
     setSearchLoading(true);
     try {
-      const response = await fetch(`/api/shops/search?q=${encodeURIComponent(searchQuery)}`);
+      let url = `/api/shops/search?q=${encodeURIComponent(searchQuery)}`;
+      if (userLocation) {
+        url += `&lat=${userLocation.lat}&lng=${userLocation.lng}`;
+      }
+      const response = await fetch(url);
       const data = await response.json();
       setSearchResults(data.data || []);
     } catch (error) {
@@ -118,6 +137,8 @@ export default function QuickLogModal({ isOpen, onClose }: QuickLogModalProps) {
   const handleDrinkModalClose = () => {
     setShowDrinkModal(false);
     setSelectedShop(null);
+    // Also close the QuickLogModal when drink modal closes
+    onClose();
   };
 
   if (!isOpen) return null;
@@ -130,8 +151,8 @@ export default function QuickLogModal({ isOpen, onClose }: QuickLogModalProps) {
         <div className="fixed inset-0 bg-black/50" onClick={onClose} />
 
         {/* Modal */}
-        <div className="flex min-h-full items-end justify-center">
-          <div className="relative bg-white w-full max-w-lg rounded-t-3xl shadow-xl max-h-[85vh] flex flex-col">
+        <div className="flex min-h-full items-end justify-center pb-20">
+          <div className="relative bg-white w-full max-w-lg rounded-t-3xl shadow-xl max-h-[calc(100vh-100px)] flex flex-col">
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-gray-200 flex-shrink-0">
               <h2 className="text-xl font-bold text-gray-900">Quick Log</h2>
@@ -144,7 +165,7 @@ export default function QuickLogModal({ isOpen, onClose }: QuickLogModalProps) {
             </div>
 
             {/* Content Area - scrollable */}
-            <div className="overflow-y-auto flex-1" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 80px)' }}>
+            <div className="overflow-y-auto flex-1" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 100px)' }}>
               {/* Search Bar */}
               <div className="p-4 pb-2">
               <div className="relative">

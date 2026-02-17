@@ -65,13 +65,17 @@ export default function SignUpPage() {
           data: {
             username,
           },
+          emailRedirectTo: `${window.location.origin}/auth/confirm-email`,
         },
       });
 
       if (signUpError) throw signUpError;
 
-      // Profile will be created automatically by the database trigger
-      router.push('/onboarding');
+      // Store email for confirmation page
+      localStorage.setItem('signup_email', email);
+
+      // Redirect to email confirmation page
+      router.push('/auth/confirm-email?email=' + encodeURIComponent(email));
     } catch (err: any) {
       setError(err.message || 'Failed to sign up');
     } finally {

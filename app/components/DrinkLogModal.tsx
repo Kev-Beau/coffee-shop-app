@@ -114,10 +114,10 @@ export default function DrinkLogModal({
       />
 
       {/* Modal */}
-      <div className="flex min-h-full items-center justify-center p-4">
-        <div className="relative bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="flex min-h-full items-center justify-center p-4 pb-24">
+        <div className="relative bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[calc(100vh-120px)] overflow-y-auto">
           {/* Header */}
-          <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+          <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between z-10">
             <div>
               <h2 className="text-xl font-bold text-gray-900">Log Drink</h2>
               <p className="text-sm text-gray-600">{shopName}</p>
@@ -145,7 +145,7 @@ export default function DrinkLogModal({
           )}
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          <form onSubmit={handleSubmit} className="p-6 space-y-6 pb-24">
             {/* Photo Upload */}
             <div>
               <PhotoUpload
@@ -188,15 +188,15 @@ export default function DrinkLogModal({
               )}
             </div>
 
-            {/* Location Notes */}
+            {/* Caption */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Location Notes
+                Caption
               </label>
               <textarea
                 value={locationNotes}
                 onChange={(e) => setLocationNotes(e.target.value)}
-                placeholder="Share your thoughts about this shop..."
+                placeholder="What did you think? Share your experience..."
                 rows={3}
                 maxLength={500}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition resize-none text-gray-900 placeholder:text-gray-400"

@@ -138,50 +138,111 @@ export default function FeedPage() {
   };
 
   const handleLike = async (postId: string) => {
+    if (!supabase) return;
+
+    // Capture original post state before optimistic update
+    const originalPost = posts.find((p) => p.id === postId);
+
+    // Optimistic update - update UI immediately
+    setPosts(posts.map((post) =>
+      post.id === postId
+        ? {
+            ...post,
+            user_has_liked: true,
+            like_count: (post.like_count || 0) + 1,
+          }
+        : post
+    ));
+
     try {
+      // Get session for auth token
+      const { data: { session } } = await supabase.auth.getSession();
+
+      const headers: HeadersInit = { 'Content-Type': 'application/json' };
+      if (session?.access_token) {
+        headers['Authorization'] = `Bearer ${session.access_token}`;
+      }
+
       const response = await fetch('/api/likes', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({ postId }),
       });
 
-      if (!response.ok) throw new Error('Failed to like post');
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        console.error('Like API error:', response.status, errorData);
 
-      // Update local state
-      setPosts(posts.map((post) =>
-        post.id === postId
-          ? {
-              ...post,
-              user_has_liked: true,
-              like_count: (post.like_count || 0) + 1,
-            }
-          : post
-      ));
+        // If it's "already liked", that's fine - keep the optimistic update
+        if (response.status === 400 && errorData.error?.includes('already liked')) {
+          console.log('Post already liked, keeping optimistic update');
+          return;
+        }
+
+        throw new Error(errorData.error || 'Failed to like post');
+      }
+
+      console.log('Like successful');
     } catch (error) {
       console.error('Error liking post:', error);
+      // Revert optimistic update on error - use the original post state
+      if (originalPost) {
+        setPosts((currentPosts) =>
+          currentPosts.map((post) =>
+            post.id === postId ? originalPost : post
+          )
+        );
+      }
     }
   };
 
   const handleUnlike = async (postId: string) => {
+    if (!supabase) return;
+
+    // Capture original post state before optimistic update
+    const originalPost = posts.find((p) => p.id === postId);
+
+    // Optimistic update - update UI immediately
+    setPosts(posts.map((post) =>
+      post.id === postId
+        ? {
+            ...post,
+            user_has_liked: false,
+            like_count: Math.max((post.like_count || 0) - 1, 0),
+          }
+        : post
+    ));
+
     try {
+      // Get session for auth token
+      const { data: { session } } = await supabase.auth.getSession();
+
+      const headers: HeadersInit = {};
+      if (session?.access_token) {
+        headers['Authorization'] = `Bearer ${session.access_token}`;
+      }
+
       const response = await fetch(`/api/likes?postId=${postId}`, {
         method: 'DELETE',
+        headers,
       });
 
-      if (!response.ok) throw new Error('Failed to unlike post');
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        throw new Error(errorData.error || 'Failed to unlike post');
+      }
 
-      // Update local state
-      setPosts(posts.map((post) =>
-        post.id === postId
-          ? {
-              ...post,
-              user_has_liked: false,
-              like_count: Math.max((post.like_count || 0) - 1, 0),
-            }
-          : post
-      ));
+      console.log('Unlike successful');
     } catch (error) {
       console.error('Error unliking post:', error);
+      // Revert optimistic update on error - use the original post state
+      if (originalPost) {
+        setPosts((currentPosts) =>
+          currentPosts.map((post) =>
+            post.id === postId ? originalPost : post
+          )
+        );
+      }
     }
   };
 
