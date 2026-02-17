@@ -1,0 +1,3 @@
+# Force Vercel to ignore cache and rebuild
+.next
+node_modules
