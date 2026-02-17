@@ -3,6 +3,5 @@
   "devCommand": "npm run dev",
   "installCommand": "npm install",
   "framework": "nextjs",
-  "outputDirectory": ".next",
-  "ignoreCommand": "git diff --quiet"
+  "outputDirectory": ".next"
 }
