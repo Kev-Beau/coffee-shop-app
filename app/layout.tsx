@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import NavigationWrapper from "./components/NavigationWrapper";
 import BottomNavigationWrapper from "./components/BottomNavigationWrapper";
+import IOSKeyboardFix from "./components/IOSKeyboardFix";
 import { ThemeProvider } from "./theme/config";
 
 const geistSans = Geist({
@@ -50,12 +51,13 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="/icon.png" />
         <link rel="apple-touch-icon" href="/icon.png" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content" />
         <meta name="theme-color" content="#6F4E37" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <IOSKeyboardFix />
         <ThemeProvider>
           <NavigationWrapper />
           {children}
