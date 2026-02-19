@@ -79,13 +79,12 @@ export async function getViewportInfo(page: Page): Promise<{
   isMobile: boolean;
 }> {
   const viewportSize = page.viewportSize();
-  const isMobile = page.context().browser()?.contexts()?.[0]?.page?.()?.toString().includes('Mobile') ||
-                   (viewportSize ? viewportSize.width < 768 : false);
+  const isMobile = viewportSize ? viewportSize.width < 768 : false;
 
   return {
     width: viewportSize?.width || 0,
     height: viewportSize?.height || 0,
-    isMobile: !!isMobile,
+    isMobile,
   };
 }
 

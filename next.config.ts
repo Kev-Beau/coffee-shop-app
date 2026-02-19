@@ -1,7 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // Exclude test files from build
+  experimental: {
+    serverComponentsExternalPackages: ['@playwright/test'],
+  },
 };
 
 export default nextConfig;
