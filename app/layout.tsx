@@ -47,11 +47,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
+          <head>
         <link rel="icon" href="/icon.png" />
         <link rel="apple-touch-icon" href="/icon.png" />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
         <meta name="theme-color" content="#6F4E37" />
+        {/* iOS PWA specific meta tags */}
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Beany" />
+        <meta name="mobile-web-app-capable" content="yes" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}

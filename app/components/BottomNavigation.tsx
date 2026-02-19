@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   HomeIcon,
   MagnifyingGlassIcon,
@@ -15,29 +15,83 @@ import { HomeIcon as HomeIconSolid, MagnifyingGlassIcon as MagnifyingGlassIconSo
 export default function BottomNavigation() {
   const pathname = usePathname();
   const [isVisible, setIsVisible] = useState(true);
+  const navRef = useRef<HTMLElement>(null);
+  const isKeyboardActive = useRef(false);
 
-  // Hide bottom nav when any input is focused (reliable iOS Safari fix)
+  // iOS Safari PWA keyboard handling with scroll fix
   useEffect(() => {
     const handleFocusIn = (e: Event) => {
       const target = e.target as HTMLElement;
       if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT') {
+        isKeyboardActive.current = true;
         setIsVisible(false);
       }
     };
 
     const handleFocusOut = () => {
-      // Small delay to ensure keyboard has started closing
-      setTimeout(() => setIsVisible(true), 100);
+      isKeyboardActive.current = false;
+      // Use requestAnimationFrame to ensure this runs after iOS viewport manipulation
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setIsVisible(true);
+          // Force reflow to reset fixed positioning
+          forceReflow();
+        });
+      });
+    };
+
+    // Force reflow to reset iOS Safari's viewport reference
+    const forceReflow = () => {
+      if (navRef.current) {
+        const nav = navRef.current;
+        // Force a reflow by reading offsetHeight
+        void nav.offsetHeight;
+        // Reset position styles to force iOS to recalculate
+        nav.style.position = 'fixed';
+        nav.style.bottom = '0';
+        nav.style.transform = 'translate3d(0, 0, 0)';
+      }
+    };
+
+    // Ensure nav stays fixed on scroll (iOS PWA fix)
+    const handleScroll = () => {
+      if (navRef.current && !isKeyboardActive.current && isVisible) {
+        const nav = navRef.current;
+        const rect = nav.getBoundingClientRect();
+
+        // If nav has moved from bottom, reset it
+        if (rect.bottom !== window.innerHeight) {
+          requestAnimationFrame(() => {
+            nav.style.position = 'fixed';
+            nav.style.bottom = '0';
+            nav.style.transform = 'translate3d(0, 0, 0)';
+          });
+        }
+      }
+    };
+
+    // Visual viewport API for iOS Safari 13+
+    const handleViewportResize = () => {
+      if (navRef.current && !isKeyboardActive.current) {
+        forceReflow();
+      }
     };
 
     document.addEventListener('focusin', handleFocusIn, true);
     document.addEventListener('focusout', handleFocusOut, true);
+    window.addEventListener('scroll', handleScroll, true);
+    window.addEventListener('resize', handleViewportResize);
+
+    // Initial reflow
+    forceReflow();
 
     return () => {
       document.removeEventListener('focusin', handleFocusIn, true);
       document.removeEventListener('focusout', handleFocusOut, true);
+      window.removeEventListener('scroll', handleScroll, true);
+      window.removeEventListener('resize', handleViewportResize);
     };
-  }, []);
+  }, [isVisible]);
 
   const navItems = [
     { href: '/feed', icon: HomeIcon, solidIcon: HomeIconSolid, label: 'Feed' },
@@ -50,7 +104,18 @@ export default function BottomNavigation() {
   if (!isVisible) return null;
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-[9999] safe-bottom transition-transform duration-200 ease-out">
+    <nav
+      ref={navRef}
+      className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-[9999] safe-bottom transition-transform duration-200 ease-out"
+      style={{
+        WebkitTransform: 'translate3d(0, 0, 0)',
+        transform: 'translate3d(0, 0, 0)',
+        willChange: 'transform',
+        WebkitBackfaceVisibility: 'hidden',
+        backfaceVisibility: 'hidden',
+        WebkitOverflowScrolling: 'touch',
+      }}
+    >
       <div className="flex items-center justify-around h-16 px-2 max-w-md mx-auto">
         {navItems.map((item) => {
           const isActive = pathname === item.href || (item.href !== '/log' && pathname.startsWith(item.href));
