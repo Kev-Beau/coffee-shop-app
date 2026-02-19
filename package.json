@@ -39,7 +39,8 @@
     "test:webkit": "playwright test --project=webkit-desktop",
     "verify:tests": "./scripts/verify-tests.sh",
     "debug:mobile": "node scripts/debug-mobile.js",
-    "debug:mobile:setup": "node scripts/debug-mobile.js"
+    "debug:mobile:setup": "node scripts/debug-mobile.js",
+    "deploy:status": "bash scripts/check-deployment.sh"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
