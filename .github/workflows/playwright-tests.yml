@@ -1,0 +1,114 @@
+name: Playwright Tests
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  schedule:
+    # Run tests daily at 2 AM UTC
+    - cron: '0 2 * * *'
+
+jobs:
+  test:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm ci --cache /tmp/npm-cache
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      - name: Build application
+        run: npm run build
+
+      - name: Run Playwright tests
+        run: npm test
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-traces
+          path: test-results/
+          retention-days: 7
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-screenshots
+          path: test-results/
+          retention-days: 7
+
+  # Job specifically for bottom navigation keyboard tests
+  test-bottom-nav:
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm ci --cache /tmp/npm-cache
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps chromium webkit
+
+      - name: Run bottom navigation tests
+        run: npm run test:bottom-nav
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bottom-nav-report
+          path: playwright-report/
+          retention-days: 30
+
+  # Job for mobile device testing
+  test-mobile:
+    timeout-minutes: 45
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm ci --cache /tmp/npm-cache
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      - name: Run mobile tests
+        run: npm run test:mobile
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mobile-tests-report
+          path: playwright-report/
+          retention-days: 30

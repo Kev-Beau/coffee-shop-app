@@ -12,6 +12,16 @@
 
 # testing
 /coverage
+/playwright-report
+/playwright/.cache
+/test-results
+
+# Playwright screenshots
+# Keep baseline screenshots but ignore test result screenshots
+visual-tests/*.png
+!visual-tests/**/*.png
+e2e/*.png
+!e2e/**/*.png
 
 # next.js
 /.next/
