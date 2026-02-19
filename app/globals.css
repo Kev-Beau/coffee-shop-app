@@ -427,13 +427,8 @@ body {
 
 /* iOS PWA keyboard interaction fix */
 @supports (-webkit-appearance: none) {
+  /* Keep body scrollable but handle viewport properly */
   body {
-    /* Prevent body scroll when keyboard is open */
-    position: fixed;
-    width: 100%;
-  }
-
-  body.keyboard-open {
     position: relative;
   }
 }
