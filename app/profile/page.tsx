@@ -3,11 +3,12 @@
 import { useState, useEffect, useContext } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
-import { Coffee, MapPin as MapPinLucide, Heart, Star, FileEdit } from 'lucide-react';
-import { PencilIcon, Squares2X2Icon, BookmarkIcon, MapPinIcon, UserGroupIcon } from '@heroicons/react/24/outline';
+import { Coffee, MapPin as MapPinLucide, Heart, Star, FileEdit, Globe, Users, Lock, Palette, X } from 'lucide-react';
+import { PencilIcon, Squares2X2Icon, BookmarkIcon, MapPinIcon, UserGroupIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
 import { db } from '@/lib/supabase';
 import { usePullToRefresh } from '../hooks/usePullToRefresh';
 import { useTheme } from '@/app/theme/config';
+import ThemeSwitcher from '@/app/components/ThemeSwitcher';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -71,8 +72,14 @@ export default function ProfilePage() {
     display_name: '',
     bio: '',
     username: '',
+    privacy_level: 'public' as 'public' | 'friends_only' | 'private',
+    favorite_drinks: [] as string[],
+    preferred_roast: '',
+    brewing_method: '',
+    coffee_strength: '',
   });
   const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -124,11 +131,16 @@ export default function ProfilePage() {
         setFavoriteDrinks(statsData.data.favorite_drinks?.slice(0, 3) || []);
       }
 
-      // Initialize edit form
+      // Initialize edit form with all settings
       setEditForm({
         display_name: profileData.display_name || '',
         bio: profileData.bio || '',
         username: profileData.username || '',
+        privacy_level: profileData.privacy_level || 'public',
+        favorite_drinks: profileData.favorite_drinks || [],
+        preferred_roast: profileData.preferred_roast || '',
+        brewing_method: profileData.brewing_method || '',
+        coffee_strength: profileData.coffee_strength || '',
       });
     } catch (error) {
       console.error('Error loading profile:', error);
@@ -215,11 +227,18 @@ export default function ProfilePage() {
   };
 
   const handleOpenEditModal = () => {
+    // Reset form with current profile data each time modal opens
     setEditForm({
       display_name: profile?.display_name || '',
       bio: profile?.bio || '',
       username: profile?.username || '',
+      privacy_level: profile?.privacy_level || 'public',
+      favorite_drinks: profile?.favorite_drinks || [],
+      preferred_roast: profile?.preferred_roast || '',
+      brewing_method: profile?.brewing_method || '',
+      coffee_strength: profile?.coffee_strength || '',
     });
+    setMessage(null);
     setShowEditModal(true);
   };
 
@@ -227,12 +246,19 @@ export default function ProfilePage() {
     if (!user) return;
 
     setSaving(true);
+    setMessage(null);
+
     try {
       const { error } = await supabase
         .from('profiles')
         .update({
           display_name: editForm.display_name,
           bio: editForm.bio,
+          privacy_level: editForm.privacy_level,
+          favorite_drinks: editForm.favorite_drinks,
+          preferred_roast: editForm.preferred_roast,
+          brewing_method: editForm.brewing_method,
+          coffee_strength: editForm.coffee_strength,
         })
         .eq('id', user.id);
 
@@ -242,12 +268,22 @@ export default function ProfilePage() {
         ...profile,
         display_name: editForm.display_name,
         bio: editForm.bio,
+        privacy_level: editForm.privacy_level,
+        favorite_drinks: editForm.favorite_drinks,
+        preferred_roast: editForm.preferred_roast,
+        brewing_method: editForm.brewing_method,
+        coffee_strength: editForm.coffee_strength,
       });
 
-      setShowEditModal(false);
+      setMessage({ type: 'success', text: 'Profile updated successfully!' });
+      setTimeout(() => {
+        setShowEditModal(false);
+        setMessage(null);
+        window.location.reload();
+      }, 1000);
     } catch (error) {
       console.error('Error saving profile:', error);
-      alert('Failed to save profile. Please try again.');
+      setMessage({ type: 'error', text: 'Failed to save profile. Please try again.' });
     } finally {
       setSaving(false);
     }
@@ -400,8 +436,8 @@ export default function ProfilePage() {
                         <div className="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xs shrink-0">
                           {index + 1}
                         </div>
-                        <p className="font-sans font-medium text-gray-900">
-                          {shop.shop_name} • {shop.visit_count} visit{shop.visit_count > 1 ? 's' : ''}
+                        <p className="font-sans font-medium text-gray-900 truncate">
+                          {shop.shop_name.length > 22 ? shop.shop_name.substring(0, 22) + '...' : shop.shop_name} • {shop.visit_count} visit{shop.visit_count > 1 ? 's' : ''}
                         </p>
                       </div>
                     ))}
@@ -665,68 +701,296 @@ export default function ProfilePage() {
         </div>
       )}
 
-      {/* Edit Profile Modal */}
+      {/* Edit Profile & Settings Modal */}
       {showEditModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center">
           <div className="absolute inset-0 bg-black/50" onClick={() => setShowEditModal(false)} />
-          <div className="relative bg-white rounded-3xl shadow-xl max-w-md w-full max-h-[80vh] flex flex-col">
+          <div className="relative bg-white rounded-t-3xl sm:rounded-3xl shadow-xl w-full sm:max-w-lg max-h-[90vh] flex flex-col animate-slide-up">
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-gray-200">
-              <h3 className="text-xl font-bold text-gray-900">Edit Profile</h3>
+            <div className="flex items-center justify-between p-4 border-b border-gray-200 sticky top-0 bg-white z-10">
+              <h3 className="text-xl font-bold text-gray-900">Edit Profile & Settings</h3>
               <button
                 onClick={() => setShowEditModal(false)}
                 className="p-2 hover:bg-gray-100 rounded-full transition"
               >
-                <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <X className="w-6 h-6 text-gray-600" />
               </button>
             </div>
 
-            {/* Form */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            {/* Message */}
+            {message && (
+              <div className={`mx-4 mt-4 p-3 rounded-lg ${
+                message.type === 'success'
+                  ? 'bg-green-100 text-green-800 border border-green-200'
+                  : 'bg-red-100 text-red-800 border border-red-200'
+              }`}>
+                {message.text}
+              </div>
+            )}
+
+            {/* Scrollable Form */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-6">
+              {/* Basic Info */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Display Name</label>
-                <input
-                  type="text"
-                  value={editForm.display_name}
-                  onChange={(e) => setEditForm({ ...editForm, display_name: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                  placeholder="Your display name"
-                />
+                <h4 className="text-sm font-semibold text-gray-900 uppercase tracking-wide mb-3">Basic Info</h4>
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Display Name</label>
+                    <input
+                      type="text"
+                      value={editForm.display_name}
+                      onChange={(e) => setEditForm({ ...editForm, display_name: e.target.value })}
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                      placeholder="Your display name"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                    <input
+                      type="text"
+                      value={editForm.username}
+                      disabled
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Username cannot be changed</p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Bio</label>
+                    <textarea
+                      value={editForm.bio}
+                      onChange={(e) => setEditForm({ ...editForm, bio: e.target.value })}
+                      rows={3}
+                      maxLength={300}
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
+                      placeholder="Tell us about your coffee journey..."
+                    />
+                    <p className="text-xs text-gray-500 mt-1">{editForm.bio.length}/300 characters</p>
+                  </div>
+                </div>
               </div>
 
+              {/* Privacy */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Username @{profile?.username}</label>
-                <p className="text-xs text-gray-500">Username cannot be changed</p>
+                <h4 className="text-sm font-semibold text-gray-900 uppercase tracking-wide mb-3">Privacy</h4>
+                <div className="space-y-2">
+                  {[
+                    { value: 'public', label: 'Public', description: 'Anyone can view your profile', icon: <Globe className="w-5 h-5" /> },
+                    { value: 'friends_only', label: 'Friends Only', description: 'Only friends can view your profile', icon: <Users className="w-5 h-5" /> },
+                    { value: 'private', label: 'Private', description: 'Only you can view your profile', icon: <Lock className="w-5 h-5" /> },
+                  ].map((option) => (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => setEditForm({ ...editForm, privacy_level: option.value as any })}
+                      className={`w-full p-3 rounded-lg border-2 text-left transition ${
+                        editForm.privacy_level === option.value
+                          ? 'border-primary bg-primary-lighter'
+                          : 'border-gray-200 hover:border-primary'
+                      }`}
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="text-gray-600">
+                            {option.icon}
+                          </div>
+                          <div>
+                            <p className="font-semibold text-gray-900 text-sm">
+                              {option.label}
+                            </p>
+                            <p className="text-xs text-gray-600">{option.description}</p>
+                          </div>
+                        </div>
+                        {editForm.privacy_level === option.value && (
+                          <div className="w-5 h-5 rounded-full border-2 border-primary flex items-center justify-center shrink-0">
+                            <div className="w-3 h-3 rounded-full bg-primary" />
+                          </div>
+                        )}
+                      </div>
+                    </button>
+                  ))}
+                </div>
               </div>
 
+              {/* Coffee Preferences */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Bio</label>
-                <textarea
-                  value={editForm.bio}
-                  onChange={(e) => setEditForm({ ...editForm, bio: e.target.value })}
-                  rows={3}
-                  maxLength={150}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
-                  placeholder="Tell us about your coffee journey..."
-                />
-                <p className="text-xs text-gray-500 mt-1">{editForm.bio.length}/150 characters</p>
+                <h4 className="text-sm font-semibold text-gray-900 uppercase tracking-wide mb-3 flex items-center gap-2">
+                  <Coffee className="w-4 h-4 text-primary" />
+                  Coffee Preferences
+                </h4>
+
+                {/* Favorite Drinks */}
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Favorite Drinks</label>
+                  <div className="flex flex-wrap gap-2">
+                    {['Espresso', 'Latte', 'Cappuccino', 'Americano', 'Cold Brew', 'Pour Over'].map(drink => (
+                      <button
+                        key={drink}
+                        type="button"
+                        onClick={() => {
+                          const drinks = editForm.favorite_drinks || [];
+                          setEditForm({
+                            ...editForm,
+                            favorite_drinks: drinks.includes(drink)
+                              ? drinks.filter(d => d !== drink)
+                              : [...drinks, drink]
+                          });
+                        }}
+                        className={`px-3 py-2 rounded-lg border-2 text-sm font-medium transition ${
+                          (editForm.favorite_drinks || []).includes(drink)
+                            ? 'border-primary bg-primary text-white'
+                            : 'border-gray-300 text-gray-700 hover:border-primary'
+                        }`}
+                      >
+                        {drink}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Roast, Brewing, Strength */}
+                <div className="grid grid-cols-1 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Roast Level</label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {['Light', 'Medium', 'Dark'].map(roast => (
+                        <button
+                          key={roast}
+                          type="button"
+                          onClick={() => setEditForm({ ...editForm, preferred_roast: roast })}
+                          className={`py-2 rounded-lg border-2 text-sm font-medium transition ${
+                            editForm.preferred_roast === roast
+                              ? 'border-primary bg-primary text-white'
+                              : 'border-gray-300 text-gray-700 hover:border-primary'
+                          }`}
+                        >
+                          {roast}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Brewing Method</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {['Espresso', 'Pour Over', 'French Press', 'Cold Brew', 'Drip', 'Aeropress'].map(method => (
+                        <button
+                          key={method}
+                          type="button"
+                          onClick={() => setEditForm({ ...editForm, brewing_method: method })}
+                          className={`py-2 rounded-lg border-2 text-sm font-medium transition ${
+                            editForm.brewing_method === method
+                              ? 'border-primary bg-primary text-white'
+                              : 'border-gray-300 text-gray-700 hover:border-primary'
+                          }`}
+                        >
+                          {method}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Strength Preference</label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {['Mild', 'Medium', 'Strong'].map(strength => (
+                        <button
+                          key={strength}
+                          type="button"
+                          onClick={() => setEditForm({ ...editForm, coffee_strength: strength })}
+                          className={`py-2 rounded-lg border-2 text-sm font-medium transition ${
+                            editForm.coffee_strength === strength
+                              ? 'border-primary bg-primary text-white'
+                              : 'border-gray-300 text-gray-700 hover:border-primary'
+                          }`}
+                        >
+                          {strength}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Appearance */}
+              <div>
+                <h4 className="text-sm font-semibold text-gray-900 uppercase tracking-wide mb-3 flex items-center gap-2">
+                  <Palette className="w-4 h-4 text-primary" />
+                  Appearance
+                </h4>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Theme</label>
+                  <p className="text-xs text-gray-500 mb-3">Choose your preferred color theme</p>
+                  <ThemeSwitcher />
+                </div>
+              </div>
+
+              {/* Danger Zone */}
+              <div className="pt-4 border-t border-gray-200">
+                <h4 className="text-sm font-semibold text-red-600 uppercase tracking-wide mb-3">Danger Zone</h4>
+                <div className="space-y-2">
+                  <button
+                    onClick={async () => {
+                      if (confirm('Are you sure you want to sign out?')) {
+                        await supabase.auth.signOut();
+                        router.push('/');
+                      }
+                    }}
+                    className="w-full px-4 py-3 text-left text-gray-700 hover:bg-gray-50 transition rounded-lg border border-gray-200 font-medium"
+                  >
+                    Sign Out
+                  </button>
+                  <button
+                    onClick={() => {
+                      const confirmation1 = confirm('Are you sure you want to delete your account? This action CANNOT be undone.');
+                      if (!confirmation1) return;
+
+                      const confirmation2 = confirm('This will PERMANENTLY delete:\n\n• Your profile and settings\n• All your posts and visits\n• All your friends and friend requests\n• All your comments and likes\n\nYour account cannot be recovered.\n\nContinue?');
+                      if (!confirmation2) return;
+
+                      const confirmation3 = prompt('Type "DELETE" to confirm account deletion:');
+                      if (confirmation3 !== 'DELETE') {
+                        alert('Account deletion cancelled.');
+                        return;
+                      }
+
+                      fetch('/api/delete-account', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ userId: user.id }),
+                      }).then(async (response) => {
+                        if (!response.ok) {
+                          const error = await response.json();
+                          throw new Error(error.error || 'Failed to delete account');
+                        }
+                        return supabase.auth.signOut();
+                      }).then(() => {
+                        router.push('/');
+                      }).catch((error: any) => {
+                        setMessage({ type: 'error', text: `Failed to delete account: ${error.message}` });
+                      });
+                    }}
+                    className="w-full px-4 py-3 text-left text-red-600 hover:bg-red-50 transition rounded-lg border border-red-200 font-medium"
+                  >
+                    Delete Account
+                  </button>
+                </div>
               </div>
             </div>
 
             {/* Actions */}
-            <div className="p-4 border-t border-gray-200 flex gap-3">
+            <div className="p-4 border-t border-gray-200 flex gap-3 sticky bottom-0 bg-white">
               <button
                 onClick={() => setShowEditModal(false)}
-                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition"
+                className="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSaveProfile}
                 disabled={saving}
-                className="flex-1 px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary-dark transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 px-4 py-2.5 bg-primary text-white rounded-lg font-medium hover:bg-primary-dark transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {saving ? 'Saving...' : 'Save Changes'}
               </button>
