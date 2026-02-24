@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, ReactNode } from 'react';
+import { useState, useEffect, ReactNode, useRef } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import {
   HomeIcon,
@@ -16,7 +16,7 @@ import {
   UserGroupIcon as UserGroupIconSolid,
   UserIcon as UserIconSolid,
 } from '@heroicons/react/24/solid';
-import { motion, useMotionValue, useTransform, PanInfo } from 'framer-motion';
+import { motion, useMotionValue, useTransform, PanInfo, AnimatePresence } from 'framer-motion';
 
 interface Tab {
   id: string;
@@ -45,6 +45,9 @@ export default function SwipeNavigation({ children }: SwipeNavigationProps) {
   const [showCurrentTab, setShowCurrentTab] = useState(true);
   const [dragOffset, setDragOffset] = useState(0);
   const [dragDirection, setDragDirection] = useState<'left' | 'right' | null>(null);
+  const [isNavigating, setIsNavigating] = useState(false);
+  const [pageReady, setPageReady] = useState(true);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   // Find current tab index
   useEffect(() => {
@@ -76,31 +79,55 @@ export default function SwipeNavigation({ children }: SwipeNavigationProps) {
     return () => clearTimeout(timer);
   }, [pathname]);
 
+  // Mark page as ready after content loads
+  useEffect(() => {
+    setPageReady(false);
+    const timer = setTimeout(() => {
+      setPageReady(true);
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [pathname, children]);
+
   const currentTab = tabs[currentTabIndex];
   const CurrentIcon = currentTab?.solidIcon || currentTab?.icon;
 
-  const handleDragEnd = (event: any, info: PanInfo) => {
+  const handleDragEnd = async (event: any, info: PanInfo) => {
     const swipeThreshold = 100;
     const { offset } = info;
 
     if (offset.x < -swipeThreshold && currentTabIndex < tabs.length - 1) {
       // Swiped left - go to next tab
-      setTargetTab(tabs[currentTabIndex + 1]);
+      const nextTab = tabs[currentTabIndex + 1];
+      setTargetTab(nextTab);
+      setIsNavigating(true);
+
+      // Small delay for smooth animation
+      await new Promise(resolve => setTimeout(resolve, 150));
+      router.push(nextTab.path);
+
       setTimeout(() => {
-        router.push(tabs[currentTabIndex + 1].path);
         setTargetTab(null);
-      }, 200);
+        setIsNavigating(false);
+      }, 300);
     } else if (offset.x > swipeThreshold && currentTabIndex > 0) {
       // Swiped right - go to previous tab
-      setTargetTab(tabs[currentTabIndex - 1]);
+      const prevTab = tabs[currentTabIndex - 1];
+      setTargetTab(prevTab);
+      setIsNavigating(true);
+
+      await new Promise(resolve => setTimeout(resolve, 150));
+      router.push(prevTab.path);
+
       setTimeout(() => {
-        router.push(tabs[currentTabIndex - 1].path);
         setTargetTab(null);
-      }, 200);
+        setIsNavigating(false);
+      }, 300);
     }
   };
 
   const handleDrag = (event: any, info: PanInfo) => {
+    if (isNavigating) return;
+
     const dragThreshold = 50;
 
     // Track drag offset and direction
@@ -120,6 +147,7 @@ export default function SwipeNavigation({ children }: SwipeNavigationProps) {
   };
 
   const handleDragStart = () => {
+    if (isNavigating) return;
     setTargetTab(null);
     setDragDirection(null);
     setDragOffset(0);
@@ -129,9 +157,9 @@ export default function SwipeNavigation({ children }: SwipeNavigationProps) {
 
   return (
     <motion.div
-      drag="x"
+      drag={isNavigating ? false : "x"}
       dragConstraints={{ left: 0, right: 0 }}
-      dragElastic={0.2}
+      dragElastic={0.15}
       onDragStart={handleDragStart}
       onDrag={handleDrag}
       onDragEnd={handleDragEnd}
@@ -139,124 +167,154 @@ export default function SwipeNavigation({ children }: SwipeNavigationProps) {
       style={{ touchAction: 'pan-y' }}
     >
       {/* Swipe hint arrows with navigation indicators */}
-      {(showHints || targetTab) && (
-        <>
-          {/* Left side - swiping right to previous tab */}
-          {currentTabIndex > 0 && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8, x: -30 }}
-              animate={{
-                opacity: targetTab && dragDirection === 'right' ? 1 : 0.4,
-                scale: targetTab && dragDirection === 'right' ? 1 : 0.9,
-                x: Math.max(-30, dragOffset * 0.3),
-              }}
-              transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-              className="fixed left-4 top-1/2 -translate-y-1/2 z-50 pointer-events-none flex items-center gap-2"
-            >
-              <div className="bg-gray-900/95 backdrop-blur-sm rounded-full p-3 shadow-xl">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
-                </svg>
-              </div>
-              {targetTab && dragDirection === 'right' && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.8, x: -10 }}
-                  animate={{ opacity: 1, scale: 1, x: 0 }}
-                  transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-                  className="bg-gray-900/95 backdrop-blur-sm text-white px-4 py-2 rounded-full shadow-xl flex items-center gap-2 whitespace-nowrap"
-                >
-                  {(() => {
-                    const Icon = targetIcon;
-                    return Icon && <Icon className="w-4 h-4" />;
-                  })()}
-                  <span className="text-sm font-semibold">{targetTab.label}</span>
-                </motion.div>
-              )}
-            </motion.div>
-          )}
+      <AnimatePresence>
+        {(showHints || targetTab) && (
+          <>
+            {/* Left side - swiping right to previous tab */}
+            {currentTabIndex > 0 && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.85, x: -40 }}
+                animate={{
+                  opacity: targetTab && dragDirection === 'right' ? 1 : 0.5,
+                  scale: targetTab && dragDirection === 'right' ? 1 : 0.92,
+                  x: Math.max(-40, dragOffset * 0.25),
+                }}
+                exit={{ opacity: 0, scale: 0.8, x: -40 }}
+                transition={{ type: 'spring', stiffness: 260, damping: 22 }}
+                className="fixed left-4 top-1/2 -translate-y-1/2 z-50 pointer-events-none flex items-center gap-2"
+              >
+                <div className="bg-gray-900/95 backdrop-blur-md rounded-full p-3.5 shadow-2xl border border-white/10">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </div>
+                {targetTab && dragDirection === 'right' && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.85, x: -15 }}
+                    animate={{ opacity: 1, scale: 1, x: 0 }}
+                    exit={{ opacity: 0, scale: 0.9, x: -10 }}
+                    transition={{ type: 'spring', stiffness: 380, damping: 22 }}
+                    className="bg-gray-900/95 backdrop-blur-md text-white px-4 py-2.5 rounded-full shadow-2xl flex items-center gap-2.5 whitespace-nowrap border border-white/10"
+                  >
+                    {(() => {
+                      const Icon = targetIcon;
+                      return Icon && <Icon className="w-4.5 h-4.5" />;
+                    })()}
+                    <span className="text-sm font-semibold tracking-tight">{targetTab.label}</span>
+                  </motion.div>
+                )}
+              </motion.div>
+            )}
 
-          {/* Right side - swiping left to next tab */}
-          {currentTabIndex < tabs.length - 1 && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8, x: 30 }}
-              animate={{
-                opacity: targetTab && dragDirection === 'left' ? 1 : 0.4,
-                scale: targetTab && dragDirection === 'left' ? 1 : 0.9,
-                x: Math.min(30, dragOffset * 0.3),
-              }}
-              transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-              className="fixed right-4 top-1/2 -translate-y-1/2 z-50 pointer-events-none flex items-center gap-2"
-            >
-              {targetTab && dragDirection === 'left' && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.8, x: 10 }}
-                  animate={{ opacity: 1, scale: 1, x: 0 }}
-                  transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-                  className="bg-gray-900/95 backdrop-blur-sm text-white px-4 py-2 rounded-full shadow-xl flex items-center gap-2 whitespace-nowrap"
-                >
-                  {(() => {
-                    const Icon = targetIcon;
-                    return Icon && <Icon className="w-4 h-4" />;
-                  })()}
-                  <span className="text-sm font-semibold">{targetTab.label}</span>
-                </motion.div>
-              )}
-              <div className="bg-gray-900/95 backdrop-blur-sm rounded-full p-3 shadow-xl">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
-                </svg>
-              </div>
-            </motion.div>
-          )}
-        </>
-      )}
+            {/* Right side - swiping left to next tab */}
+            {currentTabIndex < tabs.length - 1 && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.85, x: 40 }}
+                animate={{
+                  opacity: targetTab && dragDirection === 'left' ? 1 : 0.5,
+                  scale: targetTab && dragDirection === 'left' ? 1 : 0.92,
+                  x: Math.min(40, dragOffset * 0.25),
+                }}
+                exit={{ opacity: 0, scale: 0.8, x: 40 }}
+                transition={{ type: 'spring', stiffness: 260, damping: 22 }}
+                className="fixed right-4 top-1/2 -translate-y-1/2 z-50 pointer-events-none flex items-center gap-2"
+              >
+                {targetTab && dragDirection === 'left' && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.85, x: 15 }}
+                    animate={{ opacity: 1, scale: 1, x: 0 }}
+                    exit={{ opacity: 0, scale: 0.9, x: 10 }}
+                    transition={{ type: 'spring', stiffness: 380, damping: 22 }}
+                    className="bg-gray-900/95 backdrop-blur-md text-white px-4 py-2.5 rounded-full shadow-2xl flex items-center gap-2.5 whitespace-nowrap border border-white/10"
+                  >
+                    {(() => {
+                      const Icon = targetIcon;
+                      return Icon && <Icon className="w-4.5 h-4.5" />;
+                    })()}
+                    <span className="text-sm font-semibold tracking-tight">{targetTab.label}</span>
+                  </motion.div>
+                )}
+                <div className="bg-gray-900/95 backdrop-blur-md rounded-full p-3.5 shadow-2xl border border-white/10">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                  </svg>
+                </div>
+              </motion.div>
+            )}
+          </>
+        )}
+      </AnimatePresence>
 
       {/* Current tab indicator (top center) - auto-hides after 2 seconds */}
-      {currentTab && showCurrentTab && (
-        <motion.div
-          initial={{ opacity: 0, y: -20, scale: 0.9 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: -10, scale: 0.95 }}
-          transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-          className="fixed top-20 left-1/2 -translate-x-1/2 z-40"
-        >
-          <div className="bg-gray-900/95 backdrop-blur-sm rounded-full px-5 py-2.5 shadow-xl flex items-center gap-2">
-            {CurrentIcon && <CurrentIcon className="w-5 h-5 text-white" />}
-            <span className="text-sm font-semibold text-white">{currentTab.label}</span>
-          </div>
-        </motion.div>
-      )}
+      <AnimatePresence>
+        {currentTab && showCurrentTab && (
+          <motion.div
+            initial={{ opacity: 0, y: -25, scale: 0.88 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -15, scale: 0.92 }}
+            transition={{ type: 'spring', stiffness: 380, damping: 24 }}
+            className="fixed top-20 left-1/2 -translate-x-1/2 z-40"
+          >
+            <div className="bg-gray-900/95 backdrop-blur-md rounded-full px-6 py-3 shadow-2xl flex items-center gap-2.5 border border-white/10">
+              {CurrentIcon && <CurrentIcon className="w-5 h-5 text-white" />}
+              <span className="text-sm font-semibold text-white tracking-tight">{currentTab.label}</span>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Initial hints dismiss button */}
-      {showHints && (
-        <motion.button
-          initial={{ opacity: 0, y: 30, scale: 0.9 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 20, scale: 0.95 }}
-          transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-          onClick={() => setShowHints(false)}
-          className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 bg-gradient-to-r from-primary to-primary-dark text-white px-6 py-3 rounded-full text-sm font-medium shadow-xl hover:shadow-2xl transition-all"
-        >
-          Got it, thanks! ✨
-        </motion.button>
-      )}
+      <AnimatePresence>
+        {showHints && (
+          <motion.button
+            initial={{ opacity: 0, y: 35, scale: 0.88 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 25, scale: 0.92 }}
+            transition={{ type: 'spring', stiffness: 320, damping: 24 }}
+            onClick={() => setShowHints(false)}
+            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 bg-gradient-to-r from-gray-900 to-gray-800 text-white px-6 py-3 rounded-full text-sm font-medium shadow-2xl hover:shadow-3xl border border-white/10 transition-all"
+          >
+            Got it, thanks! ✨
+          </motion.button>
+        )}
+      </AnimatePresence>
+
+      {/* Loading overlay during navigation */}
+      <AnimatePresence>
+        {isNavigating && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-white/80 backdrop-blur-sm z-30 flex items-center justify-center"
+          >
+            <div className="flex flex-col items-center gap-3">
+              <div className="w-10 h-10 border-3 border-primary border-t-transparent rounded-full animate-spin" />
+              <p className="text-sm font-medium text-gray-700">Loading...</p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Main content with smooth transitions */}
-      <motion.div
-        key={pathname}
-        initial={{ opacity: 0, scale: 0.98, y: 10 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 1.02, y: -10 }}
-        transition={{
-          type: 'spring',
-          stiffness: 350,
-          damping: 30,
-          opacity: { duration: 0.2 }
-        }}
-        className="min-h-screen"
-      >
-        {children}
-      </motion.div>
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={pathname}
+          ref={contentRef}
+          initial={{ opacity: 0, scale: 0.97, y: 15 }}
+          animate={{ opacity: pageReady ? 1 : 0, scale: pageReady ? 1 : 0.97, y: pageReady ? 0 : 15 }}
+          exit={{ opacity: 0, scale: 1.03, y: -15 }}
+          transition={{
+            type: 'spring',
+            stiffness: 320,
+            damping: 28,
+            opacity: { duration: 0.25 }
+          }}
+          className="min-h-screen"
+        >
+          {children}
+        </motion.div>
+      </AnimatePresence>
     </motion.div>
   );
 }
