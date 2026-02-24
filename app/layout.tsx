@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import NavigationWrapper from "./components/NavigationWrapper";
-import BottomNavigationWrapper from "./components/BottomNavigationWrapper";
+import SwipeNavigationWrapper from "./components/SwipeNavigationWrapper";
 import { ThemeProvider } from "./theme/config";
 
 const geistSans = Geist({
@@ -63,8 +63,9 @@ export default function RootLayout({
       >
         <ThemeProvider>
           <NavigationWrapper />
-          {children}
-          <BottomNavigationWrapper />
+          <SwipeNavigationWrapper>
+            {children}
+          </SwipeNavigationWrapper>
         </ThemeProvider>
       </body>
     </html>

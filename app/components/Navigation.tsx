@@ -1,14 +1,12 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { Coffee } from 'lucide-react';
-import { Bars3Icon, XMarkIcon, MagnifyingGlassIcon, HomeIcon, UserGroupIcon, PlusIcon, UserIcon } from '@heroicons/react/24/outline';
+import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import NotificationBell from './NotificationBell';
-import { isIOSPWA } from '@/lib/detect-ios-pwa';
-import { useSwipeGestures } from '@/hooks/useSwipeGestures';
 
 interface NavItem {
   label: string;
@@ -22,23 +20,6 @@ export default function Navigation() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isIOSPWAMode, setIsIOSPWAMode] = useState(false);
-  const navRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    // Detect iOS PWA mode
-    setIsIOSPWAMode(isIOSPWA());
-  }, []);
-
-  // Swipe right to open menu, swipe left to close
-  useSwipeGestures(
-    navRef,
-    {
-      onSwipeRight: () => setMobileMenuOpen(true),
-      onSwipeLeft: () => setMobileMenuOpen(false),
-    },
-    { threshold: 50 }
-  );
 
   useEffect(() => {
     if (!isSupabaseConfigured || !supabase) {
@@ -75,12 +56,9 @@ export default function Navigation() {
     { label: 'About', href: '/about', icon: 'ℹ️' },
   ];
 
+  // Main navigation is now handled by swipe gestures
   const loggedInNav: NavItem[] = [
-    { label: 'Feed', href: '/feed', icon: '🏠' },
-    { label: 'Search', href: '/search', icon: '🔍' },
-    { label: 'Log Coffee', href: '/log', icon: '☕' },
-    { label: 'Friends', href: '/friends', icon: '👥' },
-    { label: 'Profile', href: '/profile', icon: '👤' },
+    // Empty - main nav is via swipe gestures
   ];
 
   const currentNav = user ? loggedInNav : loggedOutNav;
@@ -97,7 +75,7 @@ export default function Navigation() {
   }
 
   return (
-    <nav ref={navRef} className="sticky top-0 z-50 bg-white border-b border-gray-200">
+    <nav className="sticky top-0 z-50 bg-white border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-14">
           {/* Logo */}
@@ -196,6 +174,14 @@ export default function Navigation() {
 
             {user ? (
               <>
+                {/* Swipe navigation hint */}
+                {currentNav.length === 0 && (
+                  <div className="px-3 py-2 text-sm text-gray-500 text-right">
+                    <p>Swipe left/right to navigate</p>
+                    <p className="text-xs mt-1">← Feed → Search → Log → Friends → Profile →</p>
+                  </div>
+                )}
+
                 <Link
                   href="/settings"
                   className={`block px-3 py-3 rounded-lg transition ${
