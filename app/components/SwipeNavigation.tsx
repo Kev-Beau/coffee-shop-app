@@ -146,15 +146,15 @@ export default function SwipeNavigation({ children }: SwipeNavigationProps) {
             <motion.div
               initial={{ opacity: 0, scale: 0.8, x: -30 }}
               animate={{
-                opacity: targetTab && dragDirection === 'right' ? 1 : 0.3,
+                opacity: targetTab && dragDirection === 'right' ? 1 : 0.4,
                 scale: targetTab && dragDirection === 'right' ? 1 : 0.9,
                 x: Math.max(-30, dragOffset * 0.3),
               }}
               transition={{ type: 'spring', stiffness: 300, damping: 25 }}
               className="fixed left-4 top-1/2 -translate-y-1/2 z-50 pointer-events-none flex items-center gap-2"
             >
-              <div className="bg-white/95 backdrop-blur-sm rounded-full p-3 shadow-xl border-2 border-primary/20">
-                <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="bg-gray-900/95 backdrop-blur-sm rounded-full p-3 shadow-xl">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
                 </svg>
               </div>
@@ -163,13 +163,13 @@ export default function SwipeNavigation({ children }: SwipeNavigationProps) {
                   initial={{ opacity: 0, scale: 0.8, x: -10 }}
                   animate={{ opacity: 1, scale: 1, x: 0 }}
                   transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-                  className="bg-primary/95 backdrop-blur-sm text-white px-4 py-2 rounded-full shadow-xl flex items-center gap-2 whitespace-nowrap"
+                  className="bg-gray-900/95 backdrop-blur-sm text-white px-4 py-2 rounded-full shadow-xl flex items-center gap-2 whitespace-nowrap"
                 >
                   {(() => {
                     const Icon = targetIcon;
                     return Icon && <Icon className="w-4 h-4" />;
                   })()}
-                  <span className="text-sm font-medium">{targetTab.label}</span>
+                  <span className="text-sm font-semibold">{targetTab.label}</span>
                 </motion.div>
               )}
             </motion.div>
@@ -180,7 +180,7 @@ export default function SwipeNavigation({ children }: SwipeNavigationProps) {
             <motion.div
               initial={{ opacity: 0, scale: 0.8, x: 30 }}
               animate={{
-                opacity: targetTab && dragDirection === 'left' ? 1 : 0.3,
+                opacity: targetTab && dragDirection === 'left' ? 1 : 0.4,
                 scale: targetTab && dragDirection === 'left' ? 1 : 0.9,
                 x: Math.min(30, dragOffset * 0.3),
               }}
@@ -192,17 +192,17 @@ export default function SwipeNavigation({ children }: SwipeNavigationProps) {
                   initial={{ opacity: 0, scale: 0.8, x: 10 }}
                   animate={{ opacity: 1, scale: 1, x: 0 }}
                   transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-                  className="bg-primary/95 backdrop-blur-sm text-white px-4 py-2 rounded-full shadow-xl flex items-center gap-2 whitespace-nowrap"
+                  className="bg-gray-900/95 backdrop-blur-sm text-white px-4 py-2 rounded-full shadow-xl flex items-center gap-2 whitespace-nowrap"
                 >
                   {(() => {
                     const Icon = targetIcon;
                     return Icon && <Icon className="w-4 h-4" />;
                   })()}
-                  <span className="text-sm font-medium">{targetTab.label}</span>
+                  <span className="text-sm font-semibold">{targetTab.label}</span>
                 </motion.div>
               )}
-              <div className="bg-white/95 backdrop-blur-sm rounded-full p-3 shadow-xl border-2 border-primary/20">
-                <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="bg-gray-900/95 backdrop-blur-sm rounded-full p-3 shadow-xl">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
                 </svg>
               </div>
@@ -220,9 +220,9 @@ export default function SwipeNavigation({ children }: SwipeNavigationProps) {
           transition={{ type: 'spring', stiffness: 400, damping: 25 }}
           className="fixed top-20 left-1/2 -translate-x-1/2 z-40"
         >
-          <div className="bg-white/95 backdrop-blur-sm rounded-full px-5 py-2.5 shadow-xl border-2 border-primary/20 flex items-center gap-2">
-            {CurrentIcon && <CurrentIcon className="w-5 h-5 text-primary" />}
-            <span className="text-sm font-semibold text-gray-800">{currentTab.label}</span>
+          <div className="bg-gray-900/95 backdrop-blur-sm rounded-full px-5 py-2.5 shadow-xl flex items-center gap-2">
+            {CurrentIcon && <CurrentIcon className="w-5 h-5 text-white" />}
+            <span className="text-sm font-semibold text-white">{currentTab.label}</span>
           </div>
         </motion.div>
       )}
