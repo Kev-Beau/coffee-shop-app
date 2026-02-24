@@ -423,9 +423,9 @@ export default function ProfilePage() {
               {/* Inline Stats - Top 3 Most Visited Shops - Podium Layout */}
               {mostVisitedShops.length > 0 && (
                 <div className="mb-4 p-5 bg-white rounded-2xl shadow-sm border border-gray-100">
-                  <div className="flex items-center gap-2 mb-5">
-                    <MapPinIcon className="w-4 h-4 text-primary" />
-                    <h3 className="text-sm font-semibold text-gray-900">Top Spots</h3>
+                  <div className="text-center mb-5">
+                    <h3 className="text-lg font-bold text-gray-900">Top Spots</h3>
+                    <p className="text-xs text-gray-500 mt-1">Your most visited coffee shops</p>
                   </div>
                   <div className="flex items-end justify-center gap-3 min-h-[140px]">
                     {mostVisitedShops.map((shop, index) => {
@@ -489,27 +489,72 @@ export default function ProfilePage() {
                 </div>
               )}
 
-              {/* Inline Stats - Top 3 Favorite Drinks */}
+              {/* Inline Stats - Top 3 Favorite Drinks - Coffee Cup Layout */}
               {favoriteDrinks.length > 0 && (
-                <div className="mb-4 p-4 bg-white rounded-2xl shadow-sm border border-gray-100">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Coffee className="w-4 h-4 text-primary" />
-                    <h3 className="text-sm font-semibold text-gray-900">Favorites</h3>
+                <div className="mb-4 p-5 bg-white rounded-2xl shadow-sm border border-gray-100">
+                  <div className="text-center mb-4">
+                    <h3 className="text-lg font-bold text-gray-900">Favorite Drinks</h3>
+                    <p className="text-xs text-gray-500 mt-1">Your most ordered beverages</p>
                   </div>
-                  <div className="space-y-2">
-                    {favoriteDrinks.map((drink, index) => (
-                      <div
-                        key={drink.drink_name}
-                        className="flex items-center gap-2 text-sm"
-                      >
-                        <div className="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xs shrink-0">
-                          {index + 1}
+                  <div className="space-y-3">
+                    {favoriteDrinks.map((drink, index) => {
+                      const isFirst = index === 0;
+                      const isSecond = index === 1;
+                      const isThird = index === 2;
+
+                      let bgGradient = 'from-amber-100/40 to-amber-50/40';
+                      let borderColor = 'border-amber-200/60';
+                      let iconBg = 'bg-amber-500';
+                      let starColor = 'text-amber-500';
+
+                      if (isSecond) {
+                        bgGradient = 'from-gray-100/40 to-gray-50/40';
+                        borderColor = 'border-gray-200/60';
+                        iconBg = 'bg-gray-400';
+                        starColor = 'text-gray-400';
+                      } else if (isThird) {
+                        bgGradient = 'from-orange-100/40 to-orange-50/40';
+                        borderColor = 'border-orange-200/60';
+                        iconBg = 'bg-orange-600';
+                        starColor = 'text-orange-500';
+                      }
+
+                      return (
+                        <div
+                          key={drink.drink_name}
+                          className={`relative bg-gradient-to-r ${bgGradient} rounded-xl p-4 border-2 ${borderColor} shadow-sm`}
+                        >
+                          <div className="flex items-center gap-3">
+                            {/* Coffee cup icon with rank */}
+                            <div className={`w-12 h-12 ${iconBg} rounded-full flex items-center justify-center shadow-md shrink-0`}>
+                              <Coffee className="w-6 h-6 text-white" />
+                            </div>
+
+                            {/* Drink info */}
+                            <div className="flex-1 min-w-0">
+                              <p className="text-base font-bold text-gray-900 truncate">
+                                {drink.drink_name}
+                              </p>
+                              <div className="flex items-center gap-3 mt-1">
+                                <span className="text-sm text-gray-600 font-medium">
+                                  {drink.post_count} post{drink.post_count > 1 ? 's' : ''}
+                                </span>
+                                <span className="text-gray-300">•</span>
+                                <div className="flex items-center gap-1">
+                                  <Star className={`w-4 h-4 ${starColor} fill-current`} />
+                                  <span className="text-sm font-semibold text-gray-700">{drink.avg_rating.toFixed(1)}</span>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Rank badge */}
+                            <div className={`w-8 h-8 rounded-lg ${iconBg} flex items-center justify-center shadow-sm shrink-0`}>
+                              <span className="text-white font-bold text-sm">{index + 1}</span>
+                            </div>
+                          </div>
                         </div>
-                        <p className="font-sans font-medium text-gray-900">
-                          {drink.drink_name} • {drink.post_count} post{drink.post_count > 1 ? 's' : ''} • {drink.avg_rating.toFixed(1)}★
-                        </p>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               )}
