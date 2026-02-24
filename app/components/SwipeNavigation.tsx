@@ -28,7 +28,7 @@ interface Tab {
 
 const tabs: Tab[] = [
   { id: 'explore', path: '/feed', icon: HomeIcon, solidIcon: HomeIconSolid, label: 'Explore' },
-  { id: 'log', path: '/log', icon: PlusIcon, solidIcon: PlusIconSolid, label: 'Log' },
+  { id: 'log', path: '/search', icon: PlusIcon, solidIcon: PlusIconSolid, label: 'Log' },
   { id: 'profile', path: '/profile', icon: UserIcon, solidIcon: UserIconSolid, label: 'Profile' },
 ];
 
@@ -49,7 +49,7 @@ export default function SwipeNavigation({ children }: SwipeNavigationProps) {
   useEffect(() => {
     const index = tabs.findIndex(tab => {
       if (tab.id === 'log') {
-        return pathname === '/search' || pathname === '/log' || pathname.startsWith('/search') || pathname.startsWith('/log');
+        return pathname === '/search' || pathname.startsWith('/search');
       }
       return pathname === tab.path || pathname.startsWith(tab.path);
     });
