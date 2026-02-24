@@ -41,7 +41,6 @@ export default function SwipeNavigation({ children }: SwipeNavigationProps) {
   const pathname = usePathname();
   const [currentTabIndex, setCurrentTabIndex] = useState(0);
   const [targetTab, setTargetTab] = useState<Tab | null>(null);
-  const [showHints, setShowHints] = useState(true);
   const [showCurrentTab, setShowCurrentTab] = useState(true);
   const [dragOffset, setDragOffset] = useState(0);
   const [dragDirection, setDragDirection] = useState<'left' | 'right' | null>(null);
@@ -61,14 +60,6 @@ export default function SwipeNavigation({ children }: SwipeNavigationProps) {
       setCurrentTabIndex(index);
     }
   }, [pathname]);
-
-  // Hide hints after 5 seconds
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowHints(false);
-    }, 5000);
-    return () => clearTimeout(timer);
-  }, []);
 
   // Hide current tab indicator after 2 seconds
   useEffect(() => {
@@ -168,7 +159,7 @@ export default function SwipeNavigation({ children }: SwipeNavigationProps) {
     >
       {/* Swipe hint arrows with navigation indicators */}
       <AnimatePresence>
-        {(showHints || targetTab) && (
+        {targetTab && (
           <>
             {/* Left side - swiping right to previous tab */}
             {currentTabIndex > 0 && (
@@ -263,21 +254,6 @@ export default function SwipeNavigation({ children }: SwipeNavigationProps) {
         )}
       </AnimatePresence>
 
-      {/* Initial hints dismiss button */}
-      <AnimatePresence>
-        {showHints && (
-          <motion.button
-            initial={{ opacity: 0, y: 35, scale: 0.88 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 25, scale: 0.92 }}
-            transition={{ type: 'spring', stiffness: 320, damping: 24 }}
-            onClick={() => setShowHints(false)}
-            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 bg-gradient-to-r from-gray-900 to-gray-800 text-white px-6 py-3 rounded-full text-sm font-medium shadow-2xl hover:shadow-3xl border border-white/10 transition-all"
-          >
-            Got it, thanks! ✨
-          </motion.button>
-        )}
-      </AnimatePresence>
 
       {/* Loading overlay during navigation */}
       <AnimatePresence>

@@ -397,13 +397,12 @@ export default function ProfilePage() {
                         key={shop.shop_id}
                         className="flex items-center gap-2 text-sm"
                       >
-                        <div className="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xs">
+                        <div className="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xs shrink-0">
                           {index + 1}
                         </div>
-                        <div className="flex-1">
-                          <p className="font-medium text-gray-900">{shop.shop_name}</p>
-                          <p className="text-xs text-gray-500">{shop.visit_count} visit{shop.visit_count > 1 ? 's' : ''}</p>
-                        </div>
+                        <p className="font-sans font-medium text-gray-900">
+                          {shop.shop_name} • {shop.visit_count} visit{shop.visit_count > 1 ? 's' : ''}
+                        </p>
                       </div>
                     ))}
                   </div>
@@ -423,20 +422,12 @@ export default function ProfilePage() {
                         key={drink.drink_name}
                         className="flex items-center gap-2 text-sm"
                       >
-                        <div className="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xs">
+                        <div className="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xs shrink-0">
                           {index + 1}
                         </div>
-                        <div className="flex-1">
-                          <p className="font-medium text-gray-900">{drink.drink_name}</p>
-                          <div className="flex items-center gap-1 text-xs text-gray-500">
-                            <span>{drink.post_count} post{drink.post_count > 1 ? 's' : ''}</span>
-                            <span>•</span>
-                            <div className="flex items-center gap-1">
-                              <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
-                              <span>{drink.avg_rating.toFixed(1)}</span>
-                            </div>
-                          </div>
-                        </div>
+                        <p className="font-sans font-medium text-gray-900">
+                          {drink.drink_name} • {drink.post_count} post{drink.post_count > 1 ? 's' : ''} • {drink.avg_rating.toFixed(1)}★
+                        </p>
                       </div>
                     ))}
                   </div>
@@ -617,7 +608,7 @@ export default function ProfilePage() {
 
       {/* Friends Modal */}
       {showFriendsModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/50" onClick={() => setShowFriendsModal(false)} />
           <div className="relative bg-white rounded-3xl shadow-xl max-w-md w-full max-h-[80vh] flex flex-col">
             {/* Header */}
@@ -676,7 +667,7 @@ export default function ProfilePage() {
 
       {/* Edit Profile Modal */}
       {showEditModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/50" onClick={() => setShowEditModal(false)} />
           <div className="relative bg-white rounded-3xl shadow-xl max-w-md w-full max-h-[80vh] flex flex-col">
             {/* Header */}
