@@ -2,10 +2,21 @@
 
 import { useState, useEffect, ReactNode } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { ChevronLeftIcon, ChevronRightIcon, HomeIcon, MagnifyingGlassIcon, UserGroupIcon, PlusIcon, UserIcon } from '@heroicons/react/24/outline';
-import { HomeIcon as HomeIconSolid, MagnifyingGlassIcon as MagnifyingGlassIconSolid, UserGroupIcon as UserGroupIconSolid, UserIcon as UserIconSolid } from '@heroicons/react/24/solid';
-import { useSwipeGestures } from '@/hooks/useSwipeGestures';
-import { useRef } from 'react';
+import {
+  HomeIcon,
+  MagnifyingGlassIcon,
+  PlusIcon,
+  UserGroupIcon,
+  UserIcon,
+} from '@heroicons/react/24/outline';
+import {
+  HomeIcon as HomeIconSolid,
+  MagnifyingGlassIcon as MagnifyingGlassIconSolid,
+  PlusIcon as PlusIconSolid,
+  UserGroupIcon as UserGroupIconSolid,
+  UserIcon as UserIconSolid,
+} from '@heroicons/react/24/solid';
+import { motion, useMotionValue, useTransform, PanInfo } from 'framer-motion';
 
 interface Tab {
   id: string;
@@ -17,8 +28,7 @@ interface Tab {
 
 const tabs: Tab[] = [
   { id: 'feed', path: '/feed', icon: HomeIcon, solidIcon: HomeIconSolid, label: 'Feed' },
-  { id: 'search', path: '/search', icon: MagnifyingGlassIcon, solidIcon: MagnifyingGlassIconSolid, label: 'Search' },
-  { id: 'log', path: '/log', icon: PlusIcon, solidIcon: PlusIcon, label: 'Log' },
+  { id: 'searchlog', path: '/search', icon: MagnifyingGlassIcon, solidIcon: MagnifyingGlassIconSolid, label: 'Search & Log' },
   { id: 'friends', path: '/friends', icon: UserGroupIcon, solidIcon: UserGroupIconSolid, label: 'Friends' },
   { id: 'profile', path: '/profile', icon: UserIcon, solidIcon: UserIconSolid, label: 'Profile' },
 ];
@@ -30,14 +40,18 @@ interface SwipeNavigationProps {
 export default function SwipeNavigation({ children }: SwipeNavigationProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const containerRef = useRef<HTMLDivElement>(null);
   const [currentTabIndex, setCurrentTabIndex] = useState(0);
-  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [targetTab, setTargetTab] = useState<Tab | null>(null);
   const [showHints, setShowHints] = useState(true);
 
   // Find current tab index
   useEffect(() => {
-    const index = tabs.findIndex(tab => pathname === tab.path || (tab.id !== 'log' && pathname.startsWith(tab.path)));
+    const index = tabs.findIndex(tab => {
+      if (tab.id === 'searchlog') {
+        return pathname === '/search' || pathname === '/log' || pathname.startsWith('/search') || pathname.startsWith('/log');
+      }
+      return pathname === tab.path || pathname.startsWith(tab.path);
+    });
     if (index !== -1) {
       setCurrentTabIndex(index);
     }
@@ -51,102 +65,159 @@ export default function SwipeNavigation({ children }: SwipeNavigationProps) {
     return () => clearTimeout(timer);
   }, []);
 
-  // Handle swipe navigation
-  useSwipeGestures(
-    containerRef,
-    {
-      onSwipeLeft: () => navigateToTab(currentTabIndex + 1),
-      onSwipeRight: () => navigateToTab(currentTabIndex - 1),
-    },
-    { threshold: 80, allowedTime: 500 }
-  );
+  const currentTab = tabs[currentTabIndex];
+  const CurrentIcon = currentTab?.solidIcon || currentTab?.icon;
 
-  const navigateToTab = (index: number) => {
-    if (isTransitioning) return;
+  const handleDragEnd = (event: any, info: PanInfo) => {
+    const swipeThreshold = 100;
+    const { offset } = info;
 
-    if (index >= 0 && index < tabs.length) {
-      setIsTransitioning(true);
-      router.push(tabs[index].path);
-
-      // Reset transition state after navigation completes
+    if (offset.x < -swipeThreshold && currentTabIndex < tabs.length - 1) {
+      // Swiped left - go to next tab
+      setTargetTab(tabs[currentTabIndex + 1]);
       setTimeout(() => {
-        setIsTransitioning(false);
-      }, 300);
+        router.push(tabs[currentTabIndex + 1].path);
+        setTargetTab(null);
+      }, 200);
+    } else if (offset.x > swipeThreshold && currentTabIndex > 0) {
+      // Swiped right - go to previous tab
+      setTargetTab(tabs[currentTabIndex - 1]);
+      setTimeout(() => {
+        router.push(tabs[currentTabIndex - 1].path);
+        setTargetTab(null);
+      }, 200);
     }
   };
 
-  const currentTab = tabs[currentTabIndex];
-  const prevTab = currentTabIndex > 0 ? tabs[currentTabIndex - 1] : null;
-  const nextTab = currentTabIndex < tabs.length - 1 ? tabs[currentTabIndex + 1] : null;
-  const PrevIcon = prevTab?.icon;
-  const NextIcon = nextTab?.icon;
-  const CurrentIcon = currentTab?.solidIcon || currentTab?.icon;
+  const handleDrag = (event: any, info: PanInfo) => {
+    const dragThreshold = 50;
+
+    // Show target tab during drag
+    if (info.offset.x < -dragThreshold && currentTabIndex < tabs.length - 1) {
+      setTargetTab(tabs[currentTabIndex + 1]);
+    } else if (info.offset.x > dragThreshold && currentTabIndex > 0) {
+      setTargetTab(tabs[currentTabIndex - 1]);
+    } else {
+      setTargetTab(null);
+    }
+  };
+
+  const handleDragStart = () => {
+    setTargetTab(null);
+  };
+
+  const targetIcon = targetTab?.solidIcon || targetTab?.icon;
 
   return (
-    <div ref={containerRef} className="relative min-h-screen">
-      {/* Left edge indicator */}
-      {prevTab && showHints && (
-        <div className="fixed left-2 top-1/2 -translate-y-1/2 z-50 flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity">
-          <div className="bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg border border-gray-200">
-            <ChevronLeftIcon className="w-6 h-6 text-primary" />
+    <motion.div
+      drag="x"
+      dragConstraints={{ left: 0, right: 0 }}
+      dragElastic={0.2}
+      onDragStart={handleDragStart}
+      onDrag={handleDrag}
+      onDragEnd={handleDragEnd}
+      className="relative min-h-screen"
+      style={{ touchAction: 'pan-y' }}
+    >
+      {/* Navigating indicator - shows during swipe */}
+      {targetTab && targetIcon && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          className="fixed top-24 left-1/2 -translate-x-1/2 z-50"
+        >
+          <div className="bg-primary/95 backdrop-blur-sm text-white px-6 py-3 rounded-full shadow-lg flex items-center gap-3">
+            {(() => {
+              const Icon = targetIcon;
+              return <Icon className="w-5 h-5" />;
+            })()}
+            <span className="font-medium">Navigating to {targetTab.label}</span>
           </div>
-          <div className="bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg border border-gray-200">
-            {PrevIcon && <PrevIcon className="w-6 h-6 text-gray-600" />}
-          </div>
-        </div>
+        </motion.div>
       )}
 
-      {/* Right edge indicator */}
-      {nextTab && showHints && (
-        <div className="fixed right-2 top-1/2 -translate-y-1/2 z-50 flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity">
-          <div className="bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg border border-gray-200">
-            {NextIcon && <NextIcon className="w-6 h-6 text-gray-600" />}
-          </div>
-          <div className="bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg border border-gray-200">
-            <ChevronRightIcon className="w-6 h-6 text-primary" />
-          </div>
-        </div>
+      {/* Swipe hint arrows - show during swipe */}
+      {(showHints || targetTab) && (
+        <>
+          {/* Left arrow - can swipe right */}
+          {currentTabIndex > 0 && (
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{
+                opacity: targetTab ? 1 : 0.3,
+                x: targetTab ? 0 : -20,
+              }}
+              transition={{ duration: 0.2 }}
+              className="fixed left-4 top-1/2 -translate-y-1/2 z-50 pointer-events-none"
+            >
+              <div className="bg-white/90 backdrop-blur-sm rounded-full p-3 shadow-lg border border-gray-200">
+                <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+                </svg>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Right arrow - can swipe left */}
+          {currentTabIndex < tabs.length - 1 && (
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{
+                opacity: targetTab ? 1 : 0.3,
+                x: targetTab ? 0 : 20,
+              }}
+              transition={{ duration: 0.2 }}
+              className="fixed right-4 top-1/2 -translate-y-1/2 z-50 pointer-events-none"
+            >
+              <div className="bg-white/90 backdrop-blur-sm rounded-full p-3 shadow-lg border border-gray-200">
+                <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+            </motion.div>
+          )}
+        </>
       )}
 
       {/* Current tab indicator (top center) */}
       {currentTab && (
-        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50">
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="fixed top-20 left-1/2 -translate-x-1/2 z-40"
+        >
           <div className="bg-white/90 backdrop-blur-sm rounded-full px-4 py-2 shadow-md border border-gray-200 flex items-center gap-2">
             {CurrentIcon && <CurrentIcon className="w-5 h-5 text-primary" />}
             <span className="text-sm font-medium text-gray-700">{currentTab.label}</span>
           </div>
-        </div>
+        </motion.div>
       )}
 
-      {/* Hints dismiss button */}
+      {/* Initial hints dismiss button */}
       {showHints && (
-        <button
+        <motion.button
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 20 }}
           onClick={() => setShowHints(false)}
-          className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 bg-primary/90 text-white px-4 py-2 rounded-full text-sm shadow-lg hover:bg-primary transition"
+          className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 bg-primary/95 text-white px-6 py-3 rounded-full text-sm shadow-lg hover:bg-primary transition"
         >
-          Got it! ✨
-        </button>
+          Got it, thanks! ✨
+        </motion.button>
       )}
 
-      {/* Main content */}
-      <div className={`transition-opacity duration-300 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
-        {children}
-      </div>
-
-      {/* Always show hints toggle button */}
-      <button
-        onClick={() => setShowHints(!showHints)}
-        className="fixed bottom-8 right-4 z-50 bg-white/90 text-gray-600 p-2 rounded-full shadow-md border border-gray-200 hover:bg-gray-50 transition"
-        aria-label="Toggle navigation hints"
+      {/* Main content with smooth transitions */}
+      <motion.div
+        key={pathname}
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: -20 }}
+        transition={{ duration: 0.3 }}
+        className="min-h-screen"
       >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          {showHints ? (
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-          ) : (
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-          )}
-        </svg>
-      </button>
-    </div>
+        {children}
+      </motion.div>
+    </motion.div>
   );
 }

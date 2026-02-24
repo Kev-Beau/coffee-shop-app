@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
-import { XMarkIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon, MagnifyingGlassIcon, MagnifyingGlassIcon as MagnifyingGlassIconSolid } from '@heroicons/react/24/outline';
 import { MapPin, SearchX } from 'lucide-react';
 import DrinkLogModal from './DrinkLogModal';
 
@@ -155,7 +155,19 @@ export default function QuickLogModal({ isOpen, onClose }: QuickLogModalProps) {
           <div className="relative bg-white w-full max-w-lg rounded-t-3xl shadow-xl max-h-[calc(100vh-100px)] flex flex-col">
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-gray-200 flex-shrink-0">
-              <h2 className="text-xl font-bold text-gray-900">Quick Log</h2>
+              <div className="flex items-center gap-3">
+                <h2 className="text-xl font-bold text-gray-900">Quick Log</h2>
+                <button
+                  onClick={() => {
+                    onClose();
+                    setTimeout(() => router.push('/search'), 100);
+                  }}
+                  className="p-2 hover:bg-gray-100 rounded-full transition"
+                  title="Go to full search"
+                >
+                  <MagnifyingGlassIcon className="w-5 h-5 text-gray-600" />
+                </button>
+              </div>
               <button
                 onClick={onClose}
                 className="p-2 hover:bg-gray-100 rounded-full transition"
