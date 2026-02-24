@@ -1,12 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { Coffee } from 'lucide-react';
-import { Bars3Icon, XMarkIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { Bars3Icon, XMarkIcon, MagnifyingGlassIcon, HomeIcon, UserGroupIcon, PlusIcon, UserIcon } from '@heroicons/react/24/outline';
 import NotificationBell from './NotificationBell';
+import { isIOSPWA } from '@/lib/detect-ios-pwa';
+import { useSwipeGestures } from '@/hooks/useSwipeGestures';
 
 interface NavItem {
   label: string;
@@ -16,9 +18,27 @@ interface NavItem {
 
 export default function Navigation() {
   const router = useRouter();
+  const pathname = usePathname();
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isIOSPWAMode, setIsIOSPWAMode] = useState(false);
+  const navRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    // Detect iOS PWA mode
+    setIsIOSPWAMode(isIOSPWA());
+  }, []);
+
+  // Swipe right to open menu, swipe left to close
+  useSwipeGestures(
+    navRef,
+    {
+      onSwipeRight: () => setMobileMenuOpen(true),
+      onSwipeLeft: () => setMobileMenuOpen(false),
+    },
+    { threshold: 50 }
+  );
 
   useEffect(() => {
     if (!isSupabaseConfigured || !supabase) {
@@ -56,7 +76,11 @@ export default function Navigation() {
   ];
 
   const loggedInNav: NavItem[] = [
-    // Empty - main nav is in bottom bar on mobile
+    { label: 'Feed', href: '/feed', icon: '🏠' },
+    { label: 'Search', href: '/search', icon: '🔍' },
+    { label: 'Log Coffee', href: '/log', icon: '☕' },
+    { label: 'Friends', href: '/friends', icon: '👥' },
+    { label: 'Profile', href: '/profile', icon: '👤' },
   ];
 
   const currentNav = user ? loggedInNav : loggedOutNav;
@@ -73,7 +97,7 @@ export default function Navigation() {
   }
 
   return (
-    <nav className="sticky top-0 z-50 bg-white border-b border-gray-200">
+    <nav ref={navRef} className="sticky top-0 z-50 bg-white border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-14">
           {/* Logo */}
@@ -147,34 +171,45 @@ export default function Navigation() {
 
       {/* Mobile menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden absolute top-14 right-0 left-0 bg-white border-t border-gray-200 shadow-lg">
+        <div className="md:hidden absolute top-14 right-0 left-0 bg-white border-t border-gray-200 shadow-lg z-[9998]">
           <div className="px-4 pt-2 pb-4 space-y-1 text-right">
-            {currentNav.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="block px-3 py-2 rounded-lg text-gray-700 hover:bg-primary-lighter hover:text-primary transition"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                <span className="flex items-center gap-2 justify-end">
-                  <span>{item.label}</span>
-                  {item.icon && <span>{item.icon}</span>}
-                </span>
-              </Link>
-            ))}
+            {currentNav.map((item) => {
+              const isActive = pathname === item.href || (item.href !== '/log' && pathname.startsWith(item.href));
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`block px-3 py-3 rounded-lg transition ${
+                    isActive
+                      ? 'bg-primary text-white font-semibold'
+                      : 'text-gray-700 hover:bg-primary-lighter hover:text-primary'
+                  }`}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <span className="flex items-center gap-2 justify-end">
+                    <span>{item.label}</span>
+                    {item.icon && <span>{item.icon}</span>}
+                  </span>
+                </Link>
+              );
+            })}
 
             {user ? (
               <>
                 <Link
                   href="/settings"
-                  className="block px-3 py-2 rounded-lg text-gray-700 hover:bg-primary-lighter hover:text-primary transition"
+                  className={`block px-3 py-3 rounded-lg transition ${
+                    pathname === '/settings'
+                      ? 'bg-primary text-white font-semibold'
+                      : 'text-gray-700 hover:bg-primary-lighter hover:text-primary'
+                  }`}
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Settings
                 </Link>
                 <button
                   onClick={handleSignOut}
-                  className="w-full text-right px-3 py-2 rounded-lg text-gray-700 hover:bg-primary-lighter hover:text-primary transition"
+                  className="w-full text-right px-3 py-3 rounded-lg text-gray-700 hover:bg-primary-lighter hover:text-primary transition"
                 >
                   Sign Out
                 </button>
