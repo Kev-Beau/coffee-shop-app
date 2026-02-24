@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
 import {
   HomeIcon,
   MagnifyingGlassIcon,
@@ -14,59 +13,6 @@ import { HomeIcon as HomeIconSolid, MagnifyingGlassIcon as MagnifyingGlassIconSo
 
 export default function BottomNavigation() {
   const pathname = usePathname();
-  const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
-
-  useEffect(() => {
-    let keyboardOpen = false;
-    let initialViewportHeight = window.innerHeight;
-
-    const handleFocusIn = (e: Event) => {
-      const target = e.target as HTMLElement;
-      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT') {
-        keyboardOpen = true;
-        setIsKeyboardOpen(true);
-      }
-    };
-
-    const handleFocusOut = () => {
-      keyboardOpen = false;
-      // Small delay to ensure keyboard has started closing
-      setTimeout(() => {
-        setIsKeyboardOpen(false);
-      }, 100);
-    };
-
-    const handleViewportChange = () => {
-      const currentHeight = window.innerHeight;
-      // If height decreased significantly, keyboard is open
-      if (Math.abs(initialViewportHeight - currentHeight) > 150) {
-        keyboardOpen = true;
-        setIsKeyboardOpen(true);
-      } else {
-        keyboardOpen = false;
-        setIsKeyboardOpen(false);
-      }
-    };
-
-    // Listen for keyboard events
-    document.addEventListener('focusin', handleFocusIn, true);
-    document.addEventListener('focusout', handleFocusOut, true);
-
-    // Listen for viewport changes (keyboard open/close)
-    if ('visualViewport' in window) {
-      window.visualViewport!.addEventListener('resize', handleViewportChange);
-    }
-    window.addEventListener('resize', handleViewportChange);
-
-    return () => {
-      document.removeEventListener('focusin', handleFocusIn, true);
-      document.removeEventListener('focusout', handleFocusOut, true);
-      if ('visualViewport' in window) {
-        window.visualViewport!.removeEventListener('resize', handleViewportChange);
-      }
-      window.removeEventListener('resize', handleViewportChange);
-    };
-  }, []);
 
   const navItems = [
     { href: '/feed', icon: HomeIcon, solidIcon: HomeIconSolid, label: 'Feed' },
@@ -76,13 +22,8 @@ export default function BottomNavigation() {
     { href: '/profile', icon: UserIcon, solidIcon: UserIconSolid, label: 'Profile' },
   ];
 
-  // Hide nav when keyboard is open (Twitter/Instagram approach)
-  if (isKeyboardOpen) {
-    return null;
-  }
-
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-[9999] bg-white border-t border-gray-200 safe-bottom">
+    <nav className="fixed bottom-0 left-0 right-0 z-[9999] bg-white border-t border-gray-200 safe-bottom">
       <div className="flex items-center justify-around h-16 px-2 max-w-md mx-auto">
         {navItems.map((item) => {
           const isActive = pathname === item.href || (item.href !== '/log' && pathname.startsWith(item.href));
@@ -110,6 +51,6 @@ export default function BottomNavigation() {
           );
         })}
       </div>
-    </div>
+    </nav>
   );
 }
