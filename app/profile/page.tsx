@@ -3,7 +3,7 @@
 import { useState, useEffect, useContext } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
-import { Coffee, MapPin as MapPinLucide, Heart, Star, FileEdit, Globe, Users, Lock, Palette, X } from 'lucide-react';
+import { Coffee, MapPin as MapPinLucide, Heart, Star, FileEdit, Globe, Users, Lock, Palette, X, Trophy } from 'lucide-react';
 import { PencilIcon, Squares2X2Icon, BookmarkIcon, MapPinIcon, UserGroupIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
 import { db } from '@/lib/supabase';
 import { usePullToRefresh } from '../hooks/usePullToRefresh';
@@ -422,30 +422,30 @@ export default function ProfilePage() {
 
               {/* Inline Stats - Top 3 Most Visited Shops - Podium Layout */}
               {mostVisitedShops.length > 0 && (
-                <div className="mb-4 p-4 bg-white rounded-2xl shadow-sm border border-gray-100">
-                  <div className="flex items-center gap-2 mb-4">
+                <div className="mb-4 p-5 bg-white rounded-2xl shadow-sm border border-gray-100">
+                  <div className="flex items-center gap-2 mb-5">
                     <MapPinIcon className="w-4 h-4 text-primary" />
                     <h3 className="text-sm font-semibold text-gray-900">Top Spots</h3>
                   </div>
-                  <div className="flex items-end justify-center gap-2 min-h-[120px]">
+                  <div className="flex items-end justify-center gap-3 min-h-[140px]">
                     {mostVisitedShops.map((shop, index) => {
                       const isSecond = index === 1;
                       const isFirst = index === 0;
                       const isThird = index === 2;
 
-                      // Podium heights
-                      let heightClass = 'h-16'; // 3rd place base
-                      let bgClass = 'bg-amber-600'; // bronze
-                      let medal = '🥉';
+                      // Podium heights - increased
+                      let heightClass = 'h-20'; // 3rd place base
+                      let bgClass = 'bg-amber-700/60'; // bronze - softer
+                      let MedalIcon = Star;
 
                       if (isSecond) {
-                        heightClass = 'h-20'; // 2nd place medium
-                        bgClass = 'bg-gray-300'; // silver
-                        medal = '🥈';
+                        heightClass = 'h-28'; // 2nd place medium
+                        bgClass = 'bg-gray-400/60'; // silver - softer
+                        MedalIcon = Star;
                       } else if (isFirst) {
-                        heightClass = 'h-24'; // 1st place highest
-                        bgClass = 'bg-amber-400'; // gold
-                        medal = '🥇';
+                        heightClass = 'h-36'; // 1st place highest
+                        bgClass = 'bg-amber-400/60'; // gold - softer
+                        MedalIcon = Trophy;
                       }
 
                       // Order: 2nd, 1st, 3rd for podium layout
@@ -461,22 +461,24 @@ export default function ProfilePage() {
                           style={{ order: displayOrder }}
                         >
                           {/* Shop name tag */}
-                          <div className="mb-2 text-center max-w-[80px]">
-                            <p className="text-xs font-semibold text-gray-900 truncate">
-                              {shop.shop_name.length > 12 ? shop.shop_name.substring(0, 12) + '...' : shop.shop_name}
+                          <div className="mb-2 text-center max-w-[100px]">
+                            <p className="text-sm font-bold text-gray-900 truncate">
+                              {shop.shop_name.length > 15 ? shop.shop_name.substring(0, 15) + '...' : shop.shop_name}
                             </p>
-                            <p className="text-xs text-gray-500">
+                            <p className="text-sm text-gray-600 font-medium">
                               {shop.visit_count} visit{shop.visit_count > 1 ? 's' : ''}
                             </p>
                           </div>
 
                           {/* Podium block */}
-                          <div className={`relative ${heightClass} w-16 ${bgClass} rounded-t-lg flex flex-col items-center justify-end pb-2 shadow-md`}>
-                            {/* Medal */}
-                            <div className="text-2xl mb-1">{medal}</div>
+                          <div className={`relative ${heightClass} w-20 ${bgClass} rounded-t-xl flex flex-col items-center justify-end pb-3 shadow-lg backdrop-blur-sm`}>
+                            {/* Medal Icon */}
+                            <div className="mb-2">
+                              <MedalIcon className={`w-8 h-8 ${isFirst ? 'text-amber-200' : isSecond ? 'text-gray-200' : 'text-amber-300'}`} strokeWidth={2.5} fill={isFirst ? 'rgba(255,255,255,0.3)' : 'none'} />
+                            </div>
 
                             {/* Rank number */}
-                            <div className="text-white font-bold text-lg">
+                            <div className="text-white font-black text-2xl">
                               {index + 1}
                             </div>
                           </div>
