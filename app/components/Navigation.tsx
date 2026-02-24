@@ -178,7 +178,7 @@ export default function Navigation() {
                 {currentNav.length === 0 && (
                   <div className="px-3 py-2 text-sm text-gray-500 text-right">
                     <p>Swipe left/right to navigate</p>
-                    <p className="text-xs mt-1">← Feed → Search & Log → Friends → Profile →</p>
+                    <p className="text-xs mt-1">← Explore → Log → Profile →</p>
                   </div>
                 )}
 

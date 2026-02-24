@@ -28,6 +28,7 @@ export default function NotificationBell() {
   const [notifications, setNotifications] = useState<any[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [pendingRequests, setPendingRequests] = useState<any[]>([]);
 
   useEffect(() => {
     const getUser = async () => {
@@ -61,6 +62,23 @@ export default function NotificationBell() {
         if (notifsData.data) {
           setNotifications(notifsData.data);
         }
+
+        // Load pending friend requests
+        const { data: requests } = await supabase
+          .from('friendships')
+          .select(`
+            *,
+            profiles!friendships_user_id_fkey (
+              id,
+              username,
+              display_name,
+              avatar_url
+            )
+          `)
+          .eq('friend_id', user.id)
+          .eq('status', 'pending');
+
+        setPendingRequests(requests || []);
       } catch (error) {
         console.error('Error loading notifications:', error);
       }
@@ -99,11 +117,12 @@ export default function NotificationBell() {
   const handleNotificationClick = (notification: any) => {
     // Navigate based on notification type
     if (notification.type === 'friend_request') {
-      // Navigate to requests tab
-      window.location.href = '/friends?tab=requests';
+      // Show friend requests - don't close dropdown, let user act inline
+      return;
     } else if (notification.type === 'friend_accepted') {
-      // Navigate to friends page
-      window.location.href = '/friends?tab=friends';
+      // Navigate to friends list modal (could trigger this from profile)
+      // For now, just mark as read
+      return;
     } else if (notification.type === 'comment' && notification.post_id) {
       // Navigate to post
       window.location.href = `/posts/${notification.post_id}`;
@@ -112,6 +131,52 @@ export default function NotificationBell() {
       window.location.href = `/posts/${notification.post_id}`;
     }
     setIsOpen(false);
+  };
+
+  const handleAcceptRequest = async (friendshipId: string) => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+      };
+      if (session?.access_token) {
+        headers['Authorization'] = `Bearer ${session.access_token}`;
+      }
+
+      await fetch('/api/friends/requests', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ action: 'accept', friendshipId }),
+      });
+
+      // Reload notifications
+      window.location.reload();
+    } catch (error) {
+      console.error('Error accepting friend request:', error);
+    }
+  };
+
+  const handleDeclineRequest = async (friendshipId: string) => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+      };
+      if (session?.access_token) {
+        headers['Authorization'] = `Bearer ${session.access_token}`;
+      }
+
+      await fetch('/api/friends/requests', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ action: 'decline', friendshipId }),
+      });
+
+      // Reload notifications
+      window.location.reload();
+    } catch (error) {
+      console.error('Error declining friend request:', error);
+    }
   };
 
   if (!user) return null;
@@ -159,59 +224,106 @@ export default function NotificationBell() {
                   <p>No notifications yet</p>
                 </div>
               ) : (
-                notifications.map((notification: any) => (
-                  <div
-                    key={notification.id}
-                    onClick={() => handleNotificationClick(notification)}
-                    className={`p-3 border-b border-gray-50 last:border-0 hover:bg-gray-50 cursor-pointer transition ${
-                      !notification.read ? 'bg-primary-lighter' : ''
-                    }`}
-                  >
-                    <div className="flex items-start gap-3">
-                      {/* Actor avatar */}
-                      {notification.actor ? (
-                        <div className="w-9 h-9 rounded-full bg-primary-light flex items-center justify-center overflow-hidden flex-shrink-0">
-                          {notification.actor.avatar_url ? (
-                            <img
-                              src={notification.actor.avatar_url}
-                              alt=""
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <span className="text-primary font-semibold text-sm">
-                              {notification.actor.username?.charAt(0).toUpperCase()}
-                            </span>
-                          )}
-                        </div>
-                      ) : (
-                        <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${
-                          notification.type === 'friend_request' || notification.type === 'friend_accepted'
-                            ? 'bg-blue-100 text-blue-700'
-                            : 'bg-primary-light text-primary'
-                        }`}>
-                          <Bell className="w-4 h-4" />
-                        </div>
-                      )}
-
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm text-gray-900 leading-tight">
-                          {notification.title}
-                        </p>
-                        <p className="text-sm text-gray-600 mt-0.5 line-clamp-2">
-                          {notification.message}
-                        </p>
-                        <p className="text-xs text-gray-400 mt-1">
-                          {formatTime(notification.created_at)}
-                        </p>
+                <>
+                  {/* Pending Friend Requests Section */}
+                  {pendingRequests.length > 0 && (
+                    <div className="border-b border-gray-200">
+                      <div className="px-4 py-2 bg-blue-50">
+                        <p className="text-xs font-semibold text-blue-900">Friend Requests</p>
                       </div>
-
-                      {/* Unread indicator */}
-                      {!notification.read && (
-                        <div className="w-2 h-2 bg-amber-600 rounded-full flex-shrink-0 mt-2"></div>
-                      )}
+                      {pendingRequests.map((request) => (
+                        <div key={request.id} className="p-3 border-b border-gray-100 last:border-0 bg-blue-50/50">
+                          <div className="flex items-start gap-3 mb-2">
+                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center overflow-hidden flex-shrink-0">
+                              {request.profiles?.avatar_url ? (
+                                <img src={request.profiles.avatar_url} alt="" className="w-full h-full object-cover" />
+                              ) : (
+                                <span className="text-white font-semibold">
+                                  {(request.profiles?.display_name || request.profiles?.username || 'U').charAt(0).toUpperCase()}
+                                </span>
+                              )}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-sm text-gray-900">
+                                {request.profiles?.display_name || request.profiles?.username}
+                              </p>
+                              <p className="text-xs text-gray-500">wants to be your friend</p>
+                            </div>
+                          </div>
+                          <div className="flex gap-2 ml-13" style={{ marginLeft: '52px' }}>
+                            <button
+                              onClick={() => handleAcceptRequest(request.id)}
+                              className="flex-1 py-1.5 px-3 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition"
+                            >
+                              Accept
+                            </button>
+                            <button
+                              onClick={() => handleDeclineRequest(request.id)}
+                              className="flex-1 py-1.5 px-3 bg-gray-200 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-300 transition"
+                            >
+                              Decline
+                            </button>
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                  </div>
-                ))
+                  )}
+
+                  {/* Regular Notifications */}
+                  {notifications.map((notification: any) => (
+                    <div
+                      key={notification.id}
+                      onClick={() => handleNotificationClick(notification)}
+                      className={`p-3 border-b border-gray-50 last:border-0 hover:bg-gray-50 cursor-pointer transition ${
+                        !notification.read ? 'bg-primary-lighter' : ''
+                      }`}
+                    >
+                      <div className="flex items-start gap-3">
+                        {/* Actor avatar */}
+                        {notification.actor ? (
+                          <div className="w-9 h-9 rounded-full bg-primary-light flex items-center justify-center overflow-hidden flex-shrink-0">
+                            {notification.actor.avatar_url ? (
+                              <img
+                                src={notification.actor.avatar_url}
+                                alt=""
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <span className="text-primary font-semibold text-sm">
+                                {notification.actor.username?.charAt(0).toUpperCase()}
+                              </span>
+                            )}
+                          </div>
+                        ) : (
+                          <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${
+                            notification.type === 'friend_request' || notification.type === 'friend_accepted'
+                              ? 'bg-blue-100 text-blue-700'
+                              : 'bg-primary-light text-primary'
+                          }`}>
+                            <Bell className="w-4 h-4" />
+                          </div>
+                        )}
+
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-sm text-gray-900 leading-tight">
+                            {notification.title}
+                          </p>
+                          <p className="text-sm text-gray-600 mt-0.5 line-clamp-2">
+                            {notification.message}
+                          </p>
+                          <p className="text-xs text-gray-400 mt-1">
+                            {formatTime(notification.created_at)}
+                          </p>
+                        </div>
+
+                        {/* Unread indicator */}
+                        {!notification.read && (
+                          <div className="w-2 h-2 bg-amber-600 rounded-full flex-shrink-0 mt-2"></div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </>
               )}
             </div>
           </div>

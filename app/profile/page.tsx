@@ -25,6 +25,8 @@ export default function ProfilePage() {
   const [friendsCount, setFriendsCount] = useState(0);
   const [activeTab, setActiveTab] = useState<TabType>('posts');
   const [loading, setLoading] = useState(true);
+  const [showFriendsModal, setShowFriendsModal] = useState(false);
+  const [friends, setFriends] = useState<any[]>([]);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -65,6 +67,39 @@ export default function ProfilePage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const loadFriends = async () => {
+    if (!user) return;
+
+    try {
+      const { data: friendships } = await supabase
+        .from('friendships')
+        .select(`
+          *,
+          profiles!friendships_friend_id_fkey (
+            id,
+            username,
+            display_name,
+            avatar_url
+          )
+        `)
+        .or(`and(user_id.eq.${user.id},status.eq.accepted),and(friend_id.eq.${user.id},status.eq.accepted)`);
+
+      if (friendships) {
+        const friendsList = friendships.map((f: any) => {
+          return f.user_id === user.id ? f.profiles : { ...f.profiles, is_user_1: true };
+        });
+        setFriends(friendsList);
+      }
+    } catch (error) {
+      console.error('Error loading friends:', error);
+    }
+  };
+
+  const openFriendsModal = async () => {
+    setShowFriendsModal(true);
+    await loadFriends();
   };
 
   const loadTabData = async (tab: TabType) => {
@@ -208,6 +243,14 @@ export default function ProfilePage() {
             >
               <PencilIcon className="w-4 h-4" />
             </button>
+
+            {/* Edit button on desktop */}
+            <button
+              onClick={() => router.push('/settings')}
+              className="hidden md:block absolute top-3 right-3 p-2 bg-white/90 backdrop-blur rounded-xl text-primary shadow hover:bg-white transition"
+            >
+              <PencilIcon className="w-5 h-5" />
+            </button>
           </div>
 
           {/* Profile Info */}
@@ -230,7 +273,7 @@ export default function ProfilePage() {
                   icon={UserGroupIcon}
                   label="Friends"
                   value={friendsCount}
-                  onClick={() => router.push('/friends')}
+                  onClick={openFriendsModal}
                 />
                 <StatCard
                   icon={TrendingUp}
@@ -411,6 +454,65 @@ export default function ProfilePage() {
         </div>
       </div>
       </div>
+
+      {/* Friends Modal */}
+      {showFriendsModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setShowFriendsModal(false)} />
+          <div className="relative bg-white rounded-3xl shadow-xl max-w-md w-full max-h-[80vh] flex flex-col">
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b border-gray-200">
+              <h3 className="text-xl font-bold text-gray-900">Friends ({friendsCount})</h3>
+              <button
+                onClick={() => setShowFriendsModal(false)}
+                className="p-2 hover:bg-gray-100 rounded-full transition"
+              >
+                <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Friends List */}
+            <div className="flex-1 overflow-y-auto p-4">
+              {friends.length === 0 ? (
+                <div className="text-center py-8">
+                  <UserGroupIcon className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+                  <p className="text-gray-600">No friends yet</p>
+                  <p className="text-sm text-gray-500 mt-2">Connect with other coffee enthusiasts!</p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {friends.map((friend) => (
+                    <div
+                      key={friend.id}
+                      className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition cursor-pointer"
+                      onClick={() => {
+                        setShowFriendsModal(false);
+                        router.push(`/profile/${friend.username}`);
+                      }}
+                    >
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center overflow-hidden">
+                        {friend.avatar_url ? (
+                          <img src={friend.avatar_url} alt="" className="w-full h-full object-cover" />
+                        ) : (
+                          <span className="text-white font-semibold text-lg">
+                            {(friend.display_name || friend.username || 'U').charAt(0).toUpperCase()}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-semibold text-gray-900">{friend.display_name || friend.username}</p>
+                        <p className="text-sm text-gray-500">@{friend.username}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
