@@ -1,22 +1,59 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
-import { Coffee, MapPin as MapPinLucide, Heart, FileEdit, TrendingUp } from 'lucide-react';
+import { Coffee, MapPin as MapPinLucide, Heart, Star, FileEdit } from 'lucide-react';
 import { PencilIcon, Squares2X2Icon, BookmarkIcon, MapPinIcon, UserGroupIcon } from '@heroicons/react/24/outline';
 import { db } from '@/lib/supabase';
 import { usePullToRefresh } from '../hooks/usePullToRefresh';
+import { useTheme } from '@/app/theme/config';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
+const coffeeTheme = {
+  colors: {
+    primary: '#6F4E37',
+    primaryDark: '#4A3728',
+    primaryLight: '#C4A484',
+    primaryLighter: '#F2E8D5',
+  },
+};
+
 type TabType = 'posts' | 'visits' | 'favorites';
+
+interface ShopStats {
+  shop_id: string;
+  shop_name: string;
+  visit_count: number;
+}
+
+interface DrinkStats {
+  drink_name: string;
+  post_count: number;
+  avg_rating: number;
+}
 
 export default function ProfilePage() {
   const router = useRouter();
+  const [currentTheme, setCurrentTheme] = useState(coffeeTheme);
+
+  // Load theme on mount
+  useEffect(() => {
+    // Try to get theme from context, fall back to default
+    try {
+      const { useTheme: tryUseTheme } = require('@/app/theme/config');
+      const themeData = tryUseTheme();
+      if (themeData?.currentTheme) {
+        setCurrentTheme(themeData.currentTheme);
+      }
+    } catch {
+      // Use default theme
+    }
+  }, []);
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
   const [posts, setPosts] = useState<any[]>([]);
@@ -27,6 +64,15 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [showFriendsModal, setShowFriendsModal] = useState(false);
   const [friends, setFriends] = useState<any[]>([]);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [mostVisitedShops, setMostVisitedShops] = useState<ShopStats[]>([]);
+  const [favoriteDrinks, setFavoriteDrinks] = useState<DrinkStats[]>([]);
+  const [editForm, setEditForm] = useState({
+    display_name: '',
+    bio: '',
+    username: '',
+  });
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -62,6 +108,28 @@ export default function ProfilePage() {
 
       const count = await db.getFriendsCount(userId);
       setFriendsCount(count);
+
+      // Load stats
+      const { data: { session } } = await supabase.auth.getSession();
+      const headers: HeadersInit = {};
+      if (session?.access_token) {
+        headers['Authorization'] = `Bearer ${session.access_token}`;
+      }
+
+      const statsResponse = await fetch('/api/stats', { headers });
+      const statsData = await statsResponse.json();
+
+      if (statsData.data) {
+        setMostVisitedShops(statsData.data.most_visited_shops?.slice(0, 3) || []);
+        setFavoriteDrinks(statsData.data.favorite_drinks?.slice(0, 3) || []);
+      }
+
+      // Initialize edit form
+      setEditForm({
+        display_name: profileData.display_name || '',
+        bio: profileData.bio || '',
+        username: profileData.username || '',
+      });
     } catch (error) {
       console.error('Error loading profile:', error);
     } finally {
@@ -143,6 +211,45 @@ export default function ProfilePage() {
     if (user) {
       await loadProfileData(user.id);
       await loadTabData(activeTab);
+    }
+  };
+
+  const handleOpenEditModal = () => {
+    setEditForm({
+      display_name: profile?.display_name || '',
+      bio: profile?.bio || '',
+      username: profile?.username || '',
+    });
+    setShowEditModal(true);
+  };
+
+  const handleSaveProfile = async () => {
+    if (!user) return;
+
+    setSaving(true);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          display_name: editForm.display_name,
+          bio: editForm.bio,
+        })
+        .eq('id', user.id);
+
+      if (error) throw error;
+
+      setProfile({
+        ...profile,
+        display_name: editForm.display_name,
+        bio: editForm.bio,
+      });
+
+      setShowEditModal(false);
+    } catch (error) {
+      console.error('Error saving profile:', error);
+      alert('Failed to save profile. Please try again.');
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -238,16 +345,16 @@ export default function ProfilePage() {
 
             {/* Edit button on mobile (absolute) */}
             <button
-              onClick={() => router.push('/settings')}
-              className="md:hidden absolute top-3 right-3 p-2 bg-white/90 backdrop-blur rounded-xl text-primary shadow"
+              onClick={handleOpenEditModal}
+              className="md:hidden absolute top-3 right-3 p-2.5 bg-white/90 backdrop-blur rounded-xl text-primary shadow-md hover:bg-white transition"
             >
               <PencilIcon className="w-4 h-4" />
             </button>
 
             {/* Edit button on desktop */}
             <button
-              onClick={() => router.push('/settings')}
-              className="hidden md:block absolute top-3 right-3 p-2 bg-white/90 backdrop-blur rounded-xl text-primary shadow hover:bg-white transition"
+              onClick={handleOpenEditModal}
+              className="hidden md:block absolute top-3 right-3 p-2.5 bg-white/90 backdrop-blur rounded-xl text-primary shadow-md hover:bg-white transition"
             >
               <PencilIcon className="w-5 h-5" />
             </button>
@@ -275,23 +382,76 @@ export default function ProfilePage() {
                   value={friendsCount}
                   onClick={openFriendsModal}
                 />
-                <StatCard
-                  icon={TrendingUp}
-                  label="Stats"
-                  value=""
-                  onClick={() => router.push('/stats')}
-                />
               </div>
+
+              {/* Inline Stats - Top 3 Most Visited Shops */}
+              {mostVisitedShops.length > 0 && (
+                <div className="mb-4 p-4 bg-white rounded-2xl shadow-sm border border-gray-100">
+                  <div className="flex items-center gap-2 mb-3">
+                    <MapPinIcon className="w-4 h-4 text-primary" />
+                    <h3 className="text-sm font-semibold text-gray-900">Top Spots</h3>
+                  </div>
+                  <div className="space-y-2">
+                    {mostVisitedShops.map((shop, index) => (
+                      <div
+                        key={shop.shop_id}
+                        className="flex items-center gap-2 text-sm"
+                      >
+                        <div className="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xs">
+                          {index + 1}
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-medium text-gray-900">{shop.shop_name}</p>
+                          <p className="text-xs text-gray-500">{shop.visit_count} visit{shop.visit_count > 1 ? 's' : ''}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Inline Stats - Top 3 Favorite Drinks */}
+              {favoriteDrinks.length > 0 && (
+                <div className="mb-4 p-4 bg-white rounded-2xl shadow-sm border border-gray-100">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Coffee className="w-4 h-4 text-primary" />
+                    <h3 className="text-sm font-semibold text-gray-900">Favorites</h3>
+                  </div>
+                  <div className="space-y-2">
+                    {favoriteDrinks.map((drink, index) => (
+                      <div
+                        key={drink.drink_name}
+                        className="flex items-center gap-2 text-sm"
+                      >
+                        <div className="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xs">
+                          {index + 1}
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-medium text-gray-900">{drink.drink_name}</p>
+                          <div className="flex items-center gap-1 text-xs text-gray-500">
+                            <span>{drink.post_count} post{drink.post_count > 1 ? 's' : ''}</span>
+                            <span>•</span>
+                            <div className="flex items-center gap-1">
+                              <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
+                              <span>{drink.avg_rating.toFixed(1)}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
 
-        {/* Coffee Preferences Card */}
+        {/* Coffee Preferences Card - Uses theme color */}
         {profile && (
           <div
             className="rounded-3xl shadow-lg p-5 md:p-6 text-white"
             style={{
-              background: `linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 100%)`
+              background: `linear-gradient(135deg, ${currentTheme.colors.primaryDark} 0%, ${currentTheme.colors.primary} 100%)`
             }}
           >
             <div className="flex items-center gap-3 mb-4">
@@ -509,6 +669,76 @@ export default function ProfilePage() {
                   ))}
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Profile Modal */}
+      {showEditModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setShowEditModal(false)} />
+          <div className="relative bg-white rounded-3xl shadow-xl max-w-md w-full max-h-[80vh] flex flex-col">
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b border-gray-200">
+              <h3 className="text-xl font-bold text-gray-900">Edit Profile</h3>
+              <button
+                onClick={() => setShowEditModal(false)}
+                className="p-2 hover:bg-gray-100 rounded-full transition"
+              >
+                <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Form */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Display Name</label>
+                <input
+                  type="text"
+                  value={editForm.display_name}
+                  onChange={(e) => setEditForm({ ...editForm, display_name: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                  placeholder="Your display name"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Username @{profile?.username}</label>
+                <p className="text-xs text-gray-500">Username cannot be changed</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Bio</label>
+                <textarea
+                  value={editForm.bio}
+                  onChange={(e) => setEditForm({ ...editForm, bio: e.target.value })}
+                  rows={3}
+                  maxLength={150}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
+                  placeholder="Tell us about your coffee journey..."
+                />
+                <p className="text-xs text-gray-500 mt-1">{editForm.bio.length}/150 characters</p>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="p-4 border-t border-gray-200 flex gap-3">
+              <button
+                onClick={() => setShowEditModal(false)}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveProfile}
+                disabled={saving}
+                className="flex-1 px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary-dark transition disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {saving ? 'Saving...' : 'Save Changes'}
+              </button>
             </div>
           </div>
         </div>
