@@ -68,6 +68,7 @@ export default function ProfilePage() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [mostVisitedShops, setMostVisitedShops] = useState<ShopStats[]>([]);
   const [favoriteDrinks, setFavoriteDrinks] = useState<DrinkStats[]>([]);
+  const [drinksSortBy, setDrinksSortBy] = useState<'posts' | 'rating'>('posts');
   const [editForm, setEditForm] = useState({
     display_name: '',
     bio: '',
@@ -128,7 +129,8 @@ export default function ProfilePage() {
 
       if (statsData.data) {
         setMostVisitedShops(statsData.data.most_visited_shops?.slice(0, 3) || []);
-        setFavoriteDrinks(statsData.data.favorite_drinks?.slice(0, 3) || []);
+        const drinks = statsData.data.favorite_drinks || [];
+        sortFavoriteDrinks(drinks);
       }
 
       // Initialize edit form with all settings
@@ -292,6 +294,45 @@ export default function ProfilePage() {
   const { containerRef, pullDistance } = usePullToRefresh({
     onRefresh: handleRefresh,
   });
+
+  const sortFavoriteDrinks = (drinks: any[]) => {
+    if (drinksSortBy === 'posts') {
+      // Sort by post count descending
+      const sorted = [...drinks].sort((a, b) => b.post_count - a.post_count);
+      setFavoriteDrinks(sorted.slice(0, 3));
+    } else {
+      // Sort by rating descending
+      const sorted = [...drinks].sort((a, b) => b.avg_rating - a.avg_rating);
+      setFavoriteDrinks(sorted.slice(0, 3));
+    }
+  };
+
+  const handleDrinksSortChange = (sortBy: 'posts' | 'rating') => {
+    setDrinksSortBy(sortBy);
+  };
+
+  // Re-sort drinks when sort method changes
+  useEffect(() => {
+    if (profile?.favorite_drinks) {
+      // Need to get the full drinks data again
+      const loadDrinks = async () => {
+        const { data: { session } } = await supabase.auth.getSession();
+        const headers: HeadersInit = {};
+        if (session?.access_token) {
+          headers['Authorization'] = `Bearer ${session.access_token}`;
+        }
+
+        const statsResponse = await fetch('/api/stats', { headers });
+        const statsData = await statsResponse.json();
+
+        if (statsData.data?.favorite_drinks) {
+          sortFavoriteDrinks(statsData.data.favorite_drinks);
+        }
+      };
+
+      loadDrinks();
+    }
+  }, [drinksSortBy]);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -492,10 +533,39 @@ export default function ProfilePage() {
               {/* Inline Stats - Top 3 Favorite Drinks - Coffee Cup Layout */}
               {favoriteDrinks.length > 0 && (
                 <div className="mb-4 p-5 bg-white rounded-2xl shadow-sm border border-gray-100">
-                  <div className="text-center mb-4">
+                  <div className="text-center mb-3">
                     <h3 className="text-lg font-bold text-gray-900">Favorite Drinks</h3>
-                    <p className="text-xs text-gray-500 mt-1">Your most ordered beverages</p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {drinksSortBy === 'posts' ? 'Your most ordered beverages' : 'Your highest rated drinks'}
+                    </p>
                   </div>
+
+                  {/* Sort Toggle */}
+                  <div className="flex justify-center mb-4">
+                    <div className="inline-flex bg-gray-100 rounded-lg p-1">
+                      <button
+                        onClick={() => handleDrinksSortChange('posts')}
+                        className={`px-4 py-2 rounded-md text-sm font-medium transition ${
+                          drinksSortBy === 'posts'
+                            ? 'bg-white text-gray-900 shadow-sm'
+                            : 'text-gray-600 hover:text-gray-900'
+                        }`}
+                      >
+                        Most Ordered
+                      </button>
+                      <button
+                        onClick={() => handleDrinksSortChange('rating')}
+                        className={`px-4 py-2 rounded-md text-sm font-medium transition ${
+                          drinksSortBy === 'rating'
+                            ? 'bg-white text-gray-900 shadow-sm'
+                            : 'text-gray-600 hover:text-gray-900'
+                        }`}
+                      >
+                        Highest Rated
+                      </button>
+                    </div>
+                  </div>
+
                   <div className="space-y-3">
                     {favoriteDrinks.map((drink, index) => {
                       const isFirst = index === 0;
