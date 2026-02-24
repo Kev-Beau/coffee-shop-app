@@ -420,27 +420,69 @@ export default function ProfilePage() {
                 />
               </div>
 
-              {/* Inline Stats - Top 3 Most Visited Shops */}
+              {/* Inline Stats - Top 3 Most Visited Shops - Podium Layout */}
               {mostVisitedShops.length > 0 && (
                 <div className="mb-4 p-4 bg-white rounded-2xl shadow-sm border border-gray-100">
-                  <div className="flex items-center gap-2 mb-3">
+                  <div className="flex items-center gap-2 mb-4">
                     <MapPinIcon className="w-4 h-4 text-primary" />
                     <h3 className="text-sm font-semibold text-gray-900">Top Spots</h3>
                   </div>
-                  <div className="space-y-2">
-                    {mostVisitedShops.map((shop, index) => (
-                      <div
-                        key={shop.shop_id}
-                        className="flex items-center gap-2 text-sm"
-                      >
-                        <div className="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xs shrink-0">
-                          {index + 1}
+                  <div className="flex items-end justify-center gap-2 min-h-[120px]">
+                    {mostVisitedShops.map((shop, index) => {
+                      const isSecond = index === 1;
+                      const isFirst = index === 0;
+                      const isThird = index === 2;
+
+                      // Podium heights
+                      let heightClass = 'h-16'; // 3rd place base
+                      let bgClass = 'bg-amber-600'; // bronze
+                      let medal = '🥉';
+
+                      if (isSecond) {
+                        heightClass = 'h-20'; // 2nd place medium
+                        bgClass = 'bg-gray-300'; // silver
+                        medal = '🥈';
+                      } else if (isFirst) {
+                        heightClass = 'h-24'; // 1st place highest
+                        bgClass = 'bg-amber-400'; // gold
+                        medal = '🥇';
+                      }
+
+                      // Order: 2nd, 1st, 3rd for podium layout
+                      let displayOrder = 0;
+                      if (isSecond) displayOrder = 0;
+                      else if (isFirst) displayOrder = 1;
+                      else if (isThird) displayOrder = 2;
+
+                      return (
+                        <div
+                          key={shop.shop_id}
+                          className="flex flex-col items-center"
+                          style={{ order: displayOrder }}
+                        >
+                          {/* Shop name tag */}
+                          <div className="mb-2 text-center max-w-[80px]">
+                            <p className="text-xs font-semibold text-gray-900 truncate">
+                              {shop.shop_name.length > 12 ? shop.shop_name.substring(0, 12) + '...' : shop.shop_name}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              {shop.visit_count} visit{shop.visit_count > 1 ? 's' : ''}
+                            </p>
+                          </div>
+
+                          {/* Podium block */}
+                          <div className={`relative ${heightClass} w-16 ${bgClass} rounded-t-lg flex flex-col items-center justify-end pb-2 shadow-md`}>
+                            {/* Medal */}
+                            <div className="text-2xl mb-1">{medal}</div>
+
+                            {/* Rank number */}
+                            <div className="text-white font-bold text-lg">
+                              {index + 1}
+                            </div>
+                          </div>
                         </div>
-                        <p className="font-sans font-medium text-gray-900 truncate">
-                          {shop.shop_name.length > 22 ? shop.shop_name.substring(0, 22) + '...' : shop.shop_name} • {shop.visit_count} visit{shop.visit_count > 1 ? 's' : ''}
-                        </p>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               )}
