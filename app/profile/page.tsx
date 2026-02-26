@@ -39,6 +39,12 @@ interface DrinkStats {
   avg_rating: number;
 }
 
+interface DrinkCategory {
+  category: string;
+  count: number;
+  examples: string[];
+}
+
 export default function ProfilePage() {
   const router = useRouter();
   const [currentTheme, setCurrentTheme] = useState(coffeeTheme);
@@ -69,6 +75,7 @@ export default function ProfilePage() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [mostVisitedShops, setMostVisitedShops] = useState<ShopStats[]>([]);
   const [favoriteDrinks, setFavoriteDrinks] = useState<DrinkStats[]>([]);
+  const [drinkCategories, setDrinkCategories] = useState<DrinkCategory[]>([]);
   const [drinksSortBy, setDrinksSortBy] = useState<'posts' | 'rating'>('posts');
   const [editForm, setEditForm] = useState({
     display_name: '',
@@ -132,6 +139,10 @@ export default function ProfilePage() {
         setMostVisitedShops(statsData.data.most_visited_shops?.slice(0, 3) || []);
         const drinks = statsData.data.favorite_drinks || [];
         sortFavoriteDrinks(drinks);
+
+        // Categorize drinks
+        const categories = categorizeDrinks(drinks);
+        setDrinkCategories(categories);
       }
 
       // Initialize edit form with all settings
@@ -295,6 +306,99 @@ export default function ProfilePage() {
   const { containerRef, pullDistance } = usePullToRefresh({
     onRefresh: handleRefresh,
   });
+
+  const categorizeDrinks = (drinks: any[]): DrinkCategory[] => {
+    const categories: { [key: string]: DrinkCategory } = {};
+
+    drinks.forEach((drink) => {
+      const name = drink.drink_name.toLowerCase();
+      let category = 'Other';
+      const postCount = drink.post_count || 1;
+
+      // Matcha drinks
+      if (name.includes('matcha')) {
+        category = 'Matcha';
+      }
+      // Tea/Chai drinks
+      else if (name.includes('chai') || name.includes('tea') || name.includes('herbal')) {
+        category = 'Tea';
+      }
+      // Espresso shots
+      else if (name.includes('espresso') || name.includes('shot')) {
+        category = 'Espresso';
+      }
+      // Lattes
+      else if (name.includes('latte') || name.includes('mocha')) {
+        category = 'Lattes';
+      }
+      // Cappuccino
+      else if (name.includes('cappuccino') || name.includes('cap')) {
+        category = 'Cappuccinos';
+      }
+      // Cold brew
+      else if (name.includes('cold brew') || name.includes('cold-brew')) {
+        category = 'Cold Brew';
+      }
+      // Pour over / drip
+      else if (name.includes('pour over') || name.includes('pour-over') || name.includes('drip')) {
+        category = 'Pour Over';
+      }
+      // Americano
+      else if (name.includes('americano')) {
+        category = 'Americano';
+      }
+      // Macchiato
+      else if (name.includes('macchiato')) {
+        category = 'Macchiato';
+      }
+      // Flat white
+      else if (name.includes('flat white')) {
+        category = 'Flat White';
+      }
+      // Iced drinks
+      else if (name.includes('iced') || name.includes('ice')) {
+        category = 'Iced Drinks';
+      }
+      // Smoothies
+      else if (name.includes('smoothie') || name.includes('blend')) {
+        category = 'Smoothies';
+      }
+      // Frappe
+      else if (name.includes('frappe') || name.includes('frappé')) {
+        category = 'Frappés';
+      }
+      // Affogato
+      else if (name.includes('affogato')) {
+        category = 'Affogato';
+      }
+      // General coffee
+      else if (name.includes('coffee') || name.includes('brew')) {
+        category = 'Coffee';
+      }
+      // Keep existing category if found
+      else if (categories[category]) {
+        // Already in "Other"
+      }
+
+      if (!categories[category]) {
+        categories[category] = {
+          category,
+          count: 0,
+          examples: [],
+        };
+      }
+
+      categories[category].count += postCount;
+      if (!categories[category].examples.includes(drink.drink_name)) {
+        categories[category].examples.push(drink.drink_name);
+      }
+    });
+
+    // Convert to array and sort by count
+    return Object.values(categories)
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5); // Top 5 categories
+  };
 
   const sortFavoriteDrinks = (drinks: any[]) => {
     if (drinksSortBy === 'posts') {
@@ -622,6 +726,51 @@ export default function ProfilePage() {
                             <div className={`w-8 h-8 rounded-lg ${iconBg} flex items-center justify-center shadow-sm shrink-0`}>
                               <span className="text-white font-bold text-sm">{index + 1}</span>
                             </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Drink Categories Stats */}
+              {drinkCategories.length > 0 && (
+                <div className="mb-4 p-5 bg-white rounded-2xl shadow-sm border border-gray-100">
+                  <div className="text-center mb-4">
+                    <h3 className="text-lg font-bold text-gray-900">Drink Preferences</h3>
+                    <p className="text-xs text-gray-500 mt-1">Your favorite types of drinks</p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    {drinkCategories.map((cat) => {
+                      // Get a representative drink name for icon
+                      const exampleDrink = cat.examples[0] || 'Coffee';
+
+                      return (
+                        <div
+                          key={cat.category}
+                          className="bg-gradient-to-br from-primary-lighter to-primary-light rounded-xl p-4 border border-primary/20"
+                        >
+                          <div className="flex items-center gap-2 mb-2">
+                            <DrinkIcon drinkName={exampleDrink} className="text-primary" size={20} />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-bold text-gray-900 truncate">{cat.category}</p>
+                              <p className="text-xs text-gray-600">{cat.count} logged</p>
+                            </div>
+                          </div>
+                          <div className="flex flex-wrap gap-1">
+                            {cat.examples.slice(0, 3).map((example) => (
+                              <span
+                                key={example}
+                                className="text-xs bg-white/60 text-gray-700 px-2 py-0.5 rounded-full truncate max-w-full"
+                                title={example}
+                              >
+                                {example.length > 15 ? example.substring(0, 15) + '...' : example}
+                              </span>
+                            ))}
+                            {cat.examples.length > 3 && (
+                              <span className="text-xs text-gray-500">+{cat.examples.length - 3}</span>
+                            )}
                           </div>
                         </div>
                       );

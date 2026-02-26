@@ -6,6 +6,7 @@ import { Coffee } from 'lucide-react';
 import { HeartIcon, ChatBubbleLeftIcon } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid';
 import StarRating from './StarRating';
+import DrinkIcon from './DrinkIcon';
 import type { Post } from '@/lib/types';
 
 interface FeedCardProps {
@@ -146,15 +147,18 @@ export default function FeedCard({ post, currentUserId, onLike, onUnlike, commen
             <p className="font-semibold text-gray-900">
               {post.profiles.display_name || post.profiles.username}
             </p>
-            <p className="text-sm text-gray-500">
-              {formatDate(post.created_at)} • {post.shop_name}
-            </p>
+            <div className="flex items-center gap-1.5 text-sm text-gray-500">
+              <span>{formatDate(post.created_at)}</span>
+              <span>•</span>
+              <span>{post.shop_name}</span>
+              <DrinkIcon drinkName={post.drink_name} className="text-primary" size={14} />
+            </div>
           </div>
         </Link>
       </div>
 
-      {/* Photo */}
-      {post.photo_url && (
+      {/* Photo or Drink Icon Fallback */}
+      {post.photo_url ? (
         <div className="relative aspect-square">
           {/* Heart Animation Overlay */}
           {showHeartAnimation && (
@@ -170,6 +174,20 @@ export default function FeedCard({ post, currentUserId, onLike, onUnlike, commen
               alt={`Photo of ${post.drink_name} at ${post.shop_name}`}
               className="w-full h-full object-cover"
             />
+          </div>
+        </div>
+      ) : (
+        <div className="relative aspect-square bg-gradient-to-br from-primary-lighter via-primary-light to-primary-light flex items-center justify-center">
+          {/* Large Drink Icon */}
+          <div className="text-center p-8">
+            <div className="flex justify-center mb-4">
+              <DrinkIcon drinkName={post.drink_name} className="text-primary" size={80} />
+            </div>
+            <p className="font-bold text-gray-900 text-xl">{post.drink_name}</p>
+            <p className="text-primary text-sm mt-1">{post.shop_name}</p>
+            <div className="flex justify-center mt-3">
+              <StarRating rating={post.rating} readonly size="md" />
+            </div>
           </div>
         </div>
       )}
