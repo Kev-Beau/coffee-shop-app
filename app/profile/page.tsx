@@ -9,6 +9,7 @@ import { db } from '@/lib/supabase';
 import { usePullToRefresh } from '../hooks/usePullToRefresh';
 import { useTheme } from '@/app/theme/config';
 import ThemeSwitcher from '@/app/components/ThemeSwitcher';
+import DrinkIcon from '@/app/components/DrinkIcon';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -595,9 +596,9 @@ export default function ProfilePage() {
                           className={`relative bg-gradient-to-r ${bgGradient} rounded-xl p-4 border-2 ${borderColor} shadow-sm`}
                         >
                           <div className="flex items-center gap-3">
-                            {/* Coffee cup icon with rank */}
+                            {/* Drink-specific icon with rank */}
                             <div className={`w-12 h-12 ${iconBg} rounded-full flex items-center justify-center shadow-md shrink-0`}>
-                              <Coffee className="w-6 h-6 text-white" />
+                              <DrinkIcon drinkName={drink.drink_name} className="text-white" size={24} />
                             </div>
 
                             {/* Drink info */}

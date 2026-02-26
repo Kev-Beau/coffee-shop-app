@@ -45,9 +45,11 @@
   "dependencies": {
     "@heroicons/react": "^2.2.0",
     "@hookform/resolvers": "^5.2.2",
+    "@iconify/react": "^6.0.2",
     "@supabase/auth-helpers-nextjs": "^0.15.0",
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.93.3",
+    "@tabler/icons-react": "^3.37.1",
     "cloudinary": "^2.9.0",
     "framer-motion": "^12.34.3",
     "lucide-react": "^0.563.0",
