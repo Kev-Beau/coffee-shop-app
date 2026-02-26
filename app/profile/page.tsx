@@ -76,6 +76,7 @@ export default function ProfilePage() {
   const [mostVisitedShops, setMostVisitedShops] = useState<ShopStats[]>([]);
   const [favoriteDrinks, setFavoriteDrinks] = useState<DrinkStats[]>([]);
   const [drinkCategories, setDrinkCategories] = useState<DrinkCategory[]>([]);
+  const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   const [drinksSortBy, setDrinksSortBy] = useState<'posts' | 'rating'>('posts');
   const [editForm, setEditForm] = useState({
     display_name: '',
@@ -741,37 +742,58 @@ export default function ProfilePage() {
                     <h3 className="text-lg font-bold text-gray-900">Drink Preferences</h3>
                     <p className="text-xs text-gray-500 mt-1">Your favorite types of drinks</p>
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2">
                     {drinkCategories.map((cat) => {
-                      // Get a representative drink name for icon
                       const exampleDrink = cat.examples[0] || 'Coffee';
+                      const isExpanded = expandedCategory === cat.category;
 
                       return (
-                        <div
-                          key={cat.category}
-                          className="bg-gradient-to-br from-primary-lighter to-primary-light rounded-xl p-4 border border-primary/20"
-                        >
-                          <div className="flex items-center gap-2 mb-2">
-                            <DrinkIcon drinkName={exampleDrink} className="text-primary" size={20} />
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-bold text-gray-900 truncate">{cat.category}</p>
-                              <p className="text-xs text-gray-600">{cat.count} logged</p>
-                            </div>
-                          </div>
-                          <div className="flex flex-wrap gap-1">
-                            {cat.examples.slice(0, 3).map((example) => (
-                              <span
-                                key={example}
-                                className="text-xs bg-white/60 text-gray-700 px-2 py-0.5 rounded-full truncate max-w-full"
-                                title={example}
+                        <div key={cat.category}>
+                          {/* Category Card */}
+                          <button
+                            onClick={() => setExpandedCategory(isExpanded ? null : cat.category)}
+                            className="w-full bg-gradient-to-r from-primary-lighter to-primary-light hover:from-primary-lighter/80 hover:to-primary-light/80 rounded-xl p-3 border border-primary/20 transition-all text-left"
+                          >
+                            <div className="flex items-center gap-3">
+                              <DrinkIcon drinkName={exampleDrink} className="text-primary shrink-0" size={24} />
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center justify-between">
+                                  <p className="text-base font-bold text-gray-900">{cat.category}</p>
+                                  <p className="text-sm font-semibold text-primary">{cat.count}</p>
+                                </div>
+                                <p className="text-xs text-gray-600 mt-0.5">
+                                  {cat.count} drink{cat.count > 1 ? 's' : ''} logged
+                                </p>
+                              </div>
+                              <svg
+                                className={`w-5 h-5 text-gray-600 shrink-0 transition-transform ${
+                                  isExpanded ? 'rotate-180' : ''
+                                }`}
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
                               >
-                                {example.length > 15 ? example.substring(0, 15) + '...' : example}
-                              </span>
-                            ))}
-                            {cat.examples.length > 3 && (
-                              <span className="text-xs text-gray-500">+{cat.examples.length - 3}</span>
-                            )}
-                          </div>
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                              </svg>
+                            </div>
+                          </button>
+
+                          {/* Expanded Drinks List */}
+                          {isExpanded && (
+                            <div className="mt-2 ml-4 pl-4 border-l-2 border-primary/30">
+                              <div className="flex flex-wrap gap-2">
+                                {cat.examples.map((example) => (
+                                  <span
+                                    key={example}
+                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 rounded-full text-sm text-gray-700"
+                                  >
+                                    <DrinkIcon drinkName={example} className="text-primary" size={14} />
+                                    <span className="truncate max-w-[150px]">{example}</span>
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
                         </div>
                       );
                     })}
