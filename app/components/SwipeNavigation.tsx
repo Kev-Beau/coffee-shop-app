@@ -45,7 +45,6 @@ export default function SwipeNavigation({ children }: SwipeNavigationProps) {
   const [dragOffset, setDragOffset] = useState(0);
   const [dragDirection, setDragDirection] = useState<'left' | 'right' | null>(null);
   const [isNavigating, setIsNavigating] = useState(false);
-  const [pageReady, setPageReady] = useState(true);
   const contentRef = useRef<HTMLDivElement>(null);
 
   // Find current tab index
@@ -70,15 +69,6 @@ export default function SwipeNavigation({ children }: SwipeNavigationProps) {
     return () => clearTimeout(timer);
   }, [pathname]);
 
-  // Mark page as ready after content loads
-  useEffect(() => {
-    setPageReady(false);
-    const timer = setTimeout(() => {
-      setPageReady(true);
-    }, 100);
-    return () => clearTimeout(timer);
-  }, [pathname, children]);
-
   const currentTab = tabs[currentTabIndex];
   const CurrentIcon = currentTab?.solidIcon || currentTab?.icon;
 
@@ -92,26 +82,28 @@ export default function SwipeNavigation({ children }: SwipeNavigationProps) {
       setTargetTab(nextTab);
       setIsNavigating(true);
 
-      // Immediate navigation - no delay
+      // Immediate navigation
       router.push(nextTab.path);
 
+      // Quick cleanup
       setTimeout(() => {
         setTargetTab(null);
         setIsNavigating(false);
-      }, 150); // Faster fade out
+      }, 100); // Even faster
     } else if (offset.x > swipeThreshold && currentTabIndex > 0) {
       // Swiped right - go to previous tab
       const prevTab = tabs[currentTabIndex - 1];
       setTargetTab(prevTab);
       setIsNavigating(true);
 
-      // Immediate navigation - no delay
+      // Immediate navigation
       router.push(prevTab.path);
 
+      // Quick cleanup
       setTimeout(() => {
         setTargetTab(null);
         setIsNavigating(false);
-      }, 150); // Faster fade out
+      }, 100); // Even faster
     }
   };
 
@@ -167,7 +159,7 @@ export default function SwipeNavigation({ children }: SwipeNavigationProps) {
                 scale: targetTab && dragDirection === 'right' ? 1 : 0.85,
                 x: Math.max(-20, dragOffset * 0.3),
               }}
-              transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+              transition={{ duration: 0.15 }}
               className="fixed left-3 top-1/2 -translate-y-1/2 z-40 pointer-events-none"
             >
               <div className="bg-white/80 backdrop-blur-sm rounded-full p-2 shadow-lg border border-gray-200/50">
@@ -180,7 +172,7 @@ export default function SwipeNavigation({ children }: SwipeNavigationProps) {
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -5 }}
-                  transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+                  transition={{ duration: 0.15 }}
                   className="ml-2 bg-gray-900/95 backdrop-blur-md text-white px-3 py-2 rounded-full shadow-xl flex items-center gap-2 whitespace-nowrap border border-white/10"
                 >
                   {(() => {
@@ -201,7 +193,7 @@ export default function SwipeNavigation({ children }: SwipeNavigationProps) {
                 scale: targetTab && dragDirection === 'left' ? 1 : 0.85,
                 x: Math.min(20, dragOffset * 0.3),
               }}
-              transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+              transition={{ duration: 0.15 }}
               className="fixed right-3 top-1/2 -translate-y-1/2 z-40 pointer-events-none"
             >
               {targetTab && dragDirection === 'left' && (
@@ -209,7 +201,7 @@ export default function SwipeNavigation({ children }: SwipeNavigationProps) {
                   initial={{ opacity: 0, x: 10 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 5 }}
-                  transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+                  transition={{ duration: 0.15 }}
                   className="mr-2 bg-gray-900/95 backdrop-blur-md text-white px-3 py-2 rounded-full shadow-xl flex items-center gap-2 whitespace-nowrap border border-white/10"
                 >
                   {(() => {
@@ -233,10 +225,10 @@ export default function SwipeNavigation({ children }: SwipeNavigationProps) {
       <AnimatePresence>
         {currentTab && showCurrentTab && (
           <motion.div
-            initial={{ opacity: 0, y: -25, scale: 0.88 }}
+            initial={{ opacity: 0, y: -20, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -15, scale: 0.92 }}
-            transition={{ type: 'spring', stiffness: 380, damping: 24 }}
+            exit={{ opacity: 0, y: -10, scale: 0.95 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
             className="fixed top-20 left-1/2 -translate-x-1/2 z-40"
           >
             <div className="bg-gray-900/95 backdrop-blur-md rounded-full px-6 py-3 shadow-2xl flex items-center gap-2.5 border border-white/10">
@@ -255,6 +247,7 @@ export default function SwipeNavigation({ children }: SwipeNavigationProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            transition={{ duration: 0.1 }}
             className="fixed inset-0 bg-white/80 backdrop-blur-sm z-30 flex items-center justify-center"
           >
             <div className="flex flex-col items-center gap-3">
@@ -270,15 +263,10 @@ export default function SwipeNavigation({ children }: SwipeNavigationProps) {
         <motion.div
           key={pathname}
           ref={contentRef}
-          initial={{ opacity: 0, scale: 0.97, y: 15 }}
-          animate={{ opacity: pageReady ? 1 : 0, scale: pageReady ? 1 : 0.97, y: pageReady ? 0 : 15 }}
-          exit={{ opacity: 0, scale: 1.03, y: -15 }}
-          transition={{
-            type: 'spring',
-            stiffness: 320,
-            damping: 28,
-            opacity: { duration: 0.25 }
-          }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.12, ease: 'linear' }}
           className="min-h-screen"
         >
           {children}
