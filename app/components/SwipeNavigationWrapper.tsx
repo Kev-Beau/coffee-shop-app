@@ -10,9 +10,10 @@ export default function SwipeNavigationWrapper({
 }) {
   const pathname = usePathname();
   const isHomePage = pathname === '/';
+  const isLogPage = pathname === '/log';
 
-  // Don't show swipe navigation on the landing page
-  if (isHomePage) {
+  // Don't show swipe navigation on landing page or log page (log page has modal that needs scrolling)
+  if (isHomePage || isLogPage) {
     return <>{children}</>;
   }
 

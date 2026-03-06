@@ -145,41 +145,42 @@ export default function QuickLogModal({ isOpen, onClose }: QuickLogModalProps) {
 
   return (
     <>
-      {/* Scrollable container */}
-      <div className="fixed inset-0 z-50 overflow-y-auto">
-        {/* Backdrop */}
-        <div className="fixed inset-0 bg-black/50" onClick={onClose} />
+      {/* Backdrop */}
+      <div className="fixed inset-0 z-50 bg-black/50" onClick={onClose} />
 
-        {/* Modal */}
-        <div className="flex min-h-full items-end justify-center pb-20">
-          <div className="relative bg-white w-full max-w-lg rounded-t-3xl shadow-xl max-h-[calc(100vh-100px)] flex flex-col">
-            {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-gray-200 flex-shrink-0">
-              <div className="flex items-center gap-3">
-                <h2 className="text-xl font-bold text-gray-900">Quick Log</h2>
-                <button
-                  onClick={() => {
-                    onClose();
-                    setTimeout(() => router.push('/search'), 100);
-                  }}
-                  className="p-2 hover:bg-gray-100 rounded-full transition"
-                  title="Go to full search"
-                >
-                  <MagnifyingGlassIcon className="w-5 h-5 text-gray-600" />
-                </button>
-              </div>
+      {/* Modal */}
+      <div className="fixed inset-0 z-50 flex items-end justify-center pointer-events-none">
+        <div
+          className="relative bg-white w-full max-w-lg rounded-t-3xl shadow-xl max-h-[85vh] flex flex-col pointer-events-auto"
+          style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 20px)' }}
+        >
+          {/* Header */}
+          <div className="flex items-center justify-between p-4 border-b border-gray-200 flex-shrink-0">
+            <div className="flex items-center gap-3">
+              <h2 className="text-xl font-bold text-gray-900">Quick Log</h2>
               <button
-                onClick={onClose}
+                onClick={() => {
+                  onClose();
+                  setTimeout(() => router.push('/search'), 100);
+                }}
                 className="p-2 hover:bg-gray-100 rounded-full transition"
+                title="Go to full search"
               >
-                <XMarkIcon className="w-6 h-6 text-gray-600" />
+                <MagnifyingGlassIcon className="w-5 h-5 text-gray-600" />
               </button>
             </div>
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-gray-100 rounded-full transition"
+            >
+              <XMarkIcon className="w-6 h-6 text-gray-600" />
+            </button>
+          </div>
 
-            {/* Content Area - scrollable */}
-            <div className="overflow-y-auto flex-1" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 100px)' }}>
-              {/* Search Bar */}
-              <div className="p-4 pb-2">
+          {/* Content Area - scrollable */}
+          <div className="overflow-y-auto flex-1 p-4">
+            {/* Search Bar */}
+            <div className="pb-2">
               <div className="relative">
                 <MagnifyingGlassIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400 pointer-events-none" />
                 <input
@@ -205,7 +206,7 @@ export default function QuickLogModal({ isOpen, onClose }: QuickLogModalProps) {
 
             {/* Search Results */}
             {searchQuery && (
-              <div className="p-4 pt-2">
+              <div className="pt-2">
                 {searchLoading ? (
                   <div className="text-center py-8">
                     <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-3" />
@@ -249,7 +250,7 @@ export default function QuickLogModal({ isOpen, onClose }: QuickLogModalProps) {
 
             {/* Recent Shops */}
             {!searchQuery && (
-              <div className="p-4 pt-2">
+              <div className="pt-2">
                 {loading ? (
                   <div className="text-center py-8">
                     <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-3" />
@@ -280,7 +281,6 @@ export default function QuickLogModal({ isOpen, onClose }: QuickLogModalProps) {
                 )}
               </div>
             )}
-            </div>
           </div>
         </div>
       </div>
