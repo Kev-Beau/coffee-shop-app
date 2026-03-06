@@ -45,6 +45,7 @@ export default function SwipeNavigation({ children }: SwipeNavigationProps) {
   const [dragOffset, setDragOffset] = useState(0);
   const [dragDirection, setDragDirection] = useState<'left' | 'right' | null>(null);
   const [isNavigating, setIsNavigating] = useState(false);
+  const [showLoadingOverlay, setShowLoadingOverlay] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
 
   // Find current tab index
@@ -59,6 +60,14 @@ export default function SwipeNavigation({ children }: SwipeNavigationProps) {
       setCurrentTabIndex(index);
     }
   }, [pathname]);
+
+  // Prefetch all tab routes for faster navigation
+  useEffect(() => {
+    // Prefetch all tabs so they're ready when user swipes
+    tabs.forEach(tab => {
+      router.prefetch(tab.path);
+    });
+  }, []);
 
   // Hide current tab indicator after 2 seconds
   useEffect(() => {
@@ -82,28 +91,42 @@ export default function SwipeNavigation({ children }: SwipeNavigationProps) {
       setTargetTab(nextTab);
       setIsNavigating(true);
 
+      // Show loading overlay only if navigation takes >150ms
+      const loadingTimeout = setTimeout(() => {
+        setShowLoadingOverlay(true);
+      }, 150);
+
       // Immediate navigation
       router.push(nextTab.path);
 
-      // Quick cleanup
+      // Cleanup
       setTimeout(() => {
+        clearTimeout(loadingTimeout);
         setTargetTab(null);
         setIsNavigating(false);
-      }, 100); // Even faster
+        setShowLoadingOverlay(false);
+      }, 200);
     } else if (offset.x > swipeThreshold && currentTabIndex > 0) {
       // Swiped right - go to previous tab
       const prevTab = tabs[currentTabIndex - 1];
       setTargetTab(prevTab);
       setIsNavigating(true);
 
+      // Show loading overlay only if navigation takes >150ms
+      const loadingTimeout = setTimeout(() => {
+        setShowLoadingOverlay(true);
+      }, 150);
+
       // Immediate navigation
       router.push(prevTab.path);
 
-      // Quick cleanup
+      // Cleanup
       setTimeout(() => {
+        clearTimeout(loadingTimeout);
         setTargetTab(null);
         setIsNavigating(false);
-      }, 100); // Even faster
+        setShowLoadingOverlay(false);
+      }, 200);
     }
   };
 
@@ -240,9 +263,9 @@ export default function SwipeNavigation({ children }: SwipeNavigationProps) {
       </AnimatePresence>
 
 
-      {/* Loading overlay during navigation */}
+      {/* Loading overlay during navigation (only shows if slow) */}
       <AnimatePresence>
-        {isNavigating && (
+        {showLoadingOverlay && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
