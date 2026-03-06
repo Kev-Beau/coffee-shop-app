@@ -83,7 +83,7 @@ export default function SwipeNavigation({ children }: SwipeNavigationProps) {
   const CurrentIcon = currentTab?.solidIcon || currentTab?.icon;
 
   const handleDragEnd = async (event: any, info: PanInfo) => {
-    const swipeThreshold = 100;
+    const swipeThreshold = 65; // Reduced from 100 for easier triggering
     const { offset } = info;
 
     if (offset.x < -swipeThreshold && currentTabIndex < tabs.length - 1) {
@@ -92,34 +92,33 @@ export default function SwipeNavigation({ children }: SwipeNavigationProps) {
       setTargetTab(nextTab);
       setIsNavigating(true);
 
-      // Small delay for smooth animation
-      await new Promise(resolve => setTimeout(resolve, 150));
+      // Immediate navigation - no delay
       router.push(nextTab.path);
 
       setTimeout(() => {
         setTargetTab(null);
         setIsNavigating(false);
-      }, 300);
+      }, 150); // Faster fade out
     } else if (offset.x > swipeThreshold && currentTabIndex > 0) {
       // Swiped right - go to previous tab
       const prevTab = tabs[currentTabIndex - 1];
       setTargetTab(prevTab);
       setIsNavigating(true);
 
-      await new Promise(resolve => setTimeout(resolve, 150));
+      // Immediate navigation - no delay
       router.push(prevTab.path);
 
       setTimeout(() => {
         setTargetTab(null);
         setIsNavigating(false);
-      }, 300);
+      }, 150); // Faster fade out
     }
   };
 
   const handleDrag = (event: any, info: PanInfo) => {
     if (isNavigating) return;
 
-    const dragThreshold = 50;
+    const dragThreshold = 35; // Reduced from 50 to show hints earlier
 
     // Track drag offset and direction
     setDragOffset(info.offset.x);
@@ -157,83 +156,77 @@ export default function SwipeNavigation({ children }: SwipeNavigationProps) {
       className="relative min-h-screen"
       style={{ touchAction: 'pan-y' }}
     >
-      {/* Swipe hint arrows with navigation indicators */}
+      {/* Permanent swipe hint indicators */}
       <AnimatePresence>
-        {targetTab && (
-          <>
-            {/* Left side - swiping right to previous tab */}
-            {currentTabIndex > 0 && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.85, x: -40 }}
-                animate={{
-                  opacity: targetTab && dragDirection === 'right' ? 1 : 0.5,
-                  scale: targetTab && dragDirection === 'right' ? 1 : 0.92,
-                  x: Math.max(-40, dragOffset * 0.25),
-                }}
-                exit={{ opacity: 0, scale: 0.8, x: -40 }}
-                transition={{ type: 'spring', stiffness: 260, damping: 22 }}
-                className="fixed left-4 top-1/2 -translate-y-1/2 z-50 pointer-events-none flex items-center gap-2"
-              >
-                <div className="bg-gray-900/95 backdrop-blur-md rounded-full p-3.5 shadow-2xl border border-white/10">
-                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
-                  </svg>
-                </div>
-                {targetTab && dragDirection === 'right' && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.85, x: -15 }}
-                    animate={{ opacity: 1, scale: 1, x: 0 }}
-                    exit={{ opacity: 0, scale: 0.9, x: -10 }}
-                    transition={{ type: 'spring', stiffness: 380, damping: 22 }}
-                    className="bg-gray-900/95 backdrop-blur-md text-white px-4 py-2.5 rounded-full shadow-2xl flex items-center gap-2.5 whitespace-nowrap border border-white/10"
-                  >
-                    {(() => {
-                      const Icon = targetIcon;
-                      return Icon && <Icon className="w-4.5 h-4.5" />;
-                    })()}
-                    <span className="text-sm font-semibold tracking-tight">{targetTab.label}</span>
-                  </motion.div>
-                )}
-              </motion.div>
-            )}
+        <>
+          {/* Left side - swiping right to previous tab */}
+          {currentTabIndex > 0 && (
+            <motion.div
+              animate={{
+                opacity: targetTab && dragDirection === 'right' ? 1 : 0.3,
+                scale: targetTab && dragDirection === 'right' ? 1 : 0.85,
+                x: Math.max(-20, dragOffset * 0.3),
+              }}
+              transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+              className="fixed left-3 top-1/2 -translate-y-1/2 z-40 pointer-events-none"
+            >
+              <div className="bg-white/80 backdrop-blur-sm rounded-full p-2 shadow-lg border border-gray-200/50">
+                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+                </svg>
+              </div>
+              {targetTab && dragDirection === 'right' && (
+                <motion.div
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -5 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+                  className="ml-2 bg-gray-900/95 backdrop-blur-md text-white px-3 py-2 rounded-full shadow-xl flex items-center gap-2 whitespace-nowrap border border-white/10"
+                >
+                  {(() => {
+                    const Icon = targetIcon;
+                    return Icon && <Icon className="w-4 h-4" />;
+                  })()}
+                  <span className="text-xs font-semibold">{targetTab.label}</span>
+                </motion.div>
+              )}
+            </motion.div>
+          )}
 
-            {/* Right side - swiping left to next tab */}
-            {currentTabIndex < tabs.length - 1 && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.85, x: 40 }}
-                animate={{
-                  opacity: targetTab && dragDirection === 'left' ? 1 : 0.5,
-                  scale: targetTab && dragDirection === 'left' ? 1 : 0.92,
-                  x: Math.min(40, dragOffset * 0.25),
-                }}
-                exit={{ opacity: 0, scale: 0.8, x: 40 }}
-                transition={{ type: 'spring', stiffness: 260, damping: 22 }}
-                className="fixed right-4 top-1/2 -translate-y-1/2 z-50 pointer-events-none flex items-center gap-2"
-              >
-                {targetTab && dragDirection === 'left' && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.85, x: 15 }}
-                    animate={{ opacity: 1, scale: 1, x: 0 }}
-                    exit={{ opacity: 0, scale: 0.9, x: 10 }}
-                    transition={{ type: 'spring', stiffness: 380, damping: 22 }}
-                    className="bg-gray-900/95 backdrop-blur-md text-white px-4 py-2.5 rounded-full shadow-2xl flex items-center gap-2.5 whitespace-nowrap border border-white/10"
-                  >
-                    {(() => {
-                      const Icon = targetIcon;
-                      return Icon && <Icon className="w-4.5 h-4.5" />;
-                    })()}
-                    <span className="text-sm font-semibold tracking-tight">{targetTab.label}</span>
-                  </motion.div>
-                )}
-                <div className="bg-gray-900/95 backdrop-blur-md rounded-full p-3.5 shadow-2xl border border-white/10">
-                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
-                  </svg>
-                </div>
-              </motion.div>
-            )}
-          </>
-        )}
+          {/* Right side - swiping left to next tab */}
+          {currentTabIndex < tabs.length - 1 && (
+            <motion.div
+              animate={{
+                opacity: targetTab && dragDirection === 'left' ? 1 : 0.3,
+                scale: targetTab && dragDirection === 'left' ? 1 : 0.85,
+                x: Math.min(20, dragOffset * 0.3),
+              }}
+              transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+              className="fixed right-3 top-1/2 -translate-y-1/2 z-40 pointer-events-none"
+            >
+              {targetTab && dragDirection === 'left' && (
+                <motion.div
+                  initial={{ opacity: 0, x: 10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 5 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+                  className="mr-2 bg-gray-900/95 backdrop-blur-md text-white px-3 py-2 rounded-full shadow-xl flex items-center gap-2 whitespace-nowrap border border-white/10"
+                >
+                  {(() => {
+                    const Icon = targetIcon;
+                    return Icon && <Icon className="w-4 h-4" />;
+                  })()}
+                  <span className="text-xs font-semibold">{targetTab.label}</span>
+                </motion.div>
+              )}
+              <div className="bg-white/80 backdrop-blur-sm rounded-full p-2 shadow-lg border border-gray-200/50">
+                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+            </motion.div>
+          )}
+        </>
       </AnimatePresence>
 
       {/* Current tab indicator (top center) - auto-hides after 2 seconds */}
